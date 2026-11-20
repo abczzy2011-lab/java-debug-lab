@@ -256,7 +256,7 @@ function renderHeader() {
   }
   const foot = $('#jv-foot-left');
   if (foot) {
-    if (ready && !state.forceSearch) foot.textContent = state.activeSource === 'cloud' ? '混合模型 · 云端 + 本地兜底' : '混合模型 · 本地运行';
+    if (ready && !state.forceSearch) foot.textContent = state.activeSource === 'cloud' ? '混合模型 · 云端 + 本地兜底' : '混合模型 · 本地兜底';
     else foot.textContent = '仅依据本站课程 · 检索模式';
   }
 }
@@ -775,29 +775,16 @@ async function submit(prefill) {
         }
       }
       if (!answered) {
-        ai.meta = '混合模型 · 本地 · 正在回答…';
+        // 0.5B 本地模型在课程事实上容易答错；云端不可用时先用站内检索草稿兜底，
+        // 保证“本地”路径仍然能给出可核对的课程内容，而不是把错误生成当作答案。
+        ai.meta = '混合模型 · 本地 · 检索兜底';
         renderChat();
-        try {
-          if (state.localFault) throw new Error('LOCAL_FAULT');
-          const assistant = await ensureAssistant();
-          const contextBlock = `<context>\n${ctx.context}\n\n<playbook>\n${PLAYBOOK}\n</playbook>\n</context>`;
-          const userContent = `${contextBlock}\n\n用户问题：${q}\n\n参考草稿（只允许使用其中事实和编号，可改写得更口语）：\n${ctx.draft}\n\n请现在回答。`;
-          const msgs = [{ role: 'system', content: SYSTEM_PROMPT }, ...state.history.slice(-4), { role: 'user', content: userContent }];
-          const answer = await assistant.ask(msgs, { onToken: tok => {
-            ai.text += tok; ai.meta = '混合模型 · 本地 · 生成中'; renderChat();
-          } });
-          ai.streaming = false; ai.meta = '混合模型 · 本地生成';
-          ai.text = (answer || ai.text || '').trim();
-          if (!ai.text || ai.text.length < 8) throw new Error('EMPTY_MODEL_ANSWER');
-          if (!/[PCS]\d+/.test(ai.text)) ai.text += `\n\n参考：${ctx.draft.slice(-80)}`;
-          state.activeSource = 'local'; state.localFault = false;
-          state.history.push({ role: 'user', content: q }, { role: 'assistant', content: ai.text.slice(0, 1000) });
-        } catch (e) {
-          ai.streaming = false; ai.meta = '本地模型不可用 · 已切到检索';
-          ai.text = ctx.draft; state.localFault = true;
-          state.gateError = String(e?.message || e);
-          state.activeSource = state.cloudReady ? 'cloud' : 'local';
-        }
+        await new Promise(r => setTimeout(r, 220));
+        ai.text = ctx.draft;
+        ai.streaming = false;
+        ai.meta = '混合模型 · 本地检索兜底';
+        state.activeSource = 'local'; state.localFault = false;
+        state.history.push({ role: 'user', content: q }, { role: 'assistant', content: ai.text.slice(0, 1000) });
       }
     } else {
       await new Promise(r => setTimeout(r, 240));

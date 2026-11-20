@@ -4,7 +4,7 @@
 export const MODEL_ID = 'Qwen2.5-0.5B-Instruct-q4f16_1-MLC';
 export const WEBLLM_VERSION = '0.2.79'; // pinned; verify against registry at ship time
 export const GEN = { temperature: 0.2, top_p: 0.9, max_tokens: 256, repetition_penalty: 1.05 };
-export const LOAD_TIMEOUT_MS = 60000;
+export const LOAD_TIMEOUT_MS = 15 * 60 * 1000; // 280MB 模型在慢网/国内网络下需要更长的下载窗口
 export const WARMUP_TIMEOUT_MS = 30000;
 export const FIRST_TOKEN_TIMEOUT_MS = 30000;
 
