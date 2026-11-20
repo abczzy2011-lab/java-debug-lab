@@ -27,7 +27,7 @@ const state = {
   corpus: null, index: null, studyMap: null, catalog: null, stats: null,
   corpusPromise: null, loadingCorpus: false, docById: null,
   gate: null, gateRunning: false, gateError: null,
-  downloading: false, downloadProgress: 0, downloadStatus: '',
+  downloading: false, downloadProgress: 0, downloadStatus: '', downloadAttempted: false,
   modelReady: false, assistant: null,
   activeSource: 'local', cloudReady: false, cloudChecking: false, localFault: false,
   messages: [], history: [], busy: false, chatStarted: false,
@@ -329,7 +329,8 @@ function renderGate() {
     return;
   }
   if (!state.modelReady) {
-    const failed = state.gateError ? `<div class="jv-error">${esc(friendlyDownloadError(state.gateError))}</div>` : '';
+    if (state.chatStarted) { gateBox.innerHTML = ''; chatBox.hidden = false; return; }
+    const failed = state.gateError && state.downloadAttempted ? `<div class="jv-error">${esc(friendlyDownloadError(state.gateError))}</div>` : '';
     gateBox.innerHTML = `<div class="jv-intro">
       <div class="jv-kicker">性能通过 / 需要一次下载</div>
       <div class="jv-lead">这台设备可以运行 Javis。</div>
@@ -449,7 +450,7 @@ async function runGate() {
 async function startDownload() {
   if (state.downloading) return;
   if (!state.gate?.ok || state.modelReady) return;
-  state.downloading = true; state.gateError = null; state.downloadProgress = 0; state.downloadStatus = '正在启动模型下载…';
+  state.downloading = true; state.downloadAttempted = true; state.gateError = null; state.downloadProgress = 0; state.downloadStatus = '正在启动模型下载…';
   renderAll();
   try {
     if (!state.assistant) state.assistant = createAssistant();
@@ -694,9 +695,10 @@ function renderChat() {
 
 function renderChatBanner() {
   if (state.downloading) return `<div class="jv-gate-card" style="margin:4px 0 2px"><div class="jv-gate-title"><span class="jv-dot ok"></span>正在下载本地模型 · ${Math.round(state.downloadProgress * 100)}%</div><div class="jv-bar"><i style="width:${Math.max(2, Math.round(state.downloadProgress * 100))}%"></i></div><div class="jv-small">${esc(state.downloadStatus || '正在获取模型权重…')}</div></div>`;
+  if (state.downloadAttempted && state.gateError) return `<div class="jv-gate-card" style="margin:4px 0 2px"><div class="jv-gate-title"><span class="jv-dot bad"></span>本地模型没有加载成功</div><div class="jv-small">${esc(friendlyDownloadError(state.gateError))} 下载完成前，云端模型仍保持锁定。</div><div class="jv-actions"><button class="jv-btn primary" data-jv-action="download" type="button">重新下载并解锁混合模型</button><button class="jv-btn ghost" data-jv-action="search" type="button">仅使用检索</button></div></div>`;
   if (!state.gate?.ok || state.modelReady) return '';
   if (state.forceSearch) return `<div class="jv-gate-card" style="margin:4px 0 2px"><div class="jv-gate-title"><span class="jv-dot ok"></span>已切到仅检索</div><div class="jv-small">本机性能达标；需先完整下载约 280MB 本地模型，云端模型才会解锁。</div><div class="jv-actions"><button class="jv-btn primary" data-jv-action="download" type="button">下载并解锁混合模型</button></div></div>`;
-  return `<div class="jv-gate-card" style="margin:4px 0 2px"><div class="jv-gate-title"><span class="jv-dot ok"></span>本机性能达标</div><div class="jv-small">按规则，必须先完整下载约 280MB 的本地模型，才能解锁云端模型并启用“混合模型”。下载前也可以先用检索。</div><div class="jv-actions"><button class="jv-btn primary" data-jv-action="download" type="button">下载并启用 Javis</button><button class="jv-btn ghost" data-jv-action="search" type="button">仅使用检索</button></div></div>`;
+  return `<div class="jv-gate-card" style="margin:4px 0 2px"><div class="jv-gate-title"><span class="jv-dot ok"></span>本机性能达标</div><div class="jv-small">按规则，必须先完整下载约 280MB 的本地模型，才能解锁云端模型并启用“混合模型”。下载前也可以先用检索。</div><div class="jv-actions"><button class="jv-btn primary" data-jv-action="download" type="button">下载并解锁混合模型</button><button class="jv-btn ghost" data-jv-action="search" type="button">仅使用检索</button></div></div>`;
 }
 
 function renderQuick() {
