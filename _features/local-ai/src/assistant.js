@@ -37,7 +37,7 @@ export const FIRST_TOKEN_TIMEOUT_MS = 60000;
 export const WEBLLM_APP_CONFIG = {
   model_list: [
     {
-      model: `${MODEL_PROXY_BASE}/qwen15`,
+      model: `${MODEL_PROXY_BASE}/qwen15/resolve/main/`,
       model_id: 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC',
       model_lib: 'https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/Qwen2-1.5B-Instruct-q4f16_1-ctx4k_cs1k-webgpu.wasm',
       low_resource_required: true,
@@ -45,7 +45,7 @@ export const WEBLLM_APP_CONFIG = {
       overrides: { context_window_size: 4096 },
     },
     {
-      model: `${MODEL_PROXY_BASE}/qwen3`,
+      model: `${MODEL_PROXY_BASE}/qwen3/resolve/main/`,
       model_id: 'Qwen2.5-3B-Instruct-q4f16_1-MLC',
       model_lib: 'https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/Qwen2.5-3B-Instruct-q4f16_1-ctx4k_cs1k-webgpu.wasm',
       low_resource_required: true,
