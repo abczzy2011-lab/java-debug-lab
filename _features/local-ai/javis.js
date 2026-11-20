@@ -878,6 +878,12 @@ function renderChat() {
   if (!chatBox) return;
   if (!state.chatStarted) { msgBox.innerHTML = ''; return; }
   const banner = renderChatBanner();
+  const welcome = state.messages.length ? '' : `<div class="jv-welcome">
+    <div class="jv-welcome-kicker">JAVIS / READY</div>
+    <div class="jv-welcome-title">晚上好，我是 Javis。</div>
+    <div class="jv-welcome-copy">整站课程、练习和 Java API 文档都在这里。可以直接问课程内容，也可以让我帮你定位错题背后的知识点。</div>
+    <div class="jv-welcome-tags"><span>站内检索</span><span>本地 1.5B / 3B</span><span>引用可点</span></div>
+  </div>`;
   const html = state.messages.map(m => {
     const resolve = state.resolveByMsg[m.id] || {};
     const content = m.role === 'user' ? esc(m.text).replace(/\n/g, '<br>') : formatText(m.text || '', resolve);
@@ -887,7 +893,7 @@ function renderChat() {
     const cursor = m.role === 'ai' && m.streaming && m.text ? '<span class="jv-stream-cursor"></span>' : '';
     return `<div class="jv-msg ${m.role === 'user' ? 'user' : 'ai'}">${m.role === 'ai' && m.meta === '正在检索…' ? '' : ''}<div class="jv-bubble">${content}${typing}${cursor}</div>${meta}${source}</div>`;
   }).join('');
-  msgBox.innerHTML = banner + html;
+  msgBox.innerHTML = banner + welcome + html;
   const body = $('#jv-body'); if (body) body.scrollTop = body.scrollHeight;
 }
 
@@ -1146,3 +1152,5 @@ try {
 
 // 部署后如果页面在后台打开，先不下载 14MB 资料；等第一次打开窗口或第一次提问时再加载。
 if (state.panelOpen) ensureCorpus().catch(() => {});
+
+// orbit-effects v=20261121

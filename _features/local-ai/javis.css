@@ -258,6 +258,27 @@
 .jv-error{font-size:11.5px;color:#FFB3AD;line-height:1.6;background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.18);border-radius:9px;padding:8px 9px}
 .jv-inline-link{background:none;border:0;color:#A3E635;font:inherit;font-size:11.5px;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px}
 
+.jv-welcome{
+  position:relative;overflow:hidden;margin:8px 2px 6px;padding:18px 16px 16px;border-radius:16px;
+  border:1px solid rgba(163,230,53,.16);
+  background:
+    radial-gradient(420px 220px at 100% -20%,rgba(88,166,255,.16),transparent 62%),
+    radial-gradient(280px 180px at -10% 110%,rgba(163,230,53,.12),transparent 70%),
+    rgba(255,255,255,.035);
+  box-shadow:0 14px 40px rgba(0,0,0,.18),0 0 0 1px rgba(255,255,255,.025) inset;
+  animation:jv-welcome-in .36s cubic-bezier(.16,1,.3,1) both;
+}
+.jv-welcome::after{
+  content:"";position:absolute;right:-36px;top:-48px;width:140px;height:140px;border-radius:50%;
+  background:conic-gradient(from 180deg,rgba(163,230,53,.32),rgba(88,166,255,.24),rgba(210,168,255,.24),rgba(163,230,53,.32));
+  filter:blur(26px);opacity:.35;pointer-events:none;
+}
+.jv-welcome-kicker{font-size:9.5px;font-weight:850;letter-spacing:.18em;color:#A3E635;position:relative;z-index:1}
+.jv-welcome-title{margin-top:8px;font-size:19px;line-height:1.35;font-weight:760;letter-spacing:-.02em;color:#EDF4EA;position:relative;z-index:1}
+.jv-welcome-copy{margin-top:8px;font-size:12px;line-height:1.8;color:#AEB9C4;position:relative;z-index:1;max-width:32em}
+.jv-welcome-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px;position:relative;z-index:1}
+.jv-welcome-tags span{font-size:9.5px;font-weight:650;color:#C7D2DB;border:1px solid rgba(255,255,255,.10);border-radius:999px;padding:3px 8px;background:rgba(255,255,255,.045)}
+@keyframes jv-welcome-in{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
 .jv-chat{padding:14px 14px 4px;display:flex;flex-direction:column;gap:12px}
 .jv-msg{display:flex;flex-direction:column;gap:4px;max-width:94%;animation:jv-msg .18s ease both}
 @keyframes jv-msg{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
@@ -318,8 +339,10 @@
   .jv-chat{padding:12px 10px 4px}
 }
 @media (prefers-reduced-motion:reduce){
-  .jv-panel,.jv-panel.is-opening,.jv-msg,.jv-orb,.jv-orb.is-summoning,.jv-orb.is-activating{animation:none}
+  .jv-panel,.jv-panel.is-opening,.jv-msg,.jv-welcome,.jv-orb,.jv-orb.is-summoning,.jv-orb.is-activating{animation:none}
   .jv-orb::before,.jv-orb-halo,.jv-orb-dot,.jv-typing i,.jv-stream-cursor,.jv-act-ring,.jv-act-core,.jv-act-flash,.jv-act-spark,.jv-act-beam{animation:none}
   .jv-activation{display:none!important}
   .jv-orb-label{transition:none}
 }
+
+/* orbit-effects v=20261121 */
