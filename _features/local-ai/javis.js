@@ -706,6 +706,23 @@ function canonicalComparison(cmp) {
   return '';
 }
 
+function canonicalConcept(question) {
+  const n = normalizeText(question);
+  const hasPoly = n.includes('多态');
+  const hasOver = n.includes('重载');
+  const hasRide = n.includes('重写') || n.includes('覆盖');
+  if (hasPoly && !hasOver && !hasRide) {
+    return `多态：父类或接口引用在运行期按实际对象类型调用被重写的方法。成立的三个条件：有继承或实现关系；子类重写了父类的方法；通过父类或接口引用调用。重写提供运行期分派；重载是编译期按参数列表选择方法，重载不是多态的一种。`;
+  }
+  if (hasOver && !hasPoly && !hasRide) {
+    return `重载：同一个类里方法名相同、参数列表不同，编译器在编译期按参数的个数和类型选择调用哪个方法。重载与返回值无关，也不是多态的一种；重写才是父子类之间同签名覆盖，并在运行期按实际对象类型分派。`;
+  }
+  if (hasRide && !hasPoly && !hasOver) {
+    return `重写：子类提供与父类同签名的方法实现，方法名和参数列表都相同；调用时在运行期按实际对象类型分派到子类实现。重写是运行时多态成立的条件之一，但重写本身不等于多态；重载是编译期按参数列表选择，二者不同。`;
+  }
+  return '';
+}
+
 function comparisonDraft(base, question, passages) {
   const cmp = compareParts(question);
   if (cmp.length < 2) return base;
@@ -732,15 +749,15 @@ function comparisonDraft(base, question, passages) {
 }
 
 function validateLocalAnswer(text, ctx) {
-  if (!ctx || !ctx.compare) return true;
   const raw = String(text || '');
+  // 明确错误：无论问的是对比题还是单个概念，都不能放过。
+  if (/多态[^。！？]{0,24}参数列表/.test(raw)) return false;
+  if (/重载[^。！？]{0,12}(就是|是|通过|靠|由)[^。！？]{0,12}(重写|覆盖)/.test(raw)) return false;
+  if (/重载[^。！？]{0,10}(运行期|运行时)/.test(raw)) return false;
+  if (/重写[^。！？]{0,10}(编译期|编译时)/.test(raw)) return false;
+  if (!ctx || !ctx.compare) return true;
   const n = normalizeText(raw);
   if (!n.includes('编译期') || !n.includes('运行期')) return false;
-  if (/多态[^。！？]{0,24}参数列表/.test(raw)) return false;
-  // 只拦截“重载就是/是通过重写实现的”这类明确错误；不能因为答案开头写“重载和重写的区别”就误杀。
-  if (/重载[^。！？]{0,12}(就是|是|通过|靠|由)[^。！？]{0,12}(重写|覆盖)/.test(raw)) return false;
-  if (/重载[^。！？]{0,10}运行期/.test(raw)) return false;
-  if (/重写[^。！？]{0,10}编译期/.test(raw)) return false;
   return true;
 }
 
@@ -781,9 +798,11 @@ function makeContext(question) {
     }
     parts.push(...passages);
   }
-  const draft = comparisonDraft(composeDraft(question, intent, { hits, catalogDoc, passages, resolve }), question, passages);
+  let draft = comparisonDraft(composeDraft(question, intent, { hits, catalogDoc, passages, resolve }), question, passages);
   const cmp = compareParts(question);
-  return { intent, hits, catalogDoc, passages, resolve, compare: cmp.length >= 2, context: parts.join('\n\n'), draft, question };
+  const concept = cmp.length >= 2 ? '' : canonicalConcept(question);
+  if (concept) draft = concept;
+  return { intent, hits, catalogDoc, passages, resolve, compare: cmp.length >= 2, concept: !!concept, context: parts.join('\n\n'), draft, question };
 }
 
 function composeDraft(question, intent, { hits, catalogDoc, passages, resolve }) {
@@ -892,6 +911,10 @@ function sourceHint(ctx) {
 
 function mergeLocalAnswer(text, draft) {
   const raw = String(draft || '');
+  // 标准答案已经完整，不再追加检索摘要，避免同一段话重复两遍。
+  if (raw.startsWith('重载（Overload）') || raw.startsWith('多态和重载不是一回事') || raw.startsWith('重写是多态成立的条件之一') || raw.startsWith('多态：') || raw.startsWith('重载：') || raw.startsWith('重写：')) {
+    return text;
+  }
   const diff = raw.match(/差异：([^\n]+)/);
   const excerpt = diff ? diff[1].trim() : raw.replace(/\s+/g, ' ').trim().slice(0, 180);
   if (!excerpt) return text;
@@ -982,7 +1005,7 @@ async function submit(prefill) {
         if (clean.length >= 24 && validateLocalAnswer(clean, ctx)) {
           ai.text = mergeLocalAnswer(clean, ctx.draft);
           ai.meta = `混合模型 · 本地 ${modelLabel()} + 检索`;
-        } else if (ctx.compare && ctx.draft) {
+        } else if ((ctx.compare || ctx.concept) && ctx.draft) {
           ai.text = String(ctx.draft).replace(/\n\n回答要求：[\s\S]*$/, '');
           ai.meta = `混合模型 · 本地 ${modelLabel()} + 检索 · 已按课件校正`;
         } else {
