@@ -21,7 +21,7 @@ export async function checkHealth({ fetchImpl = fetch, timeout = 2500, base = ''
  * Ask the hybrid cloud. Returns {ok, answer, citations, fromCache, degraded, error}.
  * Never exposes provider names/errors to caller; HYBRID_BUSY maps to degraded:true.
  */
-export async function askCloud({ question, siteCard, courseCard = '', passages = [],
+export async function askCloud({ question, siteCard, courseCard = '', passages = [], draft = '',
   fetchImpl = fetch, timeout = 15000, base = '' } = {}) {
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(), timeout);
@@ -30,7 +30,7 @@ export async function askCloud({ question, siteCard, courseCard = '', passages =
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       signal: ctl.signal,
-      body: JSON.stringify({ question, siteCard, courseCard, passages }),
+      body: JSON.stringify({ question, siteCard, courseCard, passages, draft }),
     });
     if (res.status === 429 || res.status === 503) {
       return { ok: false, degraded: true, error: 'HYBRID_BUSY' };

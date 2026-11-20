@@ -760,10 +760,12 @@ async function submit(prefill) {
           siteCard: siteCard(state.studyMap),
           courseCard: ctx.catalogDoc ? courseCard(ctx.catalogDoc, ctx.hits[0]?.sectionIndex ?? -1) : '',
           passages: ctx.passages,
+          draft: ctx.draft,
           base: CLOUD_BASE,
           timeout: 15000,
         });
-        if (cloud.ok && cloud.answer && cloud.answer.trim()) {
+        const cleanCloud = (cloud.answer || '').replace(/\[[PCS]\d+\]/g, '').trim();
+        if (cloud.ok && cleanCloud.length >= 12) {
           ai.text = cloud.answer.trim(); ai.streaming = false; ai.meta = '混合模型 · 云端生成';
           state.activeSource = 'cloud'; answered = true; state.localFault = false;
           if (!/[PCS]\d+/.test(ai.text)) ai.text += `\n\n参考：${ctx.draft.slice(-90)}`;
