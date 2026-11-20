@@ -692,9 +692,26 @@ function passageBrief(passage, term) {
   return [match, ...sentences.filter(s => s !== match)].filter(Boolean).slice(0, 2).join('。').slice(0, 300);
 }
 
+function canonicalComparison(cmp) {
+  const has = t => cmp.some(x => x.includes(t));
+  if (has('重载') && has('重写')) {
+    return `重载（Overload）和重写（Override）解决的是两件不同的事。\n\n重载发生在同一个类里：方法名相同、参数列表不同，编译器在编译期按参数的个数和类型决定调用哪个方法。重写发生在父子类之间：方法名和参数列表都相同，子类覆盖父类的实现，运行时按实际对象类型分派到子类的方法。\n\n重载不是多态的一种；重写是运行时多态成立的条件之一。`;
+  }
+  if (has('多态') && has('重载')) {
+    return `多态和重载不是一回事。\n\n多态是父类或接口引用在运行期按实际对象类型调用被重写的方法，关键是“运行时看实际对象”。重载是同一个类里同名方法因参数列表不同而在编译期选择，关键是“编译期看参数”。\n\n重载不是多态的一种；把重载说成多态是常见混淆。`;
+  }
+  if (has('多态') && has('重写')) {
+    return `重写是多态成立的条件之一，但两者不能画等号。\n\n重写是子类提供与父类同签名的方法实现，发生在运行期按实际对象类型分派；多态是父类或接口引用在运行期调用到实际对象的重写方法，是一种调用效果。\n\n先有重写，才谈得上运行时多态。`;
+  }
+  return '';
+}
+
 function comparisonDraft(base, question, passages) {
   const cmp = compareParts(question);
-  if (cmp.length < 2 || !passages.length) return base;
+  if (cmp.length < 2) return base;
+  const canonical = canonicalComparison(cmp);
+  if (canonical) return canonical;
+  if (!passages.length) return base;
   const forTerm = (term) => passages.find(p => {
     const title = p.split('\n')[1] || '';
     return normalizeText(title).includes(term);
@@ -702,18 +719,28 @@ function comparisonDraft(base, question, passages) {
   const a = passageBrief(forTerm(cmp[0]) || passages[0], cmp[0]);
   const b = passageBrief(forTerm(cmp[1]) || passages[1], cmp[1]);
   if (!a || !b) return base;
-  const timing = (cmp[0].includes('多态') && cmp[1].includes('重载'))
-    ? `\n差异：重载在编译期按实参类型和个数选择方法；多态在运行期按实际对象类型分派。重载不是多态的一种。`
-    : '';
+  const has = t => cmp.some(x => x.includes(t));
+  let timing = '';
+  if (has('多态') && has('重载')) {
+    timing = `\n差异：重载在编译期按实参类型和个数选择方法；多态在运行期按实际对象类型分派。重载不是多态的一种。`;
+  } else if (has('重载') && has('重写')) {
+    timing = `\n差异：重载在编译期按参数列表选择方法；重写在运行期按实际对象类型分派；重载不是重写，重写也不是重载。`;
+  } else if (has('多态') && has('重写')) {
+    timing = `\n差异：重写是子类覆盖父类同签名方法，多态是父类/接口引用在运行期按实际对象类型调用被重写的方法；重写是多态成立的条件之一。`;
+  }
   return `对比题：${cmp[0]} vs ${cmp[1]}\n${cmp[0]}：${a}\n${cmp[1]}：${b}${timing}\n\n回答要求：先分别定义 ${cmp[0]} 和 ${cmp[1]}，再说明各自发生的时机和规则差异；不要编造，不要引用草稿外的编号。`;
 }
 
 function validateLocalAnswer(text, ctx) {
   if (!ctx || !ctx.compare) return true;
   const raw = String(text || '');
-  if (!normalizeText(raw).includes('编译期') || !normalizeText(raw).includes('运行期')) return false;
+  const n = normalizeText(raw);
+  if (!n.includes('编译期') || !n.includes('运行期')) return false;
   if (/多态[^。！？]{0,24}参数列表/.test(raw)) return false;
-  if (/重载[^。！？]{0,24}(重写|覆盖)/.test(raw)) return false;
+  // 只拦截“重载就是/是通过重写实现的”这类明确错误；不能因为答案开头写“重载和重写的区别”就误杀。
+  if (/重载[^。！？]{0,12}(就是|是|通过|靠|由)[^。！？]{0,12}(重写|覆盖)/.test(raw)) return false;
+  if (/重载[^。！？]{0,10}运行期/.test(raw)) return false;
+  if (/重写[^。！？]{0,10}编译期/.test(raw)) return false;
   return true;
 }
 
@@ -756,7 +783,7 @@ function makeContext(question) {
   }
   const draft = comparisonDraft(composeDraft(question, intent, { hits, catalogDoc, passages, resolve }), question, passages);
   const cmp = compareParts(question);
-  return { intent, hits, catalogDoc, passages, resolve, compare: cmp.length >= 2, context: parts.join('\n\n'), draft };
+  return { intent, hits, catalogDoc, passages, resolve, compare: cmp.length >= 2, context: parts.join('\n\n'), draft, question };
 }
 
 function composeDraft(question, intent, { hits, catalogDoc, passages, resolve }) {
