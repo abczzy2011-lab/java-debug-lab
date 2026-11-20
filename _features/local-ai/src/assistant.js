@@ -128,9 +128,13 @@ export function createAssistant({ engineFactory = null, now = Date.now, modelId 
     engine = null; loading = false;
   }
   function markDeviceLost() { deviceLost = true; engine = null; broken = true; }
+  function reset() {
+    stop();
+    engine = null; loading = false; broken = false; deviceLost = false;
+  }
 
   return {
-    load, ask, stop, unload, markDeviceLost,
+    load, ask, stop, unload, reset, markDeviceLost,
     get state() {
       return { loaded: !!engine, loading, broken, deviceLost };
     },

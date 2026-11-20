@@ -8,7 +8,7 @@ import { renderAnswer, validateCitations } from './src/citations.js';
 import { evaluateEnvironment, withBenchmark } from './src/perf-check.js';
 import { runBenchmark } from './src/perf-benchmark.js';
 import { admission, downloadDone, DECI } from './src/gatekeeper.js';
-import { createAssistant, MODEL_ID, MODELS, DEFAULT_MODEL_KEY } from './src/assistant.js?v=20261120r';
+import { createAssistant, MODEL_ID, MODELS, DEFAULT_MODEL_KEY } from './src/assistant.js?v=20261120s';
 import { checkHealth, askCloud } from './src/cloud-client.js';
 
 window.__JAVIS_STAGE = 'imported';
@@ -397,13 +397,14 @@ function friendlyDownloadError(err) {
   const map = {
     MODEL_NOT_LOADED: '本地模型还没有加载。', MODEL_TIMEOUT: '模型下载/加载超时，请重试。',
     OOM: '显存/内存不足，模型无法加载。', DEVICE_LOST: 'GPU 设备已丢失，请重新检测。',
-    MODEL_LOAD: '模型加载失败，请重试。', ABORTED: '下载已取消。',
+    MODEL_LOAD: '模型加载失败，请重试。', LOCAL_BROKEN: '模型实例已重置，请重新点击下载。',
+    ABORTED: '下载已取消。',
   };
   return map[err] || ('本地模型加载失败：' + err);
 }
 
 /* ===================== 云端解锁 =====================
-   规则：本地模型 280MB 完整下载完成之前，云端模型一直锁定；
+   规则：当前选中的本地模型完整下载完成之前，云端模型一直锁定；
    下载完成后才做 /api/health 探活，健康才把“混合模型”切到云端。 */
 async function refreshCloud() {
   if (!state.gate?.ok || !state.modelReady) {
@@ -503,8 +504,10 @@ async function startDownload() {
     refreshCloud();
   } catch (e) {
     state.downloading = false;
-    state.modelReady = !!state.downloadedModels[state.modelKey];
-    persistModels();
+    state.modelReady = false;
+    // 加载失败后必须丢弃损坏的 assistant 实例，否则重试会一直 LOCAL_BROKEN。
+    try { state.assistant?.reset?.(); await state.assistant?.unload?.(); } catch {}
+    state.assistant = null;
     state.gateError = String(e?.message || e);
     renderAll();
   }
@@ -519,11 +522,17 @@ async function ensureAssistant() {
   if (!state.assistant) state.assistant = createAssistant({ modelId: picked.id });
   if (state.assistant.state.loaded) return state.assistant;
   state.downloadStatus = `正在从本机缓存加载 ${picked.label} 模型…`;
-  await state.assistant.load(p => {
-    state.downloadProgress = Math.max(0, Math.min(1, Number(p?.progress) || 0));
-    state.downloadStatus = String(p?.text || `正在加载 ${picked.label} 本地模型…`);
-    renderHeader();
-  });
+  try {
+    await state.assistant.load(p => {
+      state.downloadProgress = Math.max(0, Math.min(1, Number(p?.progress) || 0));
+      state.downloadStatus = String(p?.text || `正在加载 ${picked.label} 本地模型…`);
+      renderHeader();
+    });
+  } catch (e) {
+    try { state.assistant?.reset?.(); await state.assistant?.unload?.(); } catch {}
+    state.assistant = null;
+    throw e;
+  }
   state.downloadedModels[state.modelKey] = true;
   persistModels();
   state.modelReady = true;
@@ -884,7 +893,7 @@ async function submit(prefill) {
     ai.sources = Object.keys(ctx.resolve).filter(k => k.startsWith('P') || k.startsWith('C')).slice(0, 4);
     if (state.gate?.ok && state.modelReady && !state.forceSearch) {
       let answered = false;
-      // 混合模型路由：本地 280MB 完整下载后才允许云端；云端失败自动回退本地。
+      // 混合模型路由：所选本地模型完整下载后才允许云端；云端失败自动回退本地。
       if (state.cloudReady) {
         ai.meta = '混合模型 · 云端 · 正在回答…';
         renderChat();
