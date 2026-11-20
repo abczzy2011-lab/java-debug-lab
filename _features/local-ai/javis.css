@@ -10,11 +10,12 @@
 }
 .jv-orb{
   position:fixed;right:32px;bottom:24px;z-index:880;
-  width:64px;height:64px;border-radius:50%;border:0;padding:0;
+  width:66px;height:66px;border-radius:50%;border:0;padding:0;
   background:transparent;isolation:isolate;
   cursor:pointer;color:#071018;display:grid;place-items:center;
-  transition:transform .2s ease, opacity .2s ease, filter .2s ease;
+  transition:transform .22s cubic-bezier(.2,.9,.24,1), opacity .2s ease, filter .22s ease;
   filter:drop-shadow(0 14px 30px rgba(0,0,0,.42));
+  -webkit-tap-highlight-color:transparent;
 }
 .jv-orb:hover{transform:translateY(-2px) scale(1.05);filter:drop-shadow(0 16px 38px rgba(0,0,0,.48)) drop-shadow(0 0 24px rgba(163,230,53,.40))}
 .jv-orb:active{transform:scale(.97)}
@@ -35,15 +36,43 @@
   border:1px solid rgba(255,255,255,.15);
   box-shadow:0 0 22px rgba(163,230,53,.12) inset,0 0 22px rgba(88,166,255,.10);
 }
-.jv-orb-glyph{position:relative;z-index:2;font-size:23px;font-weight:850;letter-spacing:-.07em;color:#E7FFC0;text-shadow:0 0 16px rgba(163,230,53,.55),0 0 34px rgba(88,166,255,.26)}
-.jv-orb-dot{position:absolute;right:8px;bottom:8px;width:8px;height:8px;border-radius:50%;background:#7EE787;box-shadow:0 0 12px #7EE787;z-index:3}
+.jv-orb-halo{
+  position:absolute;inset:-28px;border-radius:50%;z-index:-1;pointer-events:none;
+  background:radial-gradient(circle,rgba(163,230,53,.22),rgba(88,166,255,.12) 42%,transparent 70%);
+  filter:blur(11px);opacity:.52;animation:jv-breathe 3.6s ease-in-out infinite;
+}
+.jv-orb-label{
+  position:absolute;right:calc(100% + 12px);top:50%;z-index:4;
+  display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:9px;
+  color:#E8F5D2;font-size:11px;font-weight:700;letter-spacing:.02em;white-space:nowrap;
+  background:rgba(13,17,23,.86);border:1px solid rgba(163,230,53,.26);
+  box-shadow:0 8px 24px rgba(0,0,0,.36),0 0 18px rgba(163,230,53,.08);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  opacity:0;transform:translateY(-50%) translateX(6px);pointer-events:none;
+  transition:opacity .18s ease,transform .22s cubic-bezier(.2,.9,.24,1);
+}
+.jv-orb-label::after{content:"";position:absolute;right:-5px;top:50%;width:8px;height:8px;transform:translateY(-50%) rotate(45deg);background:rgba(13,17,23,.86);border-right:1px solid rgba(163,230,53,.26);border-top:1px solid rgba(163,230,53,.26)}
+.jv-orb:hover .jv-orb-label,.jv-orb:focus-visible .jv-orb-label,.jv-orb.is-summoning .jv-orb-label{opacity:1;transform:translateY(-50%) translateX(0)}
+.jv-orb-glyph{position:relative;z-index:2;font-size:24px;font-weight:850;letter-spacing:-.07em;color:#E7FFC0;text-shadow:0 0 16px rgba(163,230,53,.55),0 0 34px rgba(88,166,255,.26);transition:transform .22s cubic-bezier(.2,.9,.24,1),text-shadow .22s ease}
+.jv-orb:hover .jv-orb-glyph{transform:scale(1.06);text-shadow:0 0 20px rgba(163,230,53,.8),0 0 44px rgba(88,166,255,.42)}
+.jv-orb-dot{position:absolute;right:8px;bottom:8px;width:8px;height:8px;border-radius:50%;background:#7EE787;box-shadow:0 0 12px #7EE787;z-index:3;animation:jv-dot 2.8s ease-in-out infinite}
 .jv-orb.is-open{transform:scale(.88);opacity:.68}
-.jv-orb.is-activating{animation:jv-orb-pulse .85s ease-out}
+.jv-orb.is-activating{animation:jv-orb-pulse .72s cubic-bezier(.16,1,.3,1)}
+.jv-orb.is-summoning{animation:jv-orb-summon 1.25s cubic-bezier(.16,1,.3,1) both}
 @keyframes jv-spin{to{transform:rotate(360deg)}}
+@keyframes jv-breathe{0%,100%{opacity:.42;transform:scale(.92)}50%{opacity:.72;transform:scale(1.08)}}
+@keyframes jv-dot{0%,100%{opacity:.72;transform:scale(.9)}50%{opacity:1;transform:scale(1.12)}}
 @keyframes jv-orb-pulse{
-  0%{transform:scale(1)}
-  32%{transform:scale(1.15);filter:drop-shadow(0 0 42px rgba(163,230,53,.65))}
-  100%{transform:scale(.88);filter:drop-shadow(0 14px 30px rgba(0,0,0,.42))}
+  0%{transform:scale(1) rotate(0)}
+  28%{transform:scale(1.18) rotate(-5deg);filter:drop-shadow(0 0 46px rgba(163,230,53,.72)) drop-shadow(0 0 70px rgba(88,166,255,.32))}
+  62%{transform:scale(.94) rotate(3deg)}
+  100%{transform:scale(.88) rotate(0);filter:drop-shadow(0 0 24px rgba(163,230,53,.16))}
+}
+@keyframes jv-orb-summon{
+  0%{opacity:0;transform:scale(.28) rotate(-18deg);filter:blur(12px) drop-shadow(0 0 0 rgba(163,230,53,0))}
+  55%{opacity:1;transform:scale(1.14) rotate(4deg);filter:blur(0) drop-shadow(0 0 38px rgba(163,230,53,.55))}
+  78%{transform:scale(.96) rotate(-1deg)}
+  100%{opacity:1;transform:scale(1) rotate(0);filter:drop-shadow(0 14px 30px rgba(0,0,0,.42))}
 }
 
 /* Siri 式启用光圈：点 Javis 时，一圈彩色光从按钮中心扩散出来。 */
@@ -66,6 +95,25 @@
   background:radial-gradient(circle,rgba(217,249,157,.5),rgba(88,166,255,.18) 45%,transparent 72%);
   filter:blur(8px);animation:jv-act-core 1s ease-out forwards;opacity:0;
 }
+.jv-act-flash{
+  position:absolute;left:50%;top:50%;width:88px;height:88px;margin:-44px 0 0 -44px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.92),rgba(217,249,157,.55) 24%,rgba(88,166,255,.18) 48%,transparent 70%);
+  filter:blur(2px);mix-blend-mode:screen;animation:jv-act-flash .58s ease-out forwards;opacity:0;
+}
+.jv-act-spark{
+  position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px 0 0 -2px;border-radius:50%;
+  background:#F2FFD2;box-shadow:0 0 10px #D9F99D,0 0 20px rgba(163,230,53,.7);
+  transform:rotate(var(--a)) translateX(8px) scale(.6);opacity:0;
+  animation:jv-act-spark .78s cubic-bezier(.16,.8,.26,1) forwards;
+}
+.jv-act-spark:nth-child(1){animation-delay:.02s}.jv-act-spark:nth-child(3){animation-delay:.07s}.jv-act-spark:nth-child(5){animation-delay:.12s}.jv-act-spark:nth-child(7){animation-delay:.17s}
+.jv-act-beam{
+  position:absolute;left:50%;top:50%;width:70px;height:70px;margin:-35px 0 0 -35px;border-radius:50%;
+  background:conic-gradient(from 0deg,transparent 0 18%,rgba(163,230,53,.6) 22%,transparent 30% 48%,rgba(88,166,255,.55) 54%,transparent 62% 100%);
+  filter:blur(5px);animation:jv-act-beam .9s ease-out forwards;opacity:0;
+  -webkit-mask:radial-gradient(circle,transparent 30%,#000 38% 46%,transparent 52%);
+  mask:radial-gradient(circle,transparent 30%,#000 38% 46%,transparent 52%);
+}
 .jv-activation::before{
   content:"";position:absolute;left:50%;top:50%;width:220px;height:220px;margin:-110px 0 0 -110px;
   border-radius:50%;
@@ -79,6 +127,9 @@
 }
 @keyframes jv-act-core{0%{transform:scale(.5);opacity:.9}100%{transform:scale(1.5);opacity:0}}
 @keyframes jv-act-glow{0%{transform:scale(.5);opacity:.8}100%{transform:scale(1.7);opacity:0}}
+@keyframes jv-act-flash{0%{transform:scale(.55);opacity:.95}55%{opacity:.6}100%{transform:scale(1.65);opacity:0}}
+@keyframes jv-act-spark{0%{opacity:0;transform:rotate(var(--a)) translateX(10px) scale(.4)}22%{opacity:1}100%{opacity:0;transform:rotate(var(--a)) translateX(82px) scale(0)}}
+@keyframes jv-act-beam{0%{transform:scale(.4) rotate(0deg);opacity:.85}100%{transform:scale(1.45) rotate(140deg);opacity:0}}
 
 .jv-panel{
   position:fixed;right:20px;bottom:92px;z-index:900;
@@ -94,10 +145,15 @@
   box-shadow:var(--jv-shadow);
   backdrop-filter:blur(22px) saturate(130%);
   -webkit-backdrop-filter:blur(22px) saturate(130%);
-  animation:jv-in .22s cubic-bezier(.2,.9,.24,1) both;
+  will-change:transform,opacity,filter;
 }
 .jv-panel[hidden]{display:none!important}
-@keyframes jv-in{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+.jv-panel.is-opening{animation:jv-panel-summon .58s cubic-bezier(.16,1,.3,1) both}
+@keyframes jv-panel-summon{
+  0%{opacity:0;transform:scale(.13);filter:blur(10px) saturate(130%);box-shadow:0 0 0 rgba(0,0,0,0)}
+  58%{opacity:1;filter:blur(0) saturate(100%);transform:scale(1.012)}
+  100%{opacity:1;filter:none;transform:scale(1);box-shadow:var(--jv-shadow)}
+}
 .jv-panel::before{
   content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
   background:linear-gradient(180deg,rgba(255,255,255,.06),transparent 20%);
@@ -251,12 +307,19 @@
 .jv-panel .jv-resize::before{content:"";position:absolute;right:4px;bottom:4px;width:7px;height:7px;border-right:1px solid #9198A1;border-bottom:1px solid #9198A1}
 
 @media (max-width:640px){
-  .jv-orb{right:14px;bottom:14px;width:54px;height:54px}
+  .jv-orb{right:14px;bottom:14px;width:56px;height:56px}
+  /* 触屏没有 hover：标签改为 orb 上方常驻，避免只剩一个孤零零的 J。 */
+  .jv-orb-label{right:0;top:auto;bottom:calc(100% + 10px);height:26px;padding:0 9px;font-size:10.5px;opacity:.92;transform:translateY(5px)}
+  .jv-orb-label::after{right:auto;left:50%;top:auto;bottom:-5px;transform:translateX(-50%) rotate(45deg);border-right:0;border-top:0;border-left:1px solid rgba(163,230,53,.26);border-bottom:1px solid rgba(163,230,53,.26)}
+  .jv-orb:hover .jv-orb-label,.jv-orb:focus-visible .jv-orb-label,.jv-orb.is-summoning .jv-orb-label{transform:translateY(0)}
+  .jv-orb-halo{inset:-22px}
   .jv-panel{right:8px;left:8px;bottom:76px;width:auto;height:calc(100dvh - 90px);min-width:0;min-height:0;border-radius:18px}
   .jv-lead{font-size:18px}
   .jv-chat{padding:12px 10px 4px}
 }
 @media (prefers-reduced-motion:reduce){
-  .jv-panel,.jv-msg{animation:none}
-  .jv-typing i,.jv-stream-cursor{animation:none}
+  .jv-panel,.jv-panel.is-opening,.jv-msg,.jv-orb,.jv-orb.is-summoning,.jv-orb.is-activating{animation:none}
+  .jv-orb::before,.jv-orb-halo,.jv-orb-dot,.jv-typing i,.jv-stream-cursor,.jv-act-ring,.jv-act-core,.jv-act-flash,.jv-act-spark,.jv-act-beam{animation:none}
+  .jv-activation{display:none!important}
+  .jv-orb-label{transition:none}
 }

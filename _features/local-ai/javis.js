@@ -66,11 +66,16 @@ const LOCAL_SYSTEM_PROMPT = `你是“Javis”，本站 Java 与计算机学习�
 /* ===================== UI ===================== */
 function uiMarkup() {
   return `
-  <button class="jv-orb" id="jv-orb" type="button" aria-label="打开 Javis 助教" title="Javis · 本站专属助教（⌘K）">
+  <button class="jv-orb" id="jv-orb" type="button" aria-label="打开 Javis 助教" aria-controls="jv-panel" aria-expanded="false" title="Javis · 本站专属助教（⌘K）">
+    <span class="jv-orb-halo"></span>
+    <span class="jv-orb-label" aria-hidden="true">问 Javis</span>
     <span class="jv-orb-glyph">J</span><span class="jv-orb-dot"></span>
   </button>
   <div class="jv-activation" id="jv-activation" hidden aria-hidden="true">
+    <span class="jv-act-beam"></span>
     <span class="jv-act-ring a"></span><span class="jv-act-ring b"></span><span class="jv-act-ring c"></span>
+    <span class="jv-act-flash"></span>
+    ${Array.from({length:8},(_,i)=>`<span class="jv-act-spark" style="--a:${i*45}deg"></span>`).join('')}
     <span class="jv-act-core"></span>
   </div>
   <section class="jv-panel" id="jv-panel" hidden aria-label="Javis 助教窗口">
@@ -116,6 +121,9 @@ function mount() {
   bindUi();
   restorePanel();
   renderAll();
+  // 首次出现时从右下角“召唤”出来；标签只短暂出现，不遮挡页面。
+  orb.classList.add('is-summoning');
+  setTimeout(() => orb.classList.remove('is-summoning'), 1350);
 }
 
 function modelMeta(key = state.modelKey) { return MODELS[key] || MODELS[DEFAULT_MODEL_KEY]; }
@@ -151,6 +159,12 @@ function bindUi() {
 }
 
 function restorePanel() {
+  // 窄屏不使用桌面端记住的坐标/尺寸，否则会把面板恢复到屏幕外。
+  if (innerWidth <= 640) {
+    panel.style.left = panel.style.top = panel.style.right = panel.style.bottom = '';
+    panel.style.width = panel.style.height = '';
+    return;
+  }
   const pos = safeGet(LS.pos), size = safeGet(LS.size);
   try {
     if (pos) { const p = JSON.parse(pos); if (p.left != null) { panel.style.left = p.left + 'px'; panel.style.top = p.top + 'px'; panel.style.right = 'auto'; panel.style.bottom = 'auto'; } }
@@ -161,17 +175,28 @@ function restorePanel() {
 function openPanel() {
   if (state.panelOpen) return;
   state.panelOpen = true;
+  orb.setAttribute('aria-expanded', 'true');
   playActivation();
   orb.classList.add('is-activating');
-  // 先让 Siri 式彩色光圈扩散，再把窗口推出来。
+  // 彩色光圈先炸开，窗口再从 orb 的位置“长”出来。
   setTimeout(() => {
     orb.classList.remove('is-activating');
     if (!state.panelOpen) return;
-    panel.hidden = false; orb.classList.add('is-open');
+    panel.hidden = false;
+    const p = panel.getBoundingClientRect();
+    const o = orb.getBoundingClientRect();
+    const ox = Math.max(10, Math.min(p.width - 10, (o.left + o.width / 2) - p.left));
+    const oy = Math.max(10, Math.min(p.height - 10, (o.top + o.height / 2) - p.top));
+    panel.style.transformOrigin = `${ox}px ${oy}px`;
+    panel.classList.remove('is-opening');
+    void panel.offsetWidth;
+    panel.classList.add('is-opening');
+    setTimeout(() => panel.classList.remove('is-opening'), 680);
+    orb.classList.add('is-open');
     renderAll();
-    setTimeout(() => { try { input.focus(); } catch {} }, 120);
-  }, 380);
-  setTimeout(() => orb.classList.remove('is-activating'), 950);
+    setTimeout(() => { try { input.focus(); } catch {} }, 160);
+  }, 250);
+  setTimeout(() => orb.classList.remove('is-activating'), 820);
   if (!state.gate && !state.gateRunning) setTimeout(() => { if (state.panelOpen) runGate(); }, 420);
 }
 
@@ -188,7 +213,14 @@ function playActivation() {
   setTimeout(() => { el.hidden = true; el.classList.remove('on'); }, 1250);
 }
 
-function closePanel() { state.panelOpen = false; panel.hidden = true; orb.classList.remove('is-open'); }
+function closePanel() {
+  state.panelOpen = false;
+  panel.hidden = true;
+  panel.classList.remove('is-opening');
+  orb.classList.remove('is-open');
+  orb.setAttribute('aria-expanded', 'false');
+  try { orb.focus({ preventScroll: true }); } catch {}
+}
 
 function setupDrag() {
   const head = $('#jv-head'); let drag = null;
