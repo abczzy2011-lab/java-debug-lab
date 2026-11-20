@@ -1,15 +1,39 @@
 // src/assistant.js — WebLLM wrapper: pinned model, explicit install, load/stream/stop/unload.
 // No model bytes fetched at import; dynamic import only in load(). No main HTML edits.
 
-export const MODEL_ID = 'Qwen2.5-0.5B-Instruct-q4f16_1-MLC';
+// Two local sizes are exposed. 1.5B is the default for an 8GB M3 Air:
+// WebLLM reports ~1.63GB VRAM, while 3B needs ~2.5GB and can spill on 8GB.
+export const MODELS = {
+  '1.5b': {
+    key: '1.5b',
+    id: 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC',
+    label: '1.5B',
+    size: '约 1.1GB',
+    vram: '约 1.6GB',
+    recommended: true,
+    note: '8GB MacBook Air 推荐：速度、内存和回答质量最平衡',
+  },
+  '3b': {
+    key: '3b',
+    id: 'Qwen2.5-3B-Instruct-q4f16_1-MLC',
+    label: '3B',
+    size: '约 2.0GB',
+    vram: '约 2.5GB',
+    recommended: false,
+    note: '回答更强，但 8GB 机器更容易卡顿或挤内存',
+  },
+};
+export const DEFAULT_MODEL_KEY = '1.5b';
+export const MODEL_ID = MODELS[DEFAULT_MODEL_KEY].id;
 export const WEBLLM_VERSION = '0.2.79'; // pinned; verify against registry at ship time
-export const GEN = { temperature: 0.2, top_p: 0.9, max_tokens: 256, repetition_penalty: 1.05 };
-export const LOAD_TIMEOUT_MS = 15 * 60 * 1000; // 280MB 模型在慢网/国内网络下需要更长的下载窗口
+export const GEN = { temperature: 0.2, top_p: 0.9, max_tokens: 320, repetition_penalty: 1.05 };
+export const LOAD_TIMEOUT_MS = 30 * 60 * 1000; // 1.5B/3B 模型在慢网/国内网络下需要更长的下载窗口
 export const WARMUP_TIMEOUT_MS = 30000;
-export const FIRST_TOKEN_TIMEOUT_MS = 30000;
+export const FIRST_TOKEN_TIMEOUT_MS = 60000;
 
-export function createAssistant({ engineFactory = null, now = Date.now } = {}) {
+export function createAssistant({ engineFactory = null, now = Date.now, modelId = MODEL_ID } = {}) {
   let engine = null, loading = false, broken = false, currentAbort = null, deviceLost = false;
+  const resolvedId = modelId || MODEL_ID;
 
   async function load(onProgress = () => {}) {
     if (engine) return engine;
@@ -22,7 +46,7 @@ export function createAssistant({ engineFactory = null, now = Date.now } = {}) {
       const ctl = new AbortController();
       const timer = setTimeout(() => ctl.abort(new Error('LOAD_TIMEOUT')), LOAD_TIMEOUT_MS);
       try {
-        engine = await webllm.CreateMLCEngine(MODEL_ID, {
+        engine = await webllm.CreateMLCEngine(resolvedId, {
           initProgressCallback: p => onProgress(p),
           signal: ctl.signal,
         });
@@ -85,6 +109,6 @@ export function createAssistant({ engineFactory = null, now = Date.now } = {}) {
     get state() {
       return { loaded: !!engine, loading, broken, deviceLost };
     },
-    modelId: MODEL_ID,
+    modelId: resolvedId,
   };
 }

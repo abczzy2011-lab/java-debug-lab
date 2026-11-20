@@ -8,13 +8,14 @@ import { renderAnswer, validateCitations } from './src/citations.js';
 import { evaluateEnvironment, withBenchmark } from './src/perf-check.js';
 import { runBenchmark } from './src/perf-benchmark.js';
 import { admission, downloadDone, DECI } from './src/gatekeeper.js';
-import { createAssistant, MODEL_ID } from './src/assistant.js';
+import { createAssistant, MODEL_ID, MODELS, DEFAULT_MODEL_KEY } from './src/assistant.js';
 import { checkHealth, askCloud } from './src/cloud-client.js';
 
 window.__JAVIS_STAGE = 'imported';
 const CLOUD_BASE = (() => { try { return String(window.__JAVIS_CLOUD_BASE__ || ''); } catch { return ''; } })();
 const LS = {
-  modelReady: 'jdl.javis.modelReady.v1',
+  modelReady: 'jdl.javis.modelReady.v2',
+  modelChoice: 'jdl.javis.modelChoice.v1',
   panel: 'jdl.javis.panel.v1',
   pos: 'jdl.javis.pos.v1',
   size: 'jdl.javis.size.v1',
@@ -28,7 +29,7 @@ const state = {
   corpusPromise: null, loadingCorpus: false, docById: null,
   gate: null, gateRunning: false, gateError: null,
   downloading: false, downloadProgress: 0, downloadStatus: '', downloadAttempted: false,
-  modelReady: false, assistant: null,
+  modelReady: false, assistant: null, modelKey: DEFAULT_MODEL_KEY, downloadedModels: {}, modelPickerOpen: false,
   activeSource: 'local', cloudReady: false, cloudChecking: false, localFault: false,
   messages: [], history: [], busy: false, chatStarted: false,
   forceSearch: false, searchOnlyReason: '',
@@ -53,6 +54,14 @@ const PLAYBOOK = `答题方式：
 - 具体概念：结论 -> 机制 -> 一个最小例子 -> 易错点。
 - 本节练习：只列资料中真实存在的练习。
 - 没有命中：明确说没有依据，给最接近的课。`;
+
+const LOCAL_SYSTEM_PROMPT = `你是“Javis”，本站 Java 与计算机学习站点的助教。你只能使用用户提供的站内检索结果回答，不要补充资料外的知识。
+要求：
+1. 先给结论，再用 1-3 个要点解释，2-4 个短句，总字数不超过 220 字。
+2. 必须保留检索结果里的 [P1]、[C1]、[S1] 这类编号；不要自己编新编号。
+3. 如果检索结果不足以回答，就直说“本站课程里没有找到足够依据”，不要猜。
+4. 如果问题是“X 和 Y 的区别”，必须分别解释 X 和 Y，不能把两者说成同一个机制；必须写出各自发生的时机——重载在编译期按参数列表选方法，多态在运行期按实际对象类型分派；优先按对比草稿的结构回答。
+5. 用中文口语，不要写“综上所述”“本文将”这类套话，不要输出 Markdown 代码块。`;
 
 /* ===================== UI ===================== */
 function uiMarkup() {
@@ -99,12 +108,19 @@ function mount() {
   document.body.insertAdjacentHTML('beforeend', uiMarkup());
   orb = $('#jv-orb'); panel = $('#jv-panel'); gateBox = $('#jv-gate'); chatBox = $('#jv-chat');
   msgBox = $('#jv-messages'); input = $('#jv-input'); sendBtn = $('#jv-send'); statusEl = $('#jv-status');
-  state.modelReady = safeGet(LS.modelReady) === '1';
+  const storedKey = safeGet(LS.modelChoice);
+  state.modelKey = MODELS[storedKey] ? storedKey : DEFAULT_MODEL_KEY;
+  try { state.downloadedModels = JSON.parse(safeGet(LS.modelReady) || '{}') || {}; } catch { state.downloadedModels = {}; }
+  state.modelReady = !!state.downloadedModels[state.modelKey];
   state.initialized = true;
   bindUi();
   restorePanel();
   renderAll();
 }
+
+function modelMeta(key = state.modelKey) { return MODELS[key] || MODELS[DEFAULT_MODEL_KEY]; }
+function modelLabel(key = state.modelKey) { return modelMeta(key).label; }
+function persistModels() { safeSet(LS.modelReady, JSON.stringify(state.downloadedModels)); }
 
 function safeGet(k) { try { return localStorage.getItem(k); } catch { return null; } }
 function safeSet(k, v) { try { localStorage.setItem(k, v); } catch {} }
@@ -256,14 +272,27 @@ function renderHeader() {
   }
   const foot = $('#jv-foot-left');
   if (foot) {
-    if (ready && !state.forceSearch) foot.textContent = state.activeSource === 'cloud' ? '混合模型 · 云端 + 本地兜底' : '混合模型 · 本地兜底';
+    if (ready && !state.forceSearch) foot.textContent = state.activeSource === 'cloud' ? `混合模型 · 云端 + 本地 ${modelLabel()}` : `混合模型 · 本地 ${modelLabel()}`;
     else foot.textContent = '仅依据本站课程 · 检索模式';
   }
+}
+
+function modelCardsHTML() {
+  return `<div class="jv-model-grid">${Object.values(MODELS).map(m => {
+    const selected = state.modelKey === m.key;
+    const cached = !!state.downloadedModels[m.key];
+    return `<button class="jv-model-card${selected ? ' selected' : ''}" type="button" data-jv-action="model" data-model="${m.key}">
+      <span class="jv-model-top"><b>${m.label}</b>${m.recommended ? '<span class="jv-model-rec">推荐</span>' : ''}${cached ? '<span class="jv-model-cached">已下载</span>' : ''}</span>
+      <span class="jv-model-size">${m.size} · 内存 ${m.vram}</span>
+      <span class="jv-model-note">${m.note}</span>
+    </button>`;
+  }).join('')}</div>`;
 }
 
 function renderGate() {
   if (!gateBox) return;
   const g = state.gate;
+  const picked = modelMeta();
   if (state.forceSearch && state.chatStarted && !state.downloading) {
     gateBox.innerHTML = '';
     chatBox.hidden = false;
@@ -285,7 +314,7 @@ function renderGate() {
     gateBox.innerHTML = `<div class="jv-intro">
       <div class="jv-kicker">JAVIS / 混合模型</div>
       <div class="jv-lead">把整站课程，装进一个随叫随到的窗口。</div>
-      <div class="jv-copy">我是 Javis。先做一次最低性能检测：设备达标，就下载一次约 280MB 的本地模型；只有完整下载完成后，才会解锁云端模型，合成“混合模型”。不达标，就只用站内检索，本地和云端都不解锁。</div>
+      <div class="jv-copy">我是 Javis。先做一次最低性能检测：设备达标，就可以选择 1.5B 或 3B 本地模型；完整下载后解锁云端模型，合成“混合模型”。不达标，就只用站内检索，本地和云端都不解锁。</div>
       <div class="jv-note">检测只看 WebGPU、内存、存储和 GPU 跑分，结果留在本机。模型下载前不会建立任何对话连接。</div>
       <div class="jv-actions">
         <button class="jv-btn primary" data-jv-action="check" type="button">开始检测</button>
@@ -318,8 +347,8 @@ function renderGate() {
   if (state.downloading) {
     gateBox.innerHTML = `<div class="jv-intro">
       <div class="jv-kicker">性能通过 / 正在准备 Javis</div>
-      <div class="jv-lead">正在下载本地模型。</div>
-      <div class="jv-copy">约 280MB。下载完成前，本地和云端都保持锁定；完整下载后本地模型缓存在本机，并解锁云端模型，合成“混合模型”。</div>
+      <div class="jv-lead">正在下载本地模型 · ${esc(picked.label)}</div>
+      <div class="jv-copy">${esc(picked.size)}。下载完成前，本地和云端都保持锁定；完整下载后本地模型缓存在本机，并解锁云端模型，合成“混合模型”。</div>
       <div class="jv-gate-card"><div class="jv-gate-title"><span class="jv-dot ok"></span>下载中 · ${Math.round(state.downloadProgress * 100)}%</div>
       <div class="jv-bar"><i style="width:${Math.max(2, Math.round(state.downloadProgress * 100))}%"></i></div>
       <div class="jv-small">${esc(state.downloadStatus || '正在从官方模型仓库获取权重…')}</div></div>
@@ -329,18 +358,19 @@ function renderGate() {
     return;
   }
   if (!state.modelReady) {
-    if (state.chatStarted) { gateBox.innerHTML = ''; chatBox.hidden = false; return; }
+    if (state.chatStarted && state.forceSearch) { gateBox.innerHTML = ''; chatBox.hidden = false; return; }
     const failed = state.gateError && state.downloadAttempted ? `<div class="jv-error">${esc(friendlyDownloadError(state.gateError))}</div>` : '';
     gateBox.innerHTML = `<div class="jv-intro">
-      <div class="jv-kicker">性能通过 / 需要一次下载</div>
+      <div class="jv-kicker">性能通过 / 选择本地模型</div>
       <div class="jv-lead">这台设备可以运行 Javis。</div>
-      <div class="jv-copy">按你的规则，设备达标后必须先完整下载约 280MB 的本地模型，才能解锁云端模型并使用 AI。下载完成前只能检索；完成后显示“混合模型”，云端不可用时自动回退本地。</div>
-      <div class="jv-gate-card"><div class="jv-gate-title"><span class="jv-dot ok"></span>最低性能检测通过</div>
+      <div class="jv-copy">两个模型都可以下载，一次只加载一个。选好后必须先完整下载，才会解锁云端模型；下载完成前只能检索。云端不可用时，本地会用“检索结果 + 本地 AI”合并回答。</div>
+      ${modelCardsHTML()}
+      <div class="jv-gate-card"><div class="jv-gate-title"><span class="jv-dot ok"></span>最低性能检测通过 · 当前选择 ${esc(picked.label)}</div>
       <div class="jv-check-list">${(g.checks || []).filter(c => c.ok).slice(0, 4).map(c => `<div class="jv-check"><span class="jv-ok">✓</span><span><b>${esc(c.label)}</b>：${esc(c.detail || '')}</span></div>`).join('')}</div>
       ${failed}
-      <div class="jv-small">混合模型 = 本地模型（约 280MB） + 云端模型 · 顶栏会标注当前走“云端”还是“本地”</div></div>
+      <div class="jv-small">推荐 1.5B：8GB M3 上更稳。3B 回答可能更强，但下载约 2GB、内存约 2.5GB，8GB 机器更容易卡顿。混合模型 = 本地模型 + 云端模型，顶栏会标注当前走“云端”还是“本地”。</div></div>
       <div class="jv-actions">
-        <button class="jv-btn primary" data-jv-action="download" type="button">下载并解锁混合模型</button>
+        <button class="jv-btn primary" data-jv-action="download" type="button">下载 ${esc(picked.label)} 并解锁混合模型</button>
         <button class="jv-btn ghost" data-jv-action="search" type="button">仅使用检索</button>
       </div>
     </div>`;
@@ -453,36 +483,50 @@ async function startDownload() {
   state.downloading = true; state.downloadAttempted = true; state.gateError = null; state.downloadProgress = 0; state.downloadStatus = '正在启动模型下载…';
   renderAll();
   try {
-    if (!state.assistant) state.assistant = createAssistant();
+    const picked = modelMeta();
+    if (!state.assistant || state.assistant.modelId !== picked.id) {
+      try { await state.assistant?.unload?.(); } catch {}
+      state.assistant = createAssistant({ modelId: picked.id });
+    }
     await state.assistant.load(p => {
       state.downloadProgress = Math.max(0, Math.min(1, Number(p?.progress) || 0));
       state.downloadStatus = String(p?.text || '正在获取模型权重…');
       if (state.panelOpen) renderGate();
     });
     state.downloading = false;
-    state.modelReady = true; safeSet(LS.modelReady, '1');
+    state.downloadedModels[state.modelKey] = true;
+    persistModels();
+    state.modelReady = true;
     state.chatStarted = true; state.activeSource = 'local'; state.cloudReady = false;
     renderAll();
-    // 本地 280MB 完整落盘后，才解锁云端混合模型。
+    // 选好的本地模型完整落盘后，才解锁云端混合模型。
     refreshCloud();
   } catch (e) {
     state.downloading = false;
-    state.modelReady = false; safeSet(LS.modelReady, '0');
+    state.modelReady = !!state.downloadedModels[state.modelKey];
+    persistModels();
     state.gateError = String(e?.message || e);
     renderAll();
   }
 }
 
 async function ensureAssistant() {
-  if (!state.assistant) state.assistant = createAssistant();
+  const picked = modelMeta();
+  if (state.assistant && state.assistant.modelId !== picked.id) {
+    try { await state.assistant.unload?.(); } catch {}
+    state.assistant = null;
+  }
+  if (!state.assistant) state.assistant = createAssistant({ modelId: picked.id });
   if (state.assistant.state.loaded) return state.assistant;
-  state.downloadStatus = '正在从本机缓存加载模型…';
+  state.downloadStatus = `正在从本机缓存加载 ${picked.label} 模型…`;
   await state.assistant.load(p => {
     state.downloadProgress = Math.max(0, Math.min(1, Number(p?.progress) || 0));
-    state.downloadStatus = String(p?.text || '正在加载本地模型…');
+    state.downloadStatus = String(p?.text || `正在加载 ${picked.label} 本地模型…`);
     renderHeader();
   });
-  state.modelReady = true; safeSet(LS.modelReady, '1');
+  state.downloadedModels[state.modelKey] = true;
+  persistModels();
+  state.modelReady = true;
   return state.assistant;
 }
 
@@ -555,12 +599,17 @@ function normalizeText(s = '') {
 
 function queryKey(query) {
   let s = String(query || '')
-    .replace(/是什么|讲什么|有什么区别|区别是什么|有哪些|怎么学|怎么|为什么|如何|介绍一下|介绍|一下|本节|这门课|课程|内容|重点|概览/g, ' ')
+    .replace(/是什么|讲什么|有什么区别|区别是什么|的区别|区别|有哪些|怎么学|怎么|为什么|如何|介绍一下|介绍|一下|本节|这门课|课程|内容|重点|概览/g, ' ')
     .replace(/[？?！!。，,：:；;]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
   if (!s) s = String(query || '').trim();
   return s;
+}
+
+function compareParts(query) {
+  if (!/区别|对比|vs|VS|和|与/.test(String(query || ''))) return [];
+  return queryKey(query).split(/和|与|、|vs|VS/).map(normalizeText).filter(x => x.length >= 2).slice(0, 2);
 }
 
 function searchJavis(query, limit = 10) {
@@ -592,10 +641,57 @@ function searchJavis(query, limit = 10) {
       if (nkey && d._titleN.startsWith(nkey) && /为什么|如何|怎么|破坏|实战|误区|陷阱|清单|实验/.test(d._titleN)) score -= 7;
       const lead = normalizeText(d.text || '').slice(0, 120);
       if (nkey.length >= 2 && (lead.includes(nkey + '是') || lead.includes(nkey + '」是') || lead.includes(nkey + '）是'))) score += 8;
-      scored.push({ id: d.id, score });
+      scored.push({ id: d.id, score, doc: d });
     }
   }
-  return scored.sort((a, b) => b.score - a.score).slice(0, limit);
+  const hits = scored.sort((a, b) => b.score - a.score);
+  const cmp = compareParts(query);
+  if (cmp.length >= 2) {
+    // 对比题：先各取一条命中该词的小节，避免两个概念里的一个被另一条淹没。
+    const picked = [];
+    for (const p of cmp) {
+      const found = hits.find(h => h.doc._titleN.includes(p)) || hits.find(h => h.doc._textN.includes(p));
+      if (found && !picked.includes(found)) picked.push(found);
+    }
+    const rest = hits.filter(h => !picked.includes(h));
+    return [...picked, ...rest].slice(0, limit).map(({ id, score }) => ({ id, score }));
+  }
+  return hits.slice(0, limit).map(({ id, score }) => ({ id, score }));
+}
+
+function passageBrief(passage, term) {
+  if (!passage) return '';
+  const body = passage.split('\n').slice(1).join(' ').replace(/\[P\d+\]/g, '').trim();
+  const sentences = body.split(/[。！？]/).map(s => s.trim()).filter(Boolean);
+  const def = sentences.find(s => /^(精确定义|大白话定义)/.test(s));
+  if (def) return def.slice(0, 300);
+  const match = sentences.find(s => term && normalizeText(s).includes(normalizeText(term)));
+  return [match, ...sentences.filter(s => s !== match)].filter(Boolean).slice(0, 2).join('。').slice(0, 300);
+}
+
+function comparisonDraft(base, question, passages) {
+  const cmp = compareParts(question);
+  if (cmp.length < 2 || !passages.length) return base;
+  const forTerm = (term) => passages.find(p => {
+    const title = p.split('\n')[1] || '';
+    return normalizeText(title).includes(term);
+  });
+  const a = passageBrief(forTerm(cmp[0]) || passages[0], cmp[0]);
+  const b = passageBrief(forTerm(cmp[1]) || passages[1], cmp[1]);
+  if (!a || !b) return base;
+  const timing = (cmp[0].includes('多态') && cmp[1].includes('重载'))
+    ? `\n差异：重载在编译期按实参类型和个数选择方法；多态在运行期按实际对象类型分派。重载不是多态的一种。`
+    : '';
+  return `对比题：${cmp[0]} vs ${cmp[1]}\n${cmp[0]}：${a}\n${cmp[1]}：${b}${timing}\n\n回答要求：先分别定义 ${cmp[0]} 和 ${cmp[1]}，再说明各自发生的时机和规则差异；不要编造，不要引用草稿外的编号。`;
+}
+
+function validateLocalAnswer(text, ctx) {
+  if (!ctx || !ctx.compare) return true;
+  const raw = String(text || '');
+  if (!normalizeText(raw).includes('编译期') || !normalizeText(raw).includes('运行期')) return false;
+  if (/多态[^。！？]{0,24}参数列表/.test(raw)) return false;
+  if (/重载[^。！？]{0,24}(重写|覆盖)/.test(raw)) return false;
+  return true;
 }
 
 function makeContext(question) {
@@ -635,8 +731,9 @@ function makeContext(question) {
     }
     parts.push(...passages);
   }
-  const draft = composeDraft(question, intent, { hits, catalogDoc, passages, resolve });
-  return { intent, hits, catalogDoc, passages, resolve, context: parts.join('\n\n'), draft };
+  const draft = comparisonDraft(composeDraft(question, intent, { hits, catalogDoc, passages, resolve }), question, passages);
+  const cmp = compareParts(question);
+  return { intent, hits, catalogDoc, passages, resolve, compare: cmp.length >= 2, context: parts.join('\n\n'), draft };
 }
 
 function composeDraft(question, intent, { hits, catalogDoc, passages, resolve }) {
@@ -694,11 +791,12 @@ function renderChat() {
 }
 
 function renderChatBanner() {
-  if (state.downloading) return `<div class="jv-gate-card" style="margin:4px 0 2px"><div class="jv-gate-title"><span class="jv-dot ok"></span>正在下载本地模型 · ${Math.round(state.downloadProgress * 100)}%</div><div class="jv-bar"><i style="width:${Math.max(2, Math.round(state.downloadProgress * 100))}%"></i></div><div class="jv-small">${esc(state.downloadStatus || '正在获取模型权重…')}</div></div>`;
-  if (state.downloadAttempted && state.gateError) return `<div class="jv-gate-card" style="margin:4px 0 2px"><div class="jv-gate-title"><span class="jv-dot bad"></span>本地模型没有加载成功</div><div class="jv-small">${esc(friendlyDownloadError(state.gateError))} 下载完成前，云端模型仍保持锁定。</div><div class="jv-actions"><button class="jv-btn primary" data-jv-action="download" type="button">重新下载并解锁混合模型</button><button class="jv-btn ghost" data-jv-action="search" type="button">仅使用检索</button></div></div>`;
+  const picked = modelMeta();
+  if (state.downloading) return `<div class="jv-gate-card" style="margin:4px 0 2px"><div class="jv-gate-title"><span class="jv-dot ok"></span>正在下载本地模型 · ${esc(picked.label)} · ${Math.round(state.downloadProgress * 100)}%</div><div class="jv-bar"><i style="width:${Math.max(2, Math.round(state.downloadProgress * 100))}%"></i></div><div class="jv-small">${esc(state.downloadStatus || '正在获取模型权重…')}</div></div>`;
+  if (state.downloadAttempted && state.gateError) return `<div class="jv-gate-card" style="margin:4px 0 2px"><div class="jv-gate-title"><span class="jv-dot bad"></span>本地模型没有加载成功</div><div class="jv-small">${esc(friendlyDownloadError(state.gateError))} 下载完成前，云端模型仍保持锁定。</div><div class="jv-actions"><button class="jv-btn primary" data-jv-action="download" type="button">重新下载 ${esc(picked.label)}</button><button class="jv-btn ghost" data-jv-action="search" type="button">仅使用检索</button></div></div>`;
   if (!state.gate?.ok || state.modelReady) return '';
-  if (state.forceSearch) return `<div class="jv-gate-card" style="margin:4px 0 2px"><div class="jv-gate-title"><span class="jv-dot ok"></span>已切到仅检索</div><div class="jv-small">本机性能达标；需先完整下载约 280MB 本地模型，云端模型才会解锁。</div><div class="jv-actions"><button class="jv-btn primary" data-jv-action="download" type="button">下载并解锁混合模型</button></div></div>`;
-  return `<div class="jv-gate-card" style="margin:4px 0 2px"><div class="jv-gate-title"><span class="jv-dot ok"></span>本机性能达标</div><div class="jv-small">按规则，必须先完整下载约 280MB 的本地模型，才能解锁云端模型并启用“混合模型”。下载前也可以先用检索。</div><div class="jv-actions"><button class="jv-btn primary" data-jv-action="download" type="button">下载并解锁混合模型</button><button class="jv-btn ghost" data-jv-action="search" type="button">仅使用检索</button></div></div>`;
+  if (state.forceSearch) return `<div class="jv-gate-card" style="margin:4px 0 2px"><div class="jv-gate-title"><span class="jv-dot ok"></span>已切到仅检索</div><div class="jv-small">本机性能达标；需先完整下载选择好的本地模型，云端模型才会解锁。</div><div class="jv-actions"><button class="jv-btn primary" data-jv-action="download" type="button">下载 ${esc(picked.label)} 并解锁混合模型</button></div></div>`;
+  return `<div class="jv-gate-card" style="margin:4px 0 2px"><div class="jv-gate-title"><span class="jv-dot ok"></span>本机性能达标</div><div class="jv-small">先选择 1.5B 或 3B，并完整下载，才能解锁云端模型并启用“混合模型”。</div><div class="jv-actions"><button class="jv-btn primary" data-jv-action="download" type="button">下载 ${esc(picked.label)} 并解锁混合模型</button><button class="jv-btn ghost" data-jv-action="search" type="button">仅使用检索</button></div></div>`;
 }
 
 function renderQuick() {
@@ -722,6 +820,41 @@ function identityReply(q) {
     || /(谁是|介绍一下)javis/.test(n);
   if (asksWho) return { text: '我是 Javis，这个网站的本站助教。', meta: 'Javis · 本站助教' };
   return null;
+}
+
+function cleanLocalAnswer(text, resolve) {
+  let out = String(text || '').replace(/```[\s\S]*?```/g, '').trim();
+  out = out.replace(/\[([PCS])(\d+)\]/g, (whole, k, n) => (resolve?.[k + n] ? whole : ''));
+  if (!/[PCS]\d+/.test(out)) {
+    const key = Object.keys(resolve || {}).find(k => /^P\d+$/.test(k)) || (resolve?.C1 ? 'C1' : null);
+    if (key && resolve?.[key]) out += ` [${key}]`;
+  }
+  return out.trim();
+}
+
+function sourceHint(ctx) {
+  const titles = (ctx.passages || []).slice(0, 2).map(p => {
+    const m = String(p).match(/课程：(.+?) 小节：(.+?)\n/);
+    return m ? `${m[1]} · ${m[2]}` : '';
+  }).filter(Boolean);
+  return titles.length ? `参考：${titles.join('；')}` : '参考：本站课程检索结果。';
+}
+
+function mergeLocalAnswer(text, draft) {
+  const raw = String(draft || '');
+  const diff = raw.match(/差异：([^\n]+)/);
+  const excerpt = diff ? diff[1].trim() : raw.replace(/\s+/g, ' ').trim().slice(0, 180);
+  if (!excerpt) return text;
+  return `${text}\n\n检索补充：${excerpt}`;
+}
+
+function localMessages(question, ctx) {
+  const evidence = [ctx.draft, ...(ctx.passages || []).slice(0, 2).map(p => p.slice(0, 1000))]
+    .join('\n\n').slice(0, 3600);
+  return [
+    { role: 'system', content: LOCAL_SYSTEM_PROMPT },
+    { role: 'user', content: `问题：${question}\n\n站内检索结果：\n${evidence}` },
+  ];
 }
 
 async function submit(prefill) {
@@ -768,21 +901,45 @@ async function submit(prefill) {
         if (cloud.ok && cleanCloud.length >= 12) {
           ai.text = cloud.answer.trim(); ai.streaming = false; ai.meta = '混合模型 · 云端生成';
           state.activeSource = 'cloud'; answered = true; state.localFault = false;
-          if (!/[PCS]\d+/.test(ai.text)) ai.text += `\n\n参考：${ctx.draft.slice(-90)}`;
+          if (!/[PCS]\d+/.test(ai.text)) ai.text += `\n\n${sourceHint(ctx)}`;
           state.history.push({ role: 'user', content: q }, { role: 'assistant', content: ai.text.slice(0, 1000) });
         } else {
           state.cloudReady = false; state.activeSource = 'local'; renderHeader();
         }
       }
       if (!answered) {
-        // 0.5B 本地模型在课程事实上容易答错；云端不可用时先用站内检索草稿兜底，
-        // 保证“本地”路径仍然能给出可核对的课程内容，而不是把错误生成当作答案。
-        ai.meta = '混合模型 · 本地 · 检索兜底';
+        // 云端不可用时：本地模型基于站内检索结果生成，再把检索原文的关键结论合并进同一条回答。
+        ai.meta = `混合模型 · 本地 ${modelLabel()} · 检索 + AI…`;
         renderChat();
-        await new Promise(r => setTimeout(r, 220));
-        ai.text = ctx.draft;
+        let localText = '';
+        try {
+          const a = await ensureAssistant();
+          const parts = [];
+          let lastPaint = 0;
+          await a.ask(localMessages(q, ctx), {
+            timeout: 90000,
+            onToken: tok => {
+              parts.push(tok);
+              ai.text = parts.join('');
+              if (Date.now() - lastPaint > 120) { lastPaint = Date.now(); renderChat(); }
+            },
+          });
+          localText = parts.join('').trim();
+        } catch (e) {
+          localText = '';
+        }
+        const clean = cleanLocalAnswer(localText, ctx.resolve);
+        if (clean.length >= 24 && validateLocalAnswer(clean, ctx)) {
+          ai.text = mergeLocalAnswer(clean, ctx.draft);
+          ai.meta = `混合模型 · 本地 ${modelLabel()} + 检索`;
+        } else if (ctx.compare && ctx.draft) {
+          ai.text = String(ctx.draft).replace(/\n\n回答要求：[\s\S]*$/, '');
+          ai.meta = `混合模型 · 本地 ${modelLabel()} + 检索 · 已按课件校正`;
+        } else {
+          ai.text = ctx.draft;
+          ai.meta = `混合模型 · 本地 ${modelLabel()} 未生成 · 检索兜底`;
+        }
         ai.streaming = false;
-        ai.meta = '混合模型 · 本地检索兜底';
         state.activeSource = 'local'; state.localFault = false;
         state.history.push({ role: 'user', content: q }, { role: 'assistant', content: ai.text.slice(0, 1000) });
       }
@@ -826,8 +983,25 @@ function openCitation(msgId, key) {
   }, 50);
 }
 
+function selectModel(key) {
+  if (!MODELS[key] || state.downloading) return;
+  if (state.modelKey === key && state.modelReady) return;
+  state.modelKey = key;
+  if (safeSet) safeSet(LS.modelChoice, key);
+  state.modelReady = !!state.downloadedModels[key];
+  state.cloudReady = false;
+  state.activeSource = 'local';
+  if (!state.modelReady) {
+    state.assistant = null;
+    state.chatStarted = false;
+  }
+  renderAll();
+  if (state.modelReady) refreshCloud();
+}
+
 function handleAction(action, el) {
   if (action === 'check') return runGate();
+  if (action === 'model') return selectModel(el.dataset.model);
   if (action === 'download') return startDownload();
   if (action === 'search') {
     state.forceSearch = true; state.chatStarted = true;
