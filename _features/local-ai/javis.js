@@ -8,7 +8,7 @@ import { renderAnswer, validateCitations } from './src/citations.js';
 import { evaluateEnvironment, withBenchmark } from './src/perf-check.js';
 import { runBenchmark } from './src/perf-benchmark.js';
 import { admission, downloadDone, DECI } from './src/gatekeeper.js';
-import { createAssistant, MODEL_ID, MODELS, DEFAULT_MODEL_KEY } from './src/assistant.js?v=20261120s';
+import { createAssistant, MODEL_ID, MODELS, DEFAULT_MODEL_KEY } from './src/assistant.js?v=20261120t';
 import { checkHealth, askCloud } from './src/cloud-client.js';
 
 window.__JAVIS_STAGE = 'imported';
@@ -77,7 +77,7 @@ function uiMarkup() {
     <header class="jv-head" id="jv-head">
       <div class="jv-avatar">J</div>
       <div>
-        <div class="jv-title">Javis <span class="jv-beta">BETA</span><span class="jv-model-chip" id="jv-model-chip" hidden>混合模型</span><span class="jv-src-chip" id="jv-src-chip" hidden>本地</span></div>
+        <div class="jv-title">Javis <span class="jv-beta">BETA</span><button class="jv-model-chip" id="jv-model-chip" type="button" data-jv-action="picker" title="切换本地模型" hidden>混合模型</button><span class="jv-src-chip" id="jv-src-chip" hidden>本地</span></div>
         <div class="jv-sub"><span class="jv-live" id="jv-live"></span><span id="jv-status">本站专属助教</span></div>
       </div>
       <div class="jv-head-actions">
@@ -259,7 +259,7 @@ function renderHeader() {
   const live = $('#jv-live');
   const ready = !!state.gate?.ok && state.modelReady;
   const chip = $('#jv-model-chip'), src = $('#jv-src-chip');
-  if (chip) chip.hidden = !ready;
+  if (chip) { chip.hidden = !ready; if (ready) chip.textContent = `${modelLabel()} · 切换`; }
   if (src) {
     src.hidden = !ready;
     src.textContent = state.activeSource === 'cloud' ? '云端' : '本地';
@@ -293,6 +293,18 @@ function renderGate() {
   if (!gateBox) return;
   const g = state.gate;
   const picked = modelMeta();
+  if (state.modelPickerOpen && g?.ok) {
+    gateBox.innerHTML = `<div class="jv-intro">
+      <div class="jv-kicker">性能通过 / 切换本地模型</div>
+      <div class="jv-lead">选择要使用的本地模型。</div>
+      <div class="jv-copy">两个模型都可以下载；已经下载的模型可以直接切换，未下载的会先安装。一次只加载一个，切换时会卸载当前模型。</div>
+      ${modelCardsHTML()}
+      <div class="jv-small">推荐 1.5B：8GB M3 上更稳。3B 回答可能更强，但下载约 2GB、内存约 2.5GB，8GB 机器更容易卡顿或挤内存。</div>
+      <div class="jv-actions"><button class="jv-btn ghost" data-jv-action="closePicker" type="button">取消</button></div>
+    </div>`;
+    chatBox.hidden = true;
+    return;
+  }
   if (state.forceSearch && state.chatStarted && !state.downloading) {
     gateBox.innerHTML = '';
     chatBox.hidden = false;
@@ -498,6 +510,7 @@ async function startDownload() {
     state.downloadedModels[state.modelKey] = true;
     persistModels();
     state.modelReady = true;
+    state.modelPickerOpen = false;
     state.chatStarted = true; state.activeSource = 'local'; state.cloudReady = false;
     renderAll();
     // 选好的本地模型完整落盘后，才解锁云端混合模型。
@@ -505,6 +518,7 @@ async function startDownload() {
   } catch (e) {
     state.downloading = false;
     state.modelReady = false;
+    state.modelPickerOpen = false;
     // 加载失败后必须丢弃损坏的 assistant 实例，否则重试会一直 LOCAL_BROKEN。
     try { state.assistant?.reset?.(); await state.assistant?.unload?.(); } catch {}
     state.assistant = null;
@@ -992,8 +1006,15 @@ function openCitation(msgId, key) {
   }, 50);
 }
 
+function openModelPicker() {
+  if (!state.gate?.ok) return runGate();
+  state.modelPickerOpen = true;
+  renderAll();
+}
+
 function selectModel(key) {
   if (!MODELS[key] || state.downloading) return;
+  state.modelPickerOpen = false;
   if (state.modelKey === key && state.modelReady) return;
   state.modelKey = key;
   if (safeSet) safeSet(LS.modelChoice, key);
@@ -1011,6 +1032,8 @@ function selectModel(key) {
 function handleAction(action, el) {
   if (action === 'check') return runGate();
   if (action === 'model') return selectModel(el.dataset.model);
+  if (action === 'picker') return openModelPicker();
+  if (action === 'closePicker') { state.modelPickerOpen = false; renderAll(); return; }
   if (action === 'download') return startDownload();
   if (action === 'search') {
     state.forceSearch = true; state.chatStarted = true;
