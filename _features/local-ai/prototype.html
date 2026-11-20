@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>本站助教 · 隔离原型（无主页面改动）</title>
+<style>
+:root{--bg:#0d1117;--panel:#161b22;--border:#30363d;--text:#e6edf3;--muted:#9198a1;--accent:#a3e635;--info:#58a6ff}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column}
+header{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:center}
+h1{font-size:15px;margin:0} .chip{font-size:11px;padding:2px 8px;border:1px solid var(--border);border-radius:10px;color:var(--muted)}
+#status{color:var(--info);font-size:12px}
+#log{flex:1;overflow:auto;padding:18px;max-width:900px;width:100%;margin:auto}
+.q{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin:10px 0 0 auto;max-width:75%}
+.a{background:transparent;border-left:3px solid var(--accent);padding:8px 14px;margin:10px 0;line-height:1.8;white-space:pre-wrap}
+.a .cite{color:var(--info);text-decoration:none} .a .cite-missing{color:#f85149}
+.meta{font-size:11px;color:var(--muted);margin-top:6px}
+footer{border-top:1px solid var(--border);padding:10px 18px;display:flex;gap:8px}
+input{flex:1;background:var(--panel);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 12px;font-size:14px;outline:none}
+button{background:var(--accent);color:#0d1117;border:none;border-radius:8px;padding:0 18px;font-weight:700;cursor:pointer}
+button:disabled{opacity:.5;cursor:default}
+pre.sample{font-size:11px;color:var(--muted);white-space:pre-wrap}
+</style>
+</head>
+<body>
+<header>
+  <h1>本站助教 · 隔离原型</h1>
+  <span class="chip">纯检索 · 无模型 · 无网络</span>
+  <span id="status">正在加载 corpus.json…</span>
+</header>
+<div id="log">
+  <pre class="sample">试问：网站有什么 / 第8课讲什么 / 双亲委派是什么 / 多态和重载区别 / 本节练习 / 量子计算</pre>
+</div>
+<footer><input id="q" placeholder="输入问题…" autocomplete="off"><button id="send">问</button></footer>
+<script type="module">
+import { tokenize, buildIndex, search, buildPassages } from './src/rag.js';
+import { buildCatalog, siteCard, compactCatalog, courseCard, siteStats } from './src/catalog.js';
+import { routeIntent, contextPlan } from './src/router.js';
+import { renderAnswer } from './src/citations.js';
+const $=s=>document.querySelector(s);
+let corpus,index,catalog;
+fetch('./corpus.json').then(r=>r.json()).then(c=>{
+  corpus=c;
+  const study={};for(const s of c.subjects){study[s.key]={title:s.name,courses:[]};}
+  for(const co of c.courses){
+    // rebuild minimal body for catalog from docs
+    const body=c.docs.filter(d=>d.courseId===co.courseId&&d.subject===co.subject)
+      .sort((a,b)=>a.sectionIndex-b.sectionIndex).map(d=>({h:d.sectionTitle,p:d.text}));
+    study[co.subject].courses.push({id:co.id,title:co.courseTitle,summary:co.summary,points:co.points,body});
+  }
+  catalog=buildCatalog(study);
+  index=buildIndex(c.docs);
+  $('#status').textContent=`已索引 ${c.docs.length} 节 · ${c.courses.length} 课 · 6 学科`;
+}).catch(e=>{$('#status').textContent='加载失败: '+e.message});
+
+function answer(question){
+  const hits=search(index,question,{limit:8});
+  const intent=routeIntent(question,{hasHits:hits.length>0});
+  const plan=contextPlan(intent);
+  const stats=siteStats(Object.fromEntries(corpus.subjects.map(s=>[s.key,{title:s.name,courses:corpus.courses.filter(c=>c.subject===s.key)}])));
+  let ctx='';
+  if(plan.site)ctx+=siteCard(Object.fromEntries(corpus.subjects.map(s=>[s.key,{title:s.name,courses:corpus.courses.filter(c=>c.subject===s.key)}])))+'\n\n';
+  if(plan.compact)ctx+=compactCatalog(catalog,stats)+'\n\n';
+  if(plan.courses>0&&hits.length){
+    const d=corpus.docs.find(x=>x.id===hits[0].id);
+    const cd=catalog.find(x=>x.courseId===d.courseId);
+    ctx+=courseCard(cd,d.sectionIndex)+'\n\n';
+  }
+  const passages=plan.passages?buildPassages(hits,corpus.docs,{max:plan.passages,perCourse:2}):[];
+  passages.forEach(p=>ctx+=p+'\n');
+  const map={};passages.forEach((p,i)=>map['P'+(i+1)]={url:'#',title:'段落'+(i+1)});
+  const resolve={...map};
+  catalog.slice(0,3).forEach((c,i)=>resolve['C'+(i+1)]={url:'#',title:c.title});
+  let text;
+  if(intent==='site_overview'){
+    text='本站共 '+stats.totalCourses+' 课 / '+stats.totalSections+' 节，覆盖六科：\n'
+      +stats.subjects.map(s=>'· '+s.name+'：'+s.courses+' 课 / '+s.sections+' 节').join('\n')
+      +'\n\n建议路线：先学 Java 基础 → 再做改错练习 → 按方向深入算法/大模型/硬件/AI。';
+  }else if(intent==='course_overview'&&hits.length){
+    const d=corpus.docs.find(x=>x.id===hits[0].id);
+    const cd=catalog.find(x=>x.courseId===d.courseId);
+    text='《'+cd.title+'》共 '+cd.sectionCount+' 节。重点：'+cd.points.slice(0,5).join('、')
+      +'\n\n主要小节：\n'+cd.sectionTitles.slice(0,(plan.sectionTitles||30)).map((t,i)=>'  '+(i+1)+'. '+t).join('\n')
+      +'\n\n建议按小节顺序学习，先理解概念再看代码。';
+  }else if(intent==='not_found'||!hits.length){
+    text='本站课程里没有找到足够依据。You can try：'+['网站有什么','第8课讲什么','双亲委派是什么'].join(' / ');
+  }else if(intent==='exercise'){
+    text='本站课程中与「'+question+'」相关的练习/小节：\n'
+      +passages.slice(0,4).map((p,i)=>'['+(i+1)+'] '+p.split('\n')[0]).join('\n');
+  }else{
+    text='结论：'+passages[0].split('\n')[1].slice(0,120)+'\n\n依据：\n'
+      +passages.slice(0,3).map((p,i)=>'['+(i+1)+'] '+p.split('\n')[0].replace(/^\[P\d+\]\s*/,'')).join('\n');
+  }
+  return {text:renderAnswer(text,resolve),intent,count:hits.length};
+}
+function ask(){
+  const q=$('#q').value.trim();if(!q||!index)return;
+  $('#q').value='';
+  const log=$('#log');
+  log.insertAdjacentHTML('beforeend','<div class="q">'+q.replace(/</g,'&lt;')+'</div>');
+  const r=answer(q);
+  log.insertAdjacentHTML('beforeend','<div class="a">'+r.text+'<div class="meta">意图：'+r.intent+' · 命中 '+r.count+' 节 · 纯检索模式（未加载模型）</div></div>');
+  log.scrollTop=log.scrollHeight;
+}
+$('#send').onclick=ask;
+$('#q').onkeydown=e=>{if(e.key==='Enter')ask();};
+</script>
+</body>
+</html>
