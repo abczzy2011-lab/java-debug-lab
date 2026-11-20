@@ -8,7 +8,7 @@ import { renderAnswer, validateCitations } from './src/citations.js';
 import { evaluateEnvironment, withBenchmark } from './src/perf-check.js';
 import { runBenchmark } from './src/perf-benchmark.js';
 import { admission, downloadDone, DECI } from './src/gatekeeper.js';
-import { createAssistant, MODEL_ID, MODELS, DEFAULT_MODEL_KEY } from './src/assistant.js';
+import { createAssistant, MODEL_ID, MODELS, DEFAULT_MODEL_KEY } from './src/assistant.js?v=20261120q';
 import { checkHealth, askCloud } from './src/cloud-client.js';
 
 window.__JAVIS_STAGE = 'imported';

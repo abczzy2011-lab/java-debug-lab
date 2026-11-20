@@ -25,11 +25,35 @@ export const MODELS = {
 };
 export const DEFAULT_MODEL_KEY = '1.5b';
 export const MODEL_ID = MODELS[DEFAULT_MODEL_KEY].id;
+export const MODEL_PROXY_BASE = 'https://javis-model-proxy.abczzy2011.workers.dev/model';
 export const WEBLLM_VERSION = '0.2.79'; // pinned; verify against registry at ship time
 export const GEN = { temperature: 0.2, top_p: 0.9, max_tokens: 320, repetition_penalty: 1.05 };
 export const LOAD_TIMEOUT_MS = 30 * 60 * 1000; // 1.5B/3B 模型在慢网/国内网络下需要更长的下载窗口
 export const WARMUP_TIMEOUT_MS = 30000;
 export const FIRST_TOKEN_TIMEOUT_MS = 60000;
+
+// WebLLM 默认从 huggingface.co 直接拉 mlc-chat-config.json 和权重，跨域会被 CORS 拦。
+// 这里走自己的 Worker 代理（/model/<key>/...），代理补上 ACAO:*，权重仍然由 HF 提供。
+export const WEBLLM_APP_CONFIG = {
+  model_list: [
+    {
+      model: `${MODEL_PROXY_BASE}/qwen15`,
+      model_id: 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC',
+      model_lib: 'https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/Qwen2-1.5B-Instruct-q4f16_1-ctx4k_cs1k-webgpu.wasm',
+      low_resource_required: true,
+      vram_required_MB: 1629.75,
+      overrides: { context_window_size: 4096 },
+    },
+    {
+      model: `${MODEL_PROXY_BASE}/qwen3`,
+      model_id: 'Qwen2.5-3B-Instruct-q4f16_1-MLC',
+      model_lib: 'https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/Qwen2.5-3B-Instruct-q4f16_1-ctx4k_cs1k-webgpu.wasm',
+      low_resource_required: true,
+      vram_required_MB: 2504.76,
+      overrides: { context_window_size: 4096 },
+    },
+  ],
+};
 
 export function createAssistant({ engineFactory = null, now = Date.now, modelId = MODEL_ID } = {}) {
   let engine = null, loading = false, broken = false, currentAbort = null, deviceLost = false;
@@ -49,6 +73,7 @@ export function createAssistant({ engineFactory = null, now = Date.now, modelId 
         engine = await webllm.CreateMLCEngine(resolvedId, {
           initProgressCallback: p => onProgress(p),
           signal: ctl.signal,
+          appConfig: WEBLLM_APP_CONFIG,
         });
       } finally { clearTimeout(timer); }
 
