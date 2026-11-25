@@ -720,7 +720,12 @@ function setupOrbDrag() {
     orb.classList.add('is-dragging');
     resetMotionVars();
     void orb.offsetWidth;
+    const layoutW = orb.offsetWidth || 74;
+    const layoutH = orb.offsetHeight || 74;
     const r = orb.getBoundingClientRect();
+    // is-dragging 会把球放大 4.5%；rect 是放大后的视觉盒，先还原到未缩放的布局坐标。
+    const layoutLeft = r.left + (r.width - layoutW) / 2;
+    const layoutTop = r.top + (r.height - layoutH) / 2;
     drag = {
       pointerId: e.pointerId,
       startX: e.clientX,
@@ -730,10 +735,10 @@ function setupOrbDrag() {
       lastT: performance.now(),
       vx: 0,
       vy: 0,
-      left: r.left,
-      top: r.top,
-      x: r.left,
-      y: r.top,
+      left: layoutLeft,
+      top: layoutTop,
+      x: layoutLeft,
+      y: layoutTop,
       moved: false,
       m: orbBounds(),
     };
