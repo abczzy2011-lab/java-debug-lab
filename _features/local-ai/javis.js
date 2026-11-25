@@ -84,7 +84,7 @@ function uiMarkup() {
     <span class="jv-orb-label" aria-hidden="true">问 Javis</span>
     <span class="jv-orb-glyph">J</span><span class="jv-orb-dot"></span>
   </button>
-  <button class="jv-orb-min" id="jv-orb-min" type="button" aria-label="最小化 Javis，收起为角落小圆点" title="最小化 Javis，收起为角落小圆点" hidden><span aria-hidden="true">−</span></button>
+  <button class="jv-orb-min" id="jv-orb-min" type="button" aria-label="最小化 Javis，收起为角落小圆点" title="最小化 Javis，收起为角落小圆点" hidden><span class="jv-min-glyph" aria-hidden="true"></span></button>
   <button class="jv-orb-restore" id="jv-orb-restore" type="button" aria-label="打开 Javis 助手" title="打开 Javis" hidden><span class="jv-restore-glyph" aria-hidden="true">J</span></button>
   <div class="jv-edge-halo" id="jv-edge-halo" aria-hidden="true"></div>
   <div class="jv-activation" id="jv-activation" hidden aria-hidden="true">
@@ -250,6 +250,19 @@ function bindUi() {
   setupResize();
   setupOrbDrag();
   restoreOrbPosition();
+  // 页面在“学科首页 / 练习视图”之间切换时，只改 html 的 subjects-home；
+  // 悬浮球从 display:none 恢复后没有 resize 事件，需要在这里重新贴一次减号。
+  const refreshBadgeSoon = () => {
+    if (!state.orbMinimized) requestAnimationFrame(syncOrbBadge);
+  };
+  if (window.MutationObserver) {
+    new MutationObserver(refreshBadgeSoon).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+  }
+  window.addEventListener('load', refreshBadgeSoon, { once: true });
+  window.addEventListener('pageshow', refreshBadgeSoon);
   const startMinimized = safeGet(LS.orbMinimized) === '1';
   if (startMinimized) {
     orbMinBtn.hidden = true;
@@ -461,9 +474,11 @@ function orbCorner() {
 
 function syncOrbBadge() {
   if (!orbMinBtn || !orb || state.orbMinimized) { if (orbMinBtn) orbMinBtn.hidden = true; return; }
+  // 首页会通过 html.subjects-home 隐藏悬浮球；没有布局盒时不要留下一个漂在左上角的孤儿减号。
+  if (!orb.getClientRects().length) { orbMinBtn.hidden = true; return; }
   const r = orb.getBoundingClientRect();
-  const pad = 14;
-  orbMinBtn.style.left = Math.round(Math.max(pad, Math.min(innerWidth - pad, r.right - 4))) + 'px';
+  const pad = 20;
+  orbMinBtn.style.left = Math.round(Math.max(pad, Math.min(innerWidth - pad, r.right + 2))) + 'px';
   orbMinBtn.style.top = Math.round(Math.max(pad, Math.min(innerHeight - pad, r.top + 4))) + 'px';
   orbMinBtn.hidden = false;
 }

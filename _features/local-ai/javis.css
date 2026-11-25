@@ -2388,3 +2388,88 @@
   .jv-orb-glyph,.jv-orb-glass,.jv-orb-halo{transition:none!important}
   .jv-orb.is-tucking,.jv-orb.is-untucking,.jv-orb-restore.is-arriving{animation:none!important}
 }
+
+/* ============================================================
+   Javis · 最小化按钮 v=20261126z75
+   把原来的“深色小圆球 + 字体减号”收成一枚贴在球缘的玻璃扣：
+   34px 命中区、24px 视觉圆、手绘 9px 发光横线；静止低调，悬停变亮。
+   ============================================================ */
+.jv-orb-min{
+  width:34px;height:34px;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  color:transparent;
+  font-size:0;line-height:0;
+  opacity:.78;
+  scale:.98;
+  transition:opacity .18s ease,scale .18s cubic-bezier(.22,1,.36,1)!important;
+}
+.jv-orb-min::before{
+  content:"";position:absolute;inset:4px;border-radius:50%;
+  background:
+    radial-gradient(120% 120% at 30% 16%,rgba(255,255,255,.28),rgba(255,255,255,.06) 38%,transparent 58%),
+    radial-gradient(90% 90% at 78% 86%,rgba(94,234,212,.18),transparent 62%),
+    linear-gradient(150deg,rgba(22,43,54,.92),rgba(5,14,22,.96));
+  border:1px solid rgba(190,255,246,.34);
+  box-shadow:
+    0 6px 16px rgba(0,0,0,.34),
+    inset 0 1px 0 rgba(255,255,255,.28),
+    inset 0 -1px 0 rgba(255,255,255,.08),
+    0 0 16px rgba(94,234,212,.16);
+  -webkit-backdrop-filter:blur(14px) saturate(155%);
+  backdrop-filter:blur(14px) saturate(155%);
+  transition:border-color .18s ease,box-shadow .18s ease,background .18s ease;
+}
+.jv-min-glyph{
+  position:relative;z-index:2;
+  width:10px;height:1.5px;border-radius:999px;
+  background:linear-gradient(90deg,#BFFFF8,#FFFFFF 52%,#B8FFF4);
+  box-shadow:
+    0 0 5px rgba(255,255,255,.72),
+    0 0 10px rgba(153,246,228,.72),
+    0 0 18px rgba(94,234,212,.36);
+  transition:width .18s cubic-bezier(.22,1,.36,1),box-shadow .18s ease,transform .18s ease;
+}
+.jv-orb:hover ~ .jv-orb-min,
+.jv-orb:focus-visible ~ .jv-orb-min,
+.jv-orb-min:hover,.jv-orb-min:focus-visible{
+  opacity:1;
+  scale:1.06;
+}
+.jv-orb:hover ~ .jv-orb-min::before,
+.jv-orb:focus-visible ~ .jv-orb-min::before,
+.jv-orb-min:hover::before,
+.jv-orb-min:focus-visible::before{
+  border-color:rgba(214,255,250,.62);
+  box-shadow:
+    0 8px 20px rgba(0,0,0,.38),
+    inset 0 1px 0 rgba(255,255,255,.36),
+    0 0 22px rgba(94,234,212,.34);
+}
+.jv-orb:hover ~ .jv-orb-min .jv-min-glyph,
+.jv-orb:focus-visible ~ .jv-orb-min .jv-min-glyph,
+.jv-orb-min:hover .jv-min-glyph,
+.jv-orb-min:focus-visible .jv-min-glyph{
+  width:12px;
+  box-shadow:
+    0 0 6px rgba(255,255,255,.82),
+    0 0 14px rgba(153,246,228,.9),
+    0 0 24px rgba(94,234,212,.48);
+}
+.jv-orb-min:active{scale:.94}
+.jv-orb-min:active .jv-min-glyph{width:8px;transform:scaleY(1.15)}
+.jv-orb-min:focus-visible{
+  outline:2px solid rgba(153,246,228,.9);
+  outline-offset:3px;
+  border-radius:50%;
+}
+@media (max-width:640px){
+  .jv-orb-min{width:36px;height:36px;opacity:.86}
+  .jv-orb-min::before{inset:5px}
+}
+@media (prefers-reduced-motion:reduce){
+  .jv-orb-min,.jv-orb-min::before,.jv-min-glyph{transition:none!important}
+}
