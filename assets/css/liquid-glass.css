@@ -1,0 +1,1395 @@
+/* ============================================================
+   练习室 · 液态玻璃主题 z37
+   全站统一的环境光、玻璃面板、按压反馈与进入动效
+   ============================================================ */
+:root{
+  --jgl-blur:18px;
+  --jgl-ease:cubic-bezier(.22,1,.36,1);
+  --jgl-ease-press:cubic-bezier(.2,.75,.25,1);
+  --jgl-line:rgba(255,255,255,.10);
+  --jgl-line-soft:rgba(255,255,255,.065);
+  --jgl-sheen:rgba(255,255,255,.14);
+  --jgl-shadow:0 24px 64px rgba(0,0,0,.34),0 0 0 1px rgba(255,255,255,.025),inset 0 1px 0 rgba(255,255,255,.11),inset 0 -1px 0 rgba(255,255,255,.025);
+  /* 屏幕圆角只用于全屏光效/边缘光，不裁切正常页面内容。
+     iPhone 的实际圆角由机身裁切，Web 无法读取硬件半径，这里按
+     390/430 宽度视口做近似，并配合 safe-area 让内容避开边角。 */
+  --jgl-screen-radius:18px;
+  --jgl-safe-top:env(safe-area-inset-top,0px);
+  --jgl-safe-right:env(safe-area-inset-right,0px);
+  --jgl-safe-bottom:env(safe-area-inset-bottom,0px);
+  --jgl-safe-left:env(safe-area-inset-left,0px);
+}
+
+html,body{background:#070b12!important}
+body{
+  position:relative;
+  isolation:isolate;
+  overflow-x:hidden;
+  -webkit-tap-highlight-color:transparent;
+}
+
+/* 深色环境光：玻璃后面的“液体”底色 */
+body::before{
+  content:"";
+  position:fixed;
+  inset:-24%;
+  z-index:-1;
+  pointer-events:none;
+  background:
+    radial-gradient(38% 40% at 12% 7%,rgba(94,234,212,.20),transparent 66%),
+    radial-gradient(34% 38% at 88% 13%,rgba(167,139,250,.18),transparent 68%),
+    radial-gradient(52% 44% at 50% 42%,rgba(56,189,248,.105),transparent 72%),
+    radial-gradient(42% 38% at 52% 106%,rgba(88,166,255,.14),transparent 68%),
+    radial-gradient(26% 28% at 78% 82%,rgba(163,230,53,.08),transparent 72%);
+  filter:blur(28px) saturate(1.18);
+  opacity:.92;
+  animation:jgl-ambient 30s ease-in-out infinite alternate;
+}
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  opacity:.045;
+  mix-blend-mode:soft-light;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+}
+@keyframes jgl-ambient{
+  0%{transform:translate3d(-1.6%,-1.2%,0) scale(1.02)}
+  100%{transform:translate3d(1.8%,1.6%,0) scale(1.075)}
+}
+
+/* 统一滚动条与选中色 */
+*{scrollbar-width:thin;scrollbar-color:rgba(148,163,184,.34) transparent}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,rgba(153,246,228,.28),rgba(167,139,250,.24));
+  border-radius:999px;border:2px solid transparent;background-clip:padding-box;
+}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,rgba(153,246,228,.42),rgba(167,139,250,.36));background-clip:padding-box}
+::selection{background:rgba(94,234,212,.30);color:#fff}
+
+/* ============================================================
+   1. 顶栏 / 侧栏 / 页面外壳
+   ============================================================ */
+.topbar,
+.editor-toolbar,
+.console-tabs,
+.statusbar,
+.api-bar,
+.subbar{
+  background:
+    radial-gradient(70% 160% at 12% 0%,rgba(94,234,212,.10),transparent 64%),
+    linear-gradient(180deg,rgba(12,22,36,.70),rgba(7,14,24,.79))!important;
+  border-color:rgba(255,255,255,.08)!important;
+  box-shadow:0 12px 32px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.075);
+  -webkit-backdrop-filter:blur(var(--jgl-blur)) saturate(150%);
+  backdrop-filter:blur(var(--jgl-blur)) saturate(150%);
+}
+.statusbar{
+  background:linear-gradient(180deg,rgba(9,18,30,.72),rgba(6,12,21,.84))!important;
+  box-shadow:0 -10px 30px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.07);
+}
+.editor-toolbar,
+.console-tabs{
+  background:linear-gradient(180deg,rgba(16,28,44,.72),rgba(9,17,28,.78))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.055);
+}
+.topbar-brand,
+.brand-name{text-shadow:0 0 26px rgba(163,230,53,.16)}
+
+.left-panel,
+.hw-left,
+.logic-left{
+  background:
+    radial-gradient(130% 62% at 0% 0%,rgba(94,234,212,.16),transparent 58%),
+    radial-gradient(100% 58% at 100% 100%,rgba(167,139,250,.10),transparent 64%),
+    radial-gradient(110% 55% at 80% 8%,rgba(255,255,255,.075),transparent 48%),
+    linear-gradient(180deg,rgba(13,24,39,.58),rgba(7,13,22,.74))!important;
+  box-shadow:inset -1px 0 0 rgba(255,255,255,.055),10px 0 36px rgba(0,0,0,.14);
+  -webkit-backdrop-filter:blur(var(--jgl-blur)) saturate(140%);
+  backdrop-filter:blur(var(--jgl-blur)) saturate(140%);
+}
+.left-panel,.hw-left,.logic-left{border-right-color:rgba(255,255,255,.075)!important}
+
+/* 学习中心 / 错题本 / 词典外壳 */
+.study-wrap{
+  padding:24px 24px 26px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:26px;
+  background:
+    radial-gradient(260px circle at var(--jgl-x,50%) var(--jgl-y,0%),rgba(255,255,255,.105),transparent 62%),
+    radial-gradient(110% 80% at 8% 0%,rgba(255,255,255,.055),transparent 48%),
+    radial-gradient(100% 80% at 100% 105%,rgba(94,234,212,.055),transparent 62%),
+    linear-gradient(145deg,rgba(17,29,44,.58),rgba(6,12,21,.76));
+  box-shadow:var(--jgl-shadow);
+  -webkit-backdrop-filter:blur(22px) saturate(145%);
+  backdrop-filter:blur(22px) saturate(145%);
+}
+#study-lesson{
+  /* 外层不做 backdrop-filter：WebKit 会把子级玻璃背景一起吞掉。
+     改用一层极光暗底，阅读时仍有环境色但不透出下层页面。 */
+  background-color:rgba(5,11,19,.90)!important;
+  background-image:
+    radial-gradient(46% 40% at 82% 0%,rgba(94,234,212,.075),transparent 70%),
+    radial-gradient(44% 44% at 10% 100%,rgba(167,139,250,.06),transparent 72%),
+    radial-gradient(30% 30% at 18% 18%,rgba(88,166,255,.045),transparent 70%)!important;
+  animation:jgl-screen-in .34s var(--jgl-ease) both;
+}
+#study-lesson .study-body{
+  border:1px solid rgba(255,255,255,.075);
+  border-radius:22px;
+  background:
+    radial-gradient(260px circle at var(--jgl-x,50%) var(--jgl-y,0%),rgba(255,255,255,.08),transparent 62%),
+    linear-gradient(160deg,rgba(16,28,43,.58),rgba(6,12,21,.76));
+  box-shadow:0 22px 60px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.08);
+  background-color:rgba(11,20,33,.58);
+  -webkit-backdrop-filter:blur(20px) saturate(140%);
+  backdrop-filter:blur(20px) saturate(140%);
+}
+
+/* ============================================================
+   2. 品牌 / 标题 / 卡片
+   ============================================================ */
+.brand{
+  padding:9px 17px 9px 15px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:20px;
+  background:
+    radial-gradient(120% 140% at 20% 0%,rgba(255,255,255,.13),transparent 42%),
+    radial-gradient(100% 100% at 100% 100%,rgba(94,234,212,.08),transparent 58%),
+    linear-gradient(145deg,rgba(24,38,55,.56),rgba(7,14,24,.7));
+  box-shadow:0 16px 42px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.13),inset 0 -1px 0 rgba(255,255,255,.035);
+  -webkit-backdrop-filter:blur(18px) saturate(150%);
+  backdrop-filter:blur(18px) saturate(150%);
+}
+.brand-dot{
+  background:radial-gradient(circle at 32% 26%,#F5FFC0 0%,#D9F99D 24%,#A3E635 58%,#65A30D 100%)!important;
+  border:1px solid rgba(245,255,192,.78);
+  box-shadow:0 0 0 3px rgba(163,230,53,.06),0 0 22px rgba(163,230,53,.35),inset 0 1px 1px rgba(255,255,255,.65)!important;
+}
+.brand-name{color:#F4FFF7}
+
+/* 科目图标玻璃底托 */
+.subject-icon{position:relative;isolation:isolate}
+.subject-icon::before{
+  content:"";position:absolute;left:50%;top:50%;width:58px;height:58px;
+  transform:translate(-50%,-50%);border-radius:50%;
+  background:
+    radial-gradient(circle at 32% 24%,rgba(255,255,255,.20),transparent 42%),
+    radial-gradient(circle at 70% 78%,rgba(94,234,212,.09),transparent 58%),
+    linear-gradient(145deg,rgba(25,42,60,.62),rgba(7,14,24,.76));
+  border:1px solid rgba(255,255,255,.13);
+  box-shadow:0 10px 26px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.16),inset 0 -1px 0 rgba(255,255,255,.03);
+  -webkit-backdrop-filter:blur(12px) saturate(140%);
+  backdrop-filter:blur(12px) saturate(140%);
+  z-index:0;pointer-events:none;
+}
+.subject-icon .ui-ico{position:relative;z-index:1;filter:drop-shadow(0 6px 14px rgba(0,0,0,.28))}
+
+/* 卡片基础玻璃层 */
+.subject-card,
+.card,
+.topic-overview,
+.study-card,
+.lesson-item,
+.sec-card,
+.wb-card,
+.wb-stat .box,
+.dict-item,
+.hw-qcard,
+.logic-qcard,
+.review,
+.to-box,
+.panel-card,
+.panel-card.elevated,
+.score-card,
+.trial-card,
+.bug-card,
+.know-card,
+.lq-rcard,
+.term-card,
+.api-cn-item{
+  background-color:transparent!important;
+  background-image:
+    radial-gradient(280px circle at var(--jgl-x,50%) var(--jgl-y,0%),var(--jgl-sheen),transparent 62%),
+    radial-gradient(110% 90% at 10% 0%,rgba(255,255,255,.10),transparent 45%),
+    radial-gradient(100% 90% at 100% 108%,rgba(94,234,212,.075),transparent 58%),
+    linear-gradient(145deg,rgba(18,30,45,.62),rgba(7,13,22,.74));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.115),
+    inset 0 -1px 0 rgba(255,255,255,.025),
+    0 1px 0 rgba(255,255,255,.025),
+    0 22px 56px rgba(0,0,0,.28);
+}
+.subject-card,.card,.topic-overview,.study-card,.sec-card,.wb-stat .box,.dict-item,.hw-qcard,.logic-qcard,.review,.to-box,.panel-card,.panel-card.elevated,.score-card,.trial-card,.know-card,.api-cn-item{
+  border-color:rgba(255,255,255,.105);
+}
+.wb-card,.lesson-item,.bug-card,.lq-rcard,.term-card{
+  border-top-color:rgba(255,255,255,.105);
+  border-right-color:rgba(255,255,255,.105);
+  border-bottom-color:rgba(255,255,255,.105);
+}
+
+/* 顶部极光高光，让玻璃有可见的“液面” */
+.subject-card,.card,.topic-overview,.study-card,.lesson-item,.sec-card,.wb-card,.wb-stat .box,.dict-item,.hw-qcard,.logic-qcard,.review,.to-box,.panel-card,.panel-card.elevated,.score-card,.trial-card,.bug-card,.know-card,.lq-rcard,.term-card,.api-cn-item,.study-wrap{
+  position:relative;
+  isolation:isolate;
+}
+.subject-card::before,.card::before,.topic-overview::before,.study-card::before,.lesson-item::before,.sec-card::before,.wb-card::before,.wb-stat .box::before,.dict-item::before,.hw-qcard::before,.logic-qcard::before,.review::before,.to-box::before,.panel-card::before,.panel-card.elevated::before,.score-card::before,.trial-card::before,.bug-card::before,.know-card::before,.lq-rcard::before,.term-card::before,.api-cn-item::before,.study-wrap::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:
+    linear-gradient(115deg,rgba(255,255,255,.17),rgba(255,255,255,.035) 26%,transparent 52%),
+    radial-gradient(120% 90% at 50% -22%,rgba(255,255,255,.13),transparent 58%);
+  opacity:.58;
+  mix-blend-mode:screen;
+}
+.subject-card,.card,.review,.to-box,.hw-qcard,.logic-qcard,.topic-overview{
+  -webkit-backdrop-filter:blur(18px) saturate(145%);
+  backdrop-filter:blur(18px) saturate(145%);
+}
+
+.subject-card{
+  background-image:
+    radial-gradient(300px circle at var(--jgl-x,50%) var(--jgl-y,0%),rgba(255,255,255,.16),transparent 62%),
+    radial-gradient(130% 90% at 8% -10%,rgba(94,234,212,.12),transparent 52%),
+    radial-gradient(110% 100% at 100% 112%,rgba(167,139,250,.09),transparent 62%),
+    linear-gradient(145deg,rgba(19,33,49,.60),rgba(7,13,22,.72));
+}
+.card{
+  background-image:
+    radial-gradient(280px circle at var(--jgl-x,50%) var(--jgl-y,0%),rgba(255,255,255,.15),transparent 62%),
+    radial-gradient(130% 95% at 10% -8%,rgba(255,255,255,.10),transparent 48%),
+    radial-gradient(110% 100% at 100% 112%,rgba(94,234,212,.07),transparent 62%),
+    linear-gradient(145deg,rgba(19,33,49,.60),rgba(7,13,22,.72));
+}
+.study-card{
+  background-image:
+    radial-gradient(230px circle at var(--jgl-x,50%) var(--jgl-y,0%),rgba(255,255,255,.13),transparent 62%),
+    radial-gradient(120% 95% at 0% 0%,rgba(94,234,212,.09),transparent 55%),
+    radial-gradient(100% 100% at 100% 110%,rgba(167,139,250,.06),transparent 64%),
+    linear-gradient(145deg,rgba(20,34,50,.62),rgba(7,13,22,.74));
+}
+.lesson-item{
+  background-image:
+    radial-gradient(220px circle at var(--jgl-x,50%) var(--jgl-y,0%),rgba(255,255,255,.11),transparent 64%),
+    radial-gradient(120% 100% at 0% 0%,rgba(94,234,212,.07),transparent 58%),
+    linear-gradient(145deg,rgba(18,31,47,.62),rgba(7,13,22,.74));
+}
+.hw-qcard,.logic-qcard{
+  background-image:
+    radial-gradient(360px circle at var(--jgl-x,50%) var(--jgl-y,0%),rgba(255,255,255,.17),transparent 62%),
+    radial-gradient(120% 90% at 0% -8%,rgba(94,234,212,.11),transparent 54%),
+    radial-gradient(110% 100% at 100% 112%,rgba(167,139,250,.08),transparent 62%),
+    linear-gradient(145deg,rgba(19,33,49,.62),rgba(7,13,22,.74));
+}
+
+.subject-card{
+  border-radius:20px;
+  padding:28px 24px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.13),
+    0 20px 50px rgba(0,0,0,.26),
+    0 0 0 1px rgba(255,255,255,.025);
+}
+.card{
+  border-radius:18px;
+  padding:24px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.12),
+    0 20px 50px rgba(0,0,0,.26),
+    0 0 0 1px rgba(255,255,255,.025);
+}
+.study-card{
+  border-radius:16px;
+  padding:18px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 14px 34px rgba(0,0,0,.2);
+}
+.lesson-item{
+  border-radius:12px;
+  padding:14px 16px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 10px 26px rgba(0,0,0,.16);
+}
+.sec-card{
+  border-radius:14px;
+  padding:18px 20px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 12px 30px rgba(0,0,0,.16);
+}
+.wb-card{
+  border-radius:12px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 12px 30px rgba(0,0,0,.16);
+}
+.dict-item{border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 10px 24px rgba(0,0,0,.14)}
+.wb-stat .box{border-radius:14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 12px 28px rgba(0,0,0,.16)}
+.hw-qcard,.logic-qcard{border-radius:20px;padding:30px}
+.review{border-radius:20px;border-color:rgba(255,255,255,.13)!important}
+.to-box{border-radius:18px;border-color:rgba(255,255,255,.12)!important}
+.panel-card,.panel-card.elevated{border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 8px 20px rgba(0,0,0,.12)}
+.score-card,.trial-card{border-radius:14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 10px 26px rgba(0,0,0,.16)}
+.bug-card,.know-card,.lq-rcard,.term-card,.api-cn-item{border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.075),0 8px 22px rgba(0,0,0,.13)}
+.topic-overview{border-radius:14px;padding:11px 16px}
+
+/* 悬停时玻璃边缘更亮 */
+.subject-card:hover,
+.card:hover,
+.study-card:hover,
+.lesson-item:hover,
+.dict-item:hover{
+  border-color:rgba(153,246,228,.34);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.16),
+    0 28px 66px rgba(0,0,0,.34),
+    0 0 0 1px rgba(153,246,228,.08),
+    0 0 32px rgba(94,234,212,.075)!important;
+}
+.subject-card:hover,.card:hover,.study-card:hover{transform:translateY(-4px)}
+.lesson-item:hover,.dict-item:hover{transform:translateY(-2px)}
+
+/* 题卡里的选项也用玻璃，但保留判题色 */
+.hw-opt,.logic-choice{
+  background-image:
+    radial-gradient(180px circle at var(--jgl-x,50%) var(--jgl-y,0%),rgba(255,255,255,.12),transparent 62%),
+    linear-gradient(145deg,rgba(29,44,62,.62),rgba(10,18,30,.72))!important;
+  background-color:transparent!important;
+  border-color:rgba(255,255,255,.105);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 8px 22px rgba(0,0,0,.16);
+}
+.hw-opt:not(.locked):not(.correct):not(.wrong):hover,
+.logic-choice:not(.locked):not(.correct):not(.wrong):not(.multi-sel):hover{
+  border-color:rgba(153,246,228,.38)!important;
+  background-image:
+    radial-gradient(180px circle at var(--jgl-x,50%) var(--jgl-y,0%),rgba(255,255,255,.17),transparent 62%),
+    linear-gradient(145deg,rgba(38,57,78,.68),rgba(13,23,36,.78))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 14px 32px rgba(0,0,0,.22);
+}
+.hw-opt.correct,.logic-choice.correct{background-image:none!important;background-color:#0F2417!important}
+.hw-opt.wrong,.logic-choice.wrong{background-image:none!important;background-color:#2A1518!important}
+.hw-opt.multi-sel,.logic-choice.multi-sel{background-image:none!important;background-color:#1F2A1A!important}
+
+/* 提示 / 提交 / 清除行保留语义色，但套上玻璃高光 */
+.hint-card,.lq-hint-card{
+  background-image:
+    radial-gradient(180px circle at 18% 0%,rgba(227,192,123,.13),transparent 64%),
+    linear-gradient(145deg,rgba(44,33,15,.82),rgba(16,14,10,.82))!important;
+  border-color:#3D3016!important;
+  box-shadow:inset 0 1px 0 rgba(255,226,170,.12),0 12px 28px rgba(0,0,0,.18);
+}
+.submit-strip{
+  background-image:
+    radial-gradient(180px circle at 12% 0%,rgba(126,231,135,.12),transparent 66%),
+    linear-gradient(145deg,rgba(27,52,30,.76),rgba(9,22,13,.82))!important;
+  border-color:#2C4A22!important;
+  box-shadow:inset 0 1px 0 rgba(126,231,135,.12),0 8px 20px rgba(0,0,0,.14);
+}
+.submit-strip.trial{background-image:none!important;background-color:rgba(8,14,22,.76)!important;border-color:rgba(255,255,255,.09)!important}
+.success-banner{
+  background-image:
+    radial-gradient(220px circle at 12% 0%,rgba(126,231,135,.18),transparent 64%),
+    linear-gradient(145deg,rgba(24,60,42,.82),rgba(8,25,17,.86))!important;
+  box-shadow:inset 0 1px 0 rgba(198,255,206,.15),0 16px 36px rgba(0,0,0,.18)!important;
+}
+.clear-row{
+  background-image:linear-gradient(145deg,rgba(14,25,38,.66),rgba(7,13,22,.74))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.065);
+}
+.clear-row.hit{
+  background-image:linear-gradient(90deg,rgba(15,46,34,.86),rgba(7,20,15,.72))!important;
+  border-color:#1A6B4A!important;
+  box-shadow:inset 0 1px 0 rgba(126,231,135,.14),0 8px 22px rgba(0,0,0,.15);
+}
+
+
+/* 学习卡图标玻璃底托 */
+.study-card .sc-ico{position:relative;isolation:isolate;display:flex;align-items:center}
+.study-card .sc-ico::before{
+  content:"";position:absolute;left:50%;top:50%;width:47px;height:47px;transform:translate(-50%,-50%);
+  border-radius:50%;border:1px solid rgba(255,255,255,.12);
+  background:radial-gradient(circle at 32% 24%,rgba(255,255,255,.18),transparent 44%),linear-gradient(145deg,rgba(25,42,60,.58),rgba(7,14,24,.72));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 8px 20px rgba(0,0,0,.18);
+  z-index:0;pointer-events:none;
+}
+.study-card .sc-ico .ui-ico{position:relative;z-index:1;filter:drop-shadow(0 5px 12px rgba(0,0,0,.26))}
+.empty-note{
+  background-image:radial-gradient(200px circle at 20% 0%,rgba(255,255,255,.06),transparent 66%),linear-gradient(145deg,rgba(15,27,42,.58),rgba(7,13,22,.70))!important;
+  border:1px dashed rgba(255,255,255,.16)!important;
+  border-radius:16px!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+}
+.tag{
+  background:linear-gradient(145deg,rgba(255,255,255,.065),rgba(255,255,255,.018))!important;
+  border-color:rgba(255,255,255,.09)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07);
+  border-radius:999px!important;
+}
+.console{
+  background:linear-gradient(145deg,rgba(7,13,21,.82),rgba(4,9,15,.88))!important;
+  -webkit-backdrop-filter:blur(14px) saturate(130%);
+  backdrop-filter:blur(14px) saturate(130%);
+}
+
+/* ============================================================
+   3. 弹层 / 复盘
+   ============================================================ */
+.overlay{
+  /* 外层不再叠 backdrop-filter：WebKit 对「祖先 blur + 子级 blur」会吞掉子级背景，
+     改为更厚的暗底 + 卡片自身玻璃，Safari / Chromium 都稳定。 */
+  background:rgba(1,4,9,.70)!important;
+}
+.overlay.show{animation:jgl-fade-in .26s ease both}
+.overlay.show .review{animation:jgl-modal-in .34s var(--jgl-ease) both}
+.review{box-shadow:0 34px 90px rgba(0,0,0,.56),inset 0 1px 0 rgba(255,255,255,.12)!important}
+.review-head{
+  background:linear-gradient(180deg,rgba(24,40,58,.44),rgba(11,20,33,.18));
+  border-bottom-color:rgba(255,255,255,.085)!important;
+}
+.review-foot{
+  background:linear-gradient(180deg,rgba(8,15,24,.28),rgba(9,17,28,.58));
+  border-top-color:rgba(255,255,255,.085)!important;
+}
+.review-close{
+  width:34px;min-width:34px;height:34px;min-height:34px;border-radius:10px;
+  border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.045);
+  color:var(--text-secondary);font-size:19px;transition:background .18s,color .18s,transform .18s var(--jgl-ease),border-color .18s;
+}
+.review-close:hover{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.18);color:#fff}
+.review-close:active{transform:scale(.94);background:rgba(255,255,255,.14)}
+
+#term-overlay{background:rgba(1,4,9,.70)!important}
+#term-overlay.show{animation:jgl-fade-in .24s ease both}
+#term-overlay.show .to-box{animation:jgl-modal-in .34s var(--jgl-ease) both}
+#term-overlay .to-box{box-shadow:0 30px 80px rgba(0,0,0,.52),inset 0 1px 0 rgba(255,255,255,.12)!important}
+
+/* API 搜索下拉 */
+.api-bar{background:linear-gradient(180deg,rgba(11,21,35,.76),rgba(7,14,24,.84))!important}
+.api-results{
+  background:linear-gradient(160deg,rgba(18,30,47,.92),rgba(7,13,22,.96))!important;
+  border-color:rgba(255,255,255,.12)!important;
+  border-radius:14px;
+  box-shadow:0 24px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.10)!important;
+  -webkit-backdrop-filter:blur(22px) saturate(145%);
+  backdrop-filter:blur(22px) saturate(145%);
+}
+.api-search{
+  background:rgba(8,15,25,.62)!important;
+  border-color:rgba(255,255,255,.10)!important;
+  border-radius:10px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 8px 20px rgba(0,0,0,.13);
+  -webkit-backdrop-filter:blur(14px);
+  backdrop-filter:blur(14px);
+}
+.api-search:focus{border-color:rgba(153,246,228,.44)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 3px rgba(94,234,212,.08)!important}
+
+/* ============================================================
+   4. 按钮 / 表单 / 小控件
+   ============================================================ */
+.btn{
+  position:relative;
+  overflow:hidden;
+  border-radius:9px;
+  border:1px solid transparent;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.065),0 6px 16px rgba(0,0,0,.12);
+}
+.btn::after{
+  content:"";
+  position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(circle at var(--jgl-px,50%) var(--jgl-py,50%),rgba(255,255,255,.30),rgba(255,255,255,.10) 34%,transparent 62%);
+  opacity:0;transition:opacity .18s ease;mix-blend-mode:soft-light;
+}
+.btn:not(:disabled):active::after{opacity:.9;transition-duration:.04s}
+.btn-default{
+  background:linear-gradient(145deg,rgba(35,48,64,.62),rgba(14,22,34,.72));
+  border-color:rgba(255,255,255,.10);
+  color:var(--text-primary);
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);
+}
+.btn-default:hover{
+  background:linear-gradient(145deg,rgba(46,63,82,.72),rgba(16,26,40,.80));
+  border-color:rgba(153,246,228,.28);
+}
+.btn-primary{
+  background:linear-gradient(135deg,#E7FFB0 0%,#C7F56B 36%,#A3E635 72%,#84CC16 100%)!important;
+  color:#0B1305!important;
+  border-color:rgba(217,249,157,.72)!important;
+  box-shadow:0 10px 26px rgba(163,230,53,.18),inset 0 1px 0 rgba(255,255,255,.48),inset 0 -1px 0 rgba(54,83,20,.14);
+}
+.btn-primary:hover{opacity:1!important;filter:brightness(1.045);box-shadow:0 14px 32px rgba(163,230,53,.24),inset 0 1px 0 rgba(255,255,255,.55)}
+.btn-primary:disabled{box-shadow:none;filter:none}
+.chip{
+  background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.025))!important;
+  border:1px solid rgba(255,255,255,.085);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09);
+  -webkit-backdrop-filter:blur(10px);
+  backdrop-filter:blur(10px);
+}
+.card-badge,.card-tag{
+  align-self:flex-start;
+  background:linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.02))!important;
+  border:1px solid rgba(255,255,255,.075);
+  border-radius:999px!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09);
+}
+.card-tag{padding:4px 10px!important}
+.lesson-lv,.lesson-pts span,.pt-chips span,.dict-subj .btn,.lq-rate-banner,.topic-chip{
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07);
+}
+
+/* 学习中心 / 错题本的行动按钮 */
+.subject-actions .wrongbook-cta{
+  color:var(--text-primary);
+  border:1px solid rgba(255,255,255,.13);
+  background:
+    radial-gradient(120% 150% at 20% 0%,rgba(255,255,255,.13),transparent 46%),
+    linear-gradient(145deg,rgba(27,42,60,.76),rgba(8,15,25,.86));
+  box-shadow:0 14px 34px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.13);
+  -webkit-backdrop-filter:blur(16px) saturate(140%);
+  backdrop-filter:blur(16px) saturate(140%);
+}
+.subject-actions .wrongbook-cta:hover{
+  border-color:rgba(94,234,212,.38);
+  background:
+    radial-gradient(120% 150% at 20% 0%,rgba(255,255,255,.18),transparent 46%),
+    linear-gradient(145deg,rgba(35,54,73,.82),rgba(10,20,33,.90));
+}
+.subject-actions .study-cta{
+  background:
+    radial-gradient(110% 140% at 24% 0%,rgba(255,255,255,.72),transparent 40%),
+    linear-gradient(135deg,#E9FFB8 0%,#C9F875 34%,#A3E635 70%,#7CB928 100%);
+  box-shadow:0 18px 38px rgba(163,230,53,.20),inset 0 1px 0 rgba(255,255,255,.58),inset 0 -1px 0 rgba(43,72,15,.16);
+}
+.subject-actions .study-cta:hover{
+  box-shadow:0 24px 48px rgba(163,230,53,.28),inset 0 1px 0 rgba(255,255,255,.68),inset 0 -1px 0 rgba(43,72,15,.14);
+}
+
+/* 搜索 / 填空输入框 */
+#api-q,#dict-q,
+.logic-fill-item input.fl-in{
+  background:rgba(7,14,24,.62)!important;
+  border-color:rgba(255,255,255,.10)!important;
+  border-radius:10px!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 6px 18px rgba(0,0,0,.11)!important;
+  transition:border-color .18s,box-shadow .18s,background .18s!important;
+}
+#api-q:focus,#dict-q:focus,
+.logic-fill-item input.fl-in:focus{
+  background:rgba(10,19,31,.72)!important;
+  border-color:rgba(153,246,228,.42)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.075),0 0 0 3px rgba(94,234,212,.09)!important;
+}
+.dict-search input{color:var(--text-primary)}
+.logic-fill-item,.logic-essay-box{
+  background:linear-gradient(145deg,rgba(16,28,43,.62),rgba(7,13,22,.72))!important;
+  border-color:rgba(255,255,255,.09)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+}
+.logic-essay-box textarea{
+  background:rgba(6,12,21,.58)!important;border-color:rgba(255,255,255,.09)!important;border-radius:9px!important;
+}
+
+/* 术语卡片、词典、错题本里的小玻璃块 */
+.to-api-keys span,.to-api-row,.wb-why,.wb-study,.api-type-chip,.term-gloss .tg-item{
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.055);
+}
+.term-gloss .tg-item{background:linear-gradient(145deg,rgba(18,30,45,.58),rgba(7,13,22,.66))!important;border-color:rgba(255,255,255,.085)!important;border-radius:10px!important}
+.api-type-chip{
+  background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018))!important;
+  border-color:rgba(255,255,255,.10)!important;border-radius:8px!important;
+}
+.term-card{background-image:
+  radial-gradient(220px circle at 8% 0%,rgba(88,166,255,.10),transparent 60%),
+  linear-gradient(145deg,rgba(18,33,51,.72),rgba(7,15,26,.82))!important;
+  border-color:rgba(88,166,255,.24)!important;
+}
+
+/* ============================================================
+   5. 按下反馈：所有可点击元素
+   ============================================================ */
+button:not([class*="jv-"]):not(:disabled),
+.btn:not(:disabled),
+.home,
+.back-link,
+.study-cta,
+.wrongbook-cta,
+.tab,
+.api-type-chip,
+.subject-card,
+.card,
+.study-card,
+.lesson-item,
+.wb-card,
+.dict-item,
+.hw-opt,
+.logic-choice{
+  transition:
+    transform .22s var(--jgl-ease),
+    box-shadow .24s ease,
+    background-color .22s ease,
+    border-color .22s ease,
+    color .18s ease,
+    opacity .18s ease,
+    filter .18s ease;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+button:not([class*="jv-"]):not(:disabled):active,
+.btn:not(:disabled):active,
+.tab:active,
+.api-type-chip:active,
+.back-link:active,
+.home:active{
+  transform:translateY(1px) scale(.972);
+  transition-duration:.075s;
+  filter:brightness(.985);
+}
+.study-cta:active,.wrongbook-cta:active{
+  transform:translateY(1px) scale(.975);
+  transition-duration:.075s;
+  filter:brightness(.985);
+  box-shadow:0 8px 20px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.18)!important;
+}
+.subject-card:active,.card:active,.study-card:active{
+  transform:translateY(0) scale(.985);
+  transition-duration:.075s;
+  box-shadow:0 10px 26px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.12)!important;
+}
+.lesson-item:active,.wb-card:active,.dict-item:active{
+  transform:translateY(0) scale(.99);
+  transition-duration:.075s;
+}
+.hw-opt:active,.logic-choice:active{
+  transform:translateY(1px) scale(.985);
+  transition-duration:.075s;
+}
+.term:active{background:rgba(88,166,255,.18)}
+.review-close:active,.api-clear:active{
+  transform:scale(.94);
+  transition-duration:.075s;
+}
+
+/* ============================================================
+   6. 屏幕切换 / 弹层进入 / toast
+   ============================================================ */
+.screen-in{animation:jgl-screen-in .38s var(--jgl-ease) both}
+@keyframes jgl-screen-in{
+  from{opacity:.42;transform:translateY(10px) scale(.994)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes jgl-fade-in{
+  from{opacity:0}
+  to{opacity:1}
+}
+@keyframes jgl-modal-in{
+  from{opacity:0;transform:translateY(14px) scale(.975)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes jgl-fade-out{from{opacity:1}to{opacity:0}}
+@keyframes jgl-modal-out{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(8px) scale(.985)}}
+.overlay.closing{animation:jgl-fade-out .18s ease both;pointer-events:none}
+.overlay.closing .review{animation:jgl-modal-out .18s cubic-bezier(.4,0,.2,1) both}
+#term-overlay.closing{animation:jgl-fade-out .16s ease both;pointer-events:none}
+#term-overlay.closing .to-box{animation:jgl-modal-out .16s cubic-bezier(.4,0,.2,1) both}
+
+/* ============================================================
+   7. 科目入口页（subjects/*.html）
+   ============================================================ */
+.subbar{
+  background:linear-gradient(180deg,rgba(10,20,35,.72),rgba(6,13,24,.82))!important;
+  border-bottom:1px solid rgba(255,255,255,.09)!important;
+  box-shadow:0 12px 34px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.075)!important;
+  -webkit-backdrop-filter:blur(20px) saturate(150%)!important;
+  backdrop-filter:blur(20px) saturate(150%)!important;
+}
+.home{
+  position:relative;overflow:hidden;
+  border:1px solid rgba(153,246,228,.22)!important;
+  background:
+    radial-gradient(120% 150% at 24% 0%,rgba(255,255,255,.14),transparent 45%),
+    linear-gradient(115deg,rgba(94,234,212,.12),rgba(167,139,250,.08))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 10px 26px rgba(0,0,0,.20)!important;
+  -webkit-backdrop-filter:blur(16px) saturate(145%);
+  backdrop-filter:blur(16px) saturate(145%);
+}
+.home::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(circle at var(--jgl-px,50%) var(--jgl-py,50%),rgba(255,255,255,.32),transparent 58%);
+  opacity:0;transition:opacity .18s;mix-blend-mode:soft-light;
+}
+.home:active::after{opacity:.85}
+.home:hover{
+  border-color:rgba(153,246,228,.52)!important;
+  background:
+    radial-gradient(120% 150% at 24% 0%,rgba(255,255,255,.18),transparent 45%),
+    linear-gradient(115deg,rgba(94,234,212,.20),rgba(167,139,250,.12))!important;
+  transform:translateY(-1px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 14px 30px rgba(0,0,0,.24)!important;
+}
+.subbar .home:active,a.home:active{transform:translateY(1px) scale(.972)}
+.home{transition:transform .2s var(--jgl-ease),border-color .18s ease,box-shadow .2s ease}
+.frame-wrap{background:transparent!important}
+.loader{
+  background:rgba(5,11,20,.62)!important;
+  -webkit-backdrop-filter:blur(18px) saturate(135%);
+  backdrop-filter:blur(18px) saturate(135%);
+}
+
+/* ============================================================
+   8. 响应式 / 无障碍
+   ============================================================ */
+@media(max-width:760px){
+  :root{--jgl-blur:14px}
+  .study-wrap{padding:18px 16px 20px;border-radius:22px}
+  .subject-card,.card,.hw-qcard,.logic-qcard,.review{padding:22px}
+  .brand{padding:8px 14px}
+  .brand-name{font-size:28px}
+  .subject-icon::before{width:54px;height:54px}
+  .subject-actions .btn-lg{height:52px}
+  .left-panel,.hw-left,.logic-left{-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+  body::before{filter:blur(22px) saturate(1.12);opacity:.82}
+}
+@media(max-width:420px){
+  .study-wrap{padding:15px 12px 18px;border-radius:20px}
+  .subject-card,.card{padding:20px 18px}
+  .brand-name{font-size:25px}
+  .subject-icon::before{width:50px;height:50px}
+}
+@media(hover:none){
+  .subject-card:hover,.card:hover,.study-card:hover,.lesson-item:hover,.dict-item:hover{
+    transform:none;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 18px 44px rgba(0,0,0,.24)!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  body::before{animation:none}
+  .screen-in,#study-lesson,.overlay.show,#term-overlay.show,.overlay.show .review,#term-overlay.show .to-box,
+  .overlay.closing,#term-overlay.closing,.overlay.closing .review,#term-overlay.closing .to-box{animation:none!important}
+  button:not([class*="jv-"]):not(:disabled):active,
+  .btn:not(:disabled):active,
+  .tab:active,.api-type-chip:active,.back-link:active,.home:active,
+  .study-cta:active,.wrongbook-cta:active,
+  .subject-card:active,.card:active,.study-card:active,
+  .lesson-item:active,.wb-card:active,.dict-item:active,
+  .hw-opt:active,.logic-choice:active,
+  .review-close:active,.api-clear:active{transform:none!important}
+  .btn::after,.home::after{transition:none}
+  .subject-card,.card,.study-card,.lesson-item,.wb-card,.dict-item,.hw-opt,.logic-choice{transition-duration:.01s!important}
+}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .subject-card,.card,.study-wrap,.hw-qcard,.logic-qcard,.review,.to-box,.topbar,.left-panel,.hw-left,.logic-left{
+    background-color:rgba(9,17,28,.92)!important;
+  }
+}
+
+/* z36.1 · 术语弹层更通透：提高玻璃底色与顶部/角落内高光，避免像黑块 */
+#term-overlay .to-box{
+  background-image:
+    radial-gradient(180px circle at 18% 0%, rgba(255,255,255,.20), transparent 62%),
+    radial-gradient(120% 80% at 100% 100%, rgba(94,234,212,.08), transparent 58%),
+    radial-gradient(80% 60% at 0% 100%, rgba(167,139,250,.07), transparent 60%),
+    linear-gradient(145deg, rgba(32,50,70,.78), rgba(12,22,35,.90))!important;
+  border-color:rgba(255,255,255,.16)!important;
+  box-shadow:0 28px 90px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.22),inset 0 -1px 0 rgba(255,255,255,.04)!important;
+}
+#term-overlay .to-box::before{opacity:.5}
+#term-overlay .to-head{border-bottom-color:rgba(255,255,255,.10)!important}
+#term-overlay .to-body{color:#DCE6F2}
+#term-overlay .to-label{color:#9FB0C4}
+#term-overlay .to-close:active{transform:scale(.92)}
+
+/* z36.1 · API 下拉项也跟手 */
+.api-item{transition:background .14s ease,transform .16s cubic-bezier(.2,.8,.2,1)}
+.api-item:hover,.api-item.active{background:linear-gradient(90deg,rgba(94,234,212,.08),rgba(255,255,255,.02))}
+.api-item:active{transform:scale(.988)}
+
+/* 小屏题卡与复盘卡恢复紧凑内边距，避免 22px 把选项挤窄 */
+@media (max-width:640px){
+  .hw-qcard,.logic-qcard{padding:16px 14px}
+  .review{padding:20px 16px}
+}
+
+/* 全屏阅读/复盘层的可读性底座：保留渐变与高光，但不再让正文穿透到字上 */
+.review{background-color:rgba(11,20,33,.78)!important}
+#term-overlay .to-box{background-color:rgba(12,23,37,.30)!important}
+
+/* 课文正文是 flex 子项，必须允许收缩；否则长代码/长术语会把面板撑出手机屏幕 */
+#study-lesson .study-body{width:100%;min-width:0;box-sizing:border-box}
+
+/* 课文里的长代码在手机上也要换行，不能把整页撑宽 */
+#study-lesson .sec-code{max-width:100%;overflow-wrap:anywhere;word-break:break-word}
+#study-lesson .sec-card{min-width:0}
+
+/* ============================================================
+   z37 · 全屏按压光效
+   点击按钮/卡片时，一层低亮度液光从触点扩散到全屏，同时屏幕四边
+   出现一圈极淡的玻璃边缘光；两层都被近似 Apple 屏幕圆角裁切。
+   纯视觉层：pointer-events:none，不影响点击、滚动或键盘操作。
+   ============================================================ */
+@media (max-width:640px){
+  :root{--jgl-screen-radius:clamp(34px,14vmin,60px)}
+
+  /* iPhone 刘海/灵动岛与 Home Indicator：页面级容器也避开硬件安全区。 */
+  #subject,#landing,#hw-landing{
+    padding-top:calc(26px + var(--jgl-safe-top));
+    padding-bottom:calc(26px + var(--jgl-safe-bottom));
+  }
+  #study-hub,#study-course,#wrongbook,#term-dict{
+    padding-top:calc(18px + var(--jgl-safe-top));
+    padding-bottom:calc(18px + var(--jgl-safe-bottom));
+  }
+  #api-docs .api-bar{
+    padding-top:calc(10px + var(--jgl-safe-top));
+    padding-bottom:10px;
+  }
+}
+
+.jgl-tap-aura{
+  position:fixed;inset:0;z-index:960;
+  overflow:hidden;
+  border-radius:0;
+  pointer-events:none;
+  opacity:0;
+  isolation:isolate;
+  contain:layout paint style;
+  will-change:opacity;
+}
+.jgl-tap-aura::before{
+  content:"";position:absolute;inset:0;
+  transform-origin:var(--tap-x,50%) var(--tap-y,50%);
+  background:
+    radial-gradient(circle 90px at var(--tap-x,50%) var(--tap-y,50%),
+      rgba(255,255,255,.22) 0,
+      rgba(153,246,228,.12) 38%,
+      transparent 78%),
+    radial-gradient(circle 110vmax at var(--tap-x,50%) var(--tap-y,50%),
+      transparent 0 30%,
+      rgba(255,255,255,.10) 44%,
+      rgba(153,246,228,.15) 58%,
+      rgba(94,234,212,.08) 76%,
+      transparent 100%);
+  opacity:0;
+}
+.jgl-tap-aura::after{
+  content:"";position:absolute;inset:0;
+  border-radius:0;
+  padding:2px;
+  background:conic-gradient(from 0deg,#99F6E4,#5EEAD4,#7DD3FC,#A78BFA,#C084FC,#5EEAD4);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  filter:blur(6px) saturate(170%) brightness(1.12);
+  opacity:0;
+  mix-blend-mode:screen;
+}
+.jgl-tap-ring{
+  position:absolute;left:var(--tap-x,50%);top:var(--tap-y,50%);
+  width:14px;height:14px;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.42);
+  box-shadow:
+    0 0 18px rgba(153,246,228,.34),
+    inset 0 0 12px rgba(255,255,255,.22);
+  filter:blur(.35px);
+  mix-blend-mode:screen;
+  transform:translate(-50%,-50%) scale(.35);
+  opacity:0;
+  pointer-events:none;
+  will-change:transform,opacity;
+}
+.jgl-tap-aura.on{opacity:1}
+.jgl-tap-aura.on::before{animation:jgl-tap-bloom .72s cubic-bezier(.18,.75,.25,1) both}
+.jgl-tap-aura.on::after{animation:jgl-tap-rim .62s ease-out both}
+.jgl-tap-aura.on .jgl-tap-ring{animation:jgl-tap-ring .72s cubic-bezier(.18,.75,.25,1) both}
+@keyframes jgl-tap-bloom{
+  0%{opacity:0;transform:scale(.92)}
+  12%{opacity:.88}
+  46%{opacity:.38;transform:scale(1.05)}
+  100%{opacity:0;transform:scale(1.18)}
+}
+@keyframes jgl-tap-rim{
+  0%{opacity:0}
+  18%{opacity:.62}
+  100%{opacity:0}
+}
+@keyframes jgl-tap-ring{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.35)}
+  16%{opacity:.5}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(20)}
+}
+@media (prefers-reduced-motion:reduce){
+  .jgl-tap-aura,.jgl-tap-aura::before,.jgl-tap-aura::after,.jgl-tap-ring{display:none!important;animation:none!important}
+}
+
+/* ============================================================
+   z39 · 午夜工坊 / Midnight Atelier
+   把霓虹绿收敛成玉、香槟与烟熏玻璃；用字距、表面明暗和留白
+   做高级感，而不是再加一层亮色描边。
+   ============================================================ */
+:root{
+  --bg-canvas:#080A0E;
+  --bg-panel:#101419;
+  --bg-elevated:#171C21;
+  --bg-editor:#090C10;
+  --border:#242A30;
+  --border-strong:#3B4348;
+  --text-primary:#F3EFE6;
+  --text-secondary:#A7B0B1;
+  --text-muted:#6F797D;
+  --accent:#C8A976;
+  --success:#9CC9B8;
+  --error:#D08B84;
+  --warning:#C8A976;
+  --info:#9BB6C1;
+  --jgl-line:rgba(244,239,230,.11);
+  --jgl-line-soft:rgba(244,239,230,.06);
+  --jgl-sheen:rgba(255,255,255,.075);
+  --jgl-shadow:0 26px 64px rgba(0,0,0,.34),0 0 0 1px rgba(255,255,255,.018),inset 0 1px 0 rgba(255,255,255,.08);
+}
+html,body{background:var(--bg-canvas)!important}
+body::before{
+  background:
+    radial-gradient(42% 40% at 9% 4%,rgba(156,201,184,.10),transparent 68%),
+    radial-gradient(34% 34% at 92% 7%,rgba(200,169,118,.085),transparent 70%),
+    radial-gradient(52% 44% at 50% 48%,rgba(39,58,62,.10),transparent 74%),
+    radial-gradient(40% 40% at 52% 108%,rgba(119,148,153,.05),transparent 72%),
+    radial-gradient(74% 66% at 50% 44%,transparent 0 52%,rgba(0,0,0,.30) 100%);
+  filter:blur(38px) saturate(1.04);
+  opacity:.94;
+}
+body::after{opacity:.038;mix-blend-mode:soft-light}
+::selection{background:rgba(200,169,118,.28);color:#fff}
+
+/* 顶栏与工具栏：去掉青绿环境光，换成烟熏黑玻璃。 */
+.topbar,.editor-toolbar,.console-tabs,.statusbar,.api-bar,.subbar{
+  background:
+    linear-gradient(180deg,rgba(16,19,23,.78),rgba(7,9,12,.86))!important;
+  border-color:rgba(244,239,230,.09)!important;
+  box-shadow:0 12px 32px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.06);
+}
+.statusbar{background:linear-gradient(180deg,rgba(12,15,18,.76),rgba(6,8,11,.88))!important}
+.topbar-brand,.brand-name{text-shadow:0 1px 0 rgba(255,255,255,.05)}
+
+/* 品牌：宋体字头 + 香槟色宝石点，弱化霓虹感。 */
+.brand{
+  padding:9px 17px 9px 15px;
+  border:1px solid rgba(244,239,230,.14);
+  border-radius:19px;
+  background:
+    radial-gradient(130% 140% at 18% 0,rgba(255,255,255,.095),transparent 44%),
+    linear-gradient(145deg,rgba(26,31,36,.84),rgba(8,11,15,.92));
+  box-shadow:0 20px 48px rgba(0,0,0,.30),inset 0 1px 0 rgba(255,255,255,.10),inset 0 -1px 0 rgba(255,255,255,.02);
+  -webkit-backdrop-filter:blur(22px) saturate(118%);
+  backdrop-filter:blur(22px) saturate(118%);
+}
+.brand-dot{
+  width:11px;height:11px;
+  background:radial-gradient(circle at 34% 28%,#FAF3E4 0%,#E1C99D 26%,#C8A976 58%,#84663B 100%)!important;
+  border:1px solid rgba(255,246,226,.72);
+  box-shadow:0 0 0 3px rgba(200,169,118,.055),0 0 20px rgba(200,169,118,.22),inset 0 1px 1px rgba(255,255,255,.70)!important;
+}
+.brand-name{
+  color:#F6F1E7;
+  font-family:"Songti SC","STSong","Noto Serif SC","Source Han Serif SC",Georgia,serif;
+  font-weight:600;
+  letter-spacing:.075em;
+}
+.landing-sub{
+  max-width:600px;
+  color:#A7B0B1;
+  font-size:13.5px;
+  line-height:1.9;
+  letter-spacing:.012em;
+}
+
+/* 首屏双入口：把荧光绿换成香槟象牙，按钮自己发光而不是靠描边。 */
+.subject-actions .btn-lg{
+  height:56px;
+  padding:0 25px;
+  border-radius:15px;
+  font-size:15px;
+  font-weight:650;
+  letter-spacing:.015em;
+}
+.subject-actions .study-cta,.study-cta,.btn-primary{
+  color:#18140F!important;
+  border:1px solid rgba(255,250,240,.52)!important;
+  background:
+    radial-gradient(120% 160% at 24% 0,rgba(255,255,255,.34),transparent 42%),
+    linear-gradient(135deg,#F7F1E4 0%,#E9DECA 48%,#D2BA97 100%)!important;
+  box-shadow:
+    0 18px 42px rgba(0,0,0,.32),
+    inset 0 1px 0 rgba(255,255,255,.68),
+    inset 0 -1px 0 rgba(74,58,35,.13)!important;
+}
+.subject-actions .study-cta:hover,.study-cta:hover,.btn-primary:hover{
+  filter:none!important;
+  background:
+    radial-gradient(120% 160% at 24% 0,rgba(255,255,255,.42),transparent 42%),
+    linear-gradient(135deg,#FBF7EE 0%,#EEE4D3 48%,#D8C3A2 100%)!important;
+  box-shadow:0 22px 48px rgba(0,0,0,.36),inset 0 1px 0 rgba(255,255,255,.74)!important;
+}
+.subject-actions .wrongbook-cta{
+  color:#EBE7DE;
+  border:1px solid rgba(244,239,230,.13);
+  background:
+    radial-gradient(120% 140% at 18% 0,rgba(255,255,255,.06),transparent 46%),
+    linear-gradient(145deg,rgba(27,32,37,.86),rgba(8,11,15,.94));
+  box-shadow:0 16px 38px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.095);
+}
+.subject-actions .wrongbook-cta:hover{
+  border-color:rgba(200,169,118,.30);
+  background:
+    radial-gradient(120% 140% at 18% 0,rgba(255,255,255,.09),transparent 46%),
+    linear-gradient(145deg,rgba(33,39,45,.90),rgba(10,13,18,.96));
+}
+
+/* 科目卡：从蓝紫玻璃改成烟熏黑曜石；只留极轻的玉色返光。 */
+.subject-card,.card,.topic-overview,.study-card,.lesson-item,.sec-card,.wb-card,.wb-stat .box,.dict-item,.hw-qcard,.logic-qcard,.review,.to-box,.panel-card,.panel-card.elevated,.score-card,.trial-card,.bug-card,.know-card,.lq-rcard,.term-card,.api-cn-item,.study-wrap{
+  background-color:transparent!important;
+  background-image:
+    radial-gradient(260px circle at var(--jgl-x,50%) var(--jgl-y,0%),rgba(255,255,255,.075),transparent 64%),
+    radial-gradient(110% 90% at 100% 108%,rgba(156,201,184,.035),transparent 62%),
+    linear-gradient(155deg,rgba(25,30,35,.78),rgba(9,12,16,.90))!important;
+  border-color:rgba(244,239,230,.095)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.075),
+    inset 0 -1px 0 rgba(255,255,255,.015),
+    0 22px 52px rgba(0,0,0,.26)!important;
+  -webkit-backdrop-filter:blur(20px) saturate(118%);
+  backdrop-filter:blur(20px) saturate(118%);
+}
+.subject-card{border-radius:22px;padding:27px 25px}
+.card{border-radius:18px}
+.study-wrap{
+  border-radius:25px;
+  background-image:
+    radial-gradient(340px circle at var(--jgl-x,50%) var(--jgl-y,0%),rgba(255,255,255,.065),transparent 66%),
+    linear-gradient(155deg,rgba(21,26,31,.72),rgba(7,10,14,.86))!important;
+}
+:is(.subject-card,.card,.topic-overview,.study-card,.lesson-item,.sec-card,.wb-card,.wb-stat .box,.dict-item,.hw-qcard,.logic-qcard,.review,.to-box,.panel-card,.panel-card.elevated,.score-card,.trial-card,.bug-card,.know-card,.lq-rcard,.term-card,.api-cn-item,.study-wrap)::before{
+  background:
+    linear-gradient(120deg,rgba(255,255,255,.108),rgba(255,255,255,.018) 28%,transparent 56%),
+    radial-gradient(120% 90% at 50% -24%,rgba(255,255,255,.08),transparent 58%);
+  opacity:.40;
+}
+:is(.subject-card,.card,.study-card,.lesson-item,.dict-item):hover{
+  border-color:rgba(200,169,118,.30)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.095),
+    0 28px 60px rgba(0,0,0,.32),
+    0 0 0 1px rgba(200,169,118,.035)!important;
+}
+.subject-card:hover,.card:hover,.study-card:hover{transform:translateY(-3px)}
+.subject-name{
+  font-size:21px;
+  font-weight:650;
+  letter-spacing:-.018em;
+  color:#F3EFE6;
+}
+.subject-desc{font-size:13px;color:#A7B0B1;line-height:1.78}
+.subject-meta{
+  border-top-color:rgba(244,239,230,.075);
+  color:#707A7E;
+  font-size:11.5px;
+  letter-spacing:.012em;
+}
+.subject-icon::before{
+  width:56px;height:56px;
+  background:
+    radial-gradient(circle at 32% 23%,rgba(255,255,255,.16),transparent 44%),
+    linear-gradient(145deg,rgba(32,37,42,.66),rgba(8,11,15,.80));
+  border-color:rgba(244,239,230,.11);
+  box-shadow:0 10px 26px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.12);
+}
+
+/* 低层级控件统一到暖灰玻璃。 */
+.btn-default{
+  background:linear-gradient(145deg,rgba(32,37,43,.70),rgba(12,15,20,.82));
+  border-color:rgba(244,239,230,.10);
+  color:#EDE9E1;
+}
+.btn-default:hover{
+  background:linear-gradient(145deg,rgba(41,48,54,.78),rgba(14,18,23,.88));
+  border-color:rgba(200,169,118,.26);
+}
+.chip,.tag,.card-badge,.card-tag{
+  background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.015))!important;
+  border-color:rgba(244,239,230,.085)!important;
+  color:#C8CFCE;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+}
+.card-badge,.t-basic,.t-inter,.t-hard{letter-spacing:.055em}
+.t-basic{color:#9CC9B8}.t-inter{color:#C8A976}.t-hard{color:#D08B84}
+
+/* 深层弹层保持暗场，卡片本身已经是主角。 */
+.overlay,#term-overlay{background:rgba(2,4,7,.76)!important}
+.review-head{background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(10,13,17,.10))!important}
+.review-foot{background:linear-gradient(180deg,rgba(7,10,14,.28),rgba(8,11,15,.62))!important}
+
+/* 全屏点击光也收敛到玉与香槟。 */
+.jgl-tap-aura::before{
+  background:
+    radial-gradient(circle 90px at var(--tap-x,50%) var(--tap-y,50%),
+      rgba(255,250,240,.20) 0,
+      rgba(200,169,118,.12) 38%,
+      transparent 78%),
+    radial-gradient(circle 110vmax at var(--tap-x,50%) var(--tap-y,50%),
+      transparent 0 30%,
+      rgba(255,250,240,.085) 44%,
+      rgba(200,169,118,.14) 58%,
+      rgba(156,201,184,.07) 76%,
+      transparent 100%);
+}
+.jgl-tap-aura::after{
+  background:conic-gradient(from 0deg,#F6EFE3,#C8A976,#9CC9B8,#E7D8BB,#C8A976);
+}
+.jgl-tap-ring{
+  border-color:rgba(255,248,234,.40);
+  box-shadow:0 0 18px rgba(200,169,118,.30),inset 0 0 12px rgba(255,255,255,.18);
+}
+
+@media (max-width:640px){
+  .brand{padding:9px 15px 9px 13px;border-radius:18px}
+  .brand-name{font-size:31px;letter-spacing:.055em}
+  .landing-sub{font-size:12.5px;line-height:1.85}
+  .subject-actions .btn-lg{height:54px;font-size:14.5px;border-radius:14px}
+  .subject-card{padding:22px 19px;border-radius:21px}
+  .subject-name{font-size:20px}
+}
+@media (max-width:360px){
+  .brand-name{font-size:27px;letter-spacing:.04em}
+  .landing-sub{font-size:12px}
+}
+
+/* z39 · 收掉科目图标里最跳的青绿荧光，让它们像暗室里的旧宝石，而不是灯牌。 */
+.ui-ico-subject,
+.ui-ico-sc,
+.ui-ico-btn,
+.ui-ico-title{
+  filter:grayscale(.26) sepia(.10) saturate(.55) brightness(.90) contrast(1.03);
+}
+.subject-icon .ui-ico-subject{filter:grayscale(.32) sepia(.12) saturate(.50) brightness(.89) contrast(1.04)}
+.subject-card:hover .ui-ico-subject,
+.study-card:hover .ui-ico-sc{
+  filter:grayscale(.15) sepia(.08) saturate(.70) brightness(.98) contrast(1.03);
+}
+
+/* 题库概览从“一堵小字”变成可读的引文块。 */
+.topic-overview{
+  max-width:780px!important;
+  padding:14px 20px!important;
+  border-radius:14px!important;
+  font-size:11.8px!important;
+  line-height:1.92!important;
+  letter-spacing:.012em;
+  color:#9AA5A6!important;
+  text-wrap:pretty;
+}
+.topic-overview b{color:#D8C4A0!important}
+@media (max-width:640px){
+  .topic-overview{font-size:11.2px!important;line-height:1.85!important;padding:11px 13px!important;text-align:left!important}
+}
+
+
+/* ============================================================
+   z39 · 练习室深水区
+   编辑器正文保持可读的深色实底；只把四周的蓝灰玻璃、
+   荧光绿状态和旧绿色按钮统一成烟熏/香槟/玉色。
+   ============================================================ */
+.left-panel{
+  background:
+    radial-gradient(130% 64% at 0% 0%,rgba(200,169,118,.075),transparent 58%),
+    radial-gradient(100% 58% at 100% 100%,rgba(156,201,184,.055),transparent 64%),
+    radial-gradient(110% 55% at 80% 8%,rgba(255,255,255,.035),transparent 48%),
+    linear-gradient(165deg,rgba(18,22,26,.88),rgba(8,10,13,.95))!important;
+  border-right-color:rgba(244,239,230,.10)!important;
+  box-shadow:inset -1px 0 0 rgba(255,255,255,.018);
+}
+.editor-pane{
+  background:
+    radial-gradient(90% 40% at 50% 0%,rgba(255,255,255,.025),transparent 62%),
+    linear-gradient(165deg,#0B0E12,#07090C)!important;
+}
+.line-gutter{background:linear-gradient(180deg,#0A0D11,#07090B)!important;border-right-color:rgba(244,239,230,.065)!important}
+.console{
+  background:
+    radial-gradient(90% 36% at 50% 0%,rgba(200,169,118,.045),transparent 66%),
+    linear-gradient(165deg,#0A0D11,#06080B)!important;
+  border-top-color:rgba(244,239,230,.085)!important;
+}
+.console-body{background:transparent!important}
+.code-editor{caret-color:#D8C4A0!important}
+.code-editor::selection,.code-editor::-moz-selection{background:rgba(200,169,118,.28)!important}
+.code-highlight .occ,.inline-code .occ{
+  background:rgba(200,169,118,.16)!important;
+  outline-color:rgba(200,169,118,.42)!important;
+  box-shadow:0 0 0 1px rgba(9,12,16,.30)!important;
+}
+.code-highlight .op,.inline-code .op{color:#D89A90!important}
+.inline-code{
+  background:#0B0E12!important;
+  border-color:rgba(244,239,230,.12)!important;
+  color:#E8E3D9!important;
+}
+.inline-code.block{border-left-color:rgba(200,169,118,.55)!important}
+
+.hint-card{
+  background:linear-gradient(155deg,rgba(200,169,118,.13),rgba(200,169,118,.05))!important;
+  border-color:rgba(200,169,118,.24)!important;
+  border-radius:12px!important;
+}
+.hint-label{color:#E1C99D!important}
+.hint-text{color:#D8C6A9!important}
+
+.status-pill{border:1px solid rgba(244,239,230,.055)}
+.s-error{background:rgba(208,139,132,.10)!important;color:#DFA7A1!important;border-color:rgba(208,139,132,.18)!important}
+.s-ok{background:rgba(156,201,184,.10)!important;color:#B9D9CE!important;border-color:rgba(156,201,184,.18)!important}
+.s-warn{background:rgba(200,169,118,.10)!important;color:#DEC9A7!important;border-color:rgba(200,169,118,.18)!important}
+.s-info{background:rgba(255,255,255,.045)!important;color:#AAB3B3!important;border-color:rgba(244,239,230,.08)!important}
+
+.submit-strip{
+  background:linear-gradient(145deg,rgba(200,169,118,.10),rgba(200,169,118,.035))!important;
+  border-color:rgba(200,169,118,.20)!important;
+  color:#B8B3A8!important;
+}
+.submit-strip.trial{background:rgba(255,255,255,.03)!important;border-color:rgba(244,239,230,.08)!important;color:#90999B!important}
+.submit-strip b{color:#D8C4A0!important}
+.submit-strip .up{color:#B9D9CE!important}
+
+.success-banner{
+  background:
+    radial-gradient(110% 80% at 50% 0%,rgba(156,201,184,.10),transparent 60%),
+    linear-gradient(145deg,rgba(16,34,30,.88),rgba(7,15,13,.94))!important;
+  border-color:rgba(156,201,184,.26)!important;
+  box-shadow:0 16px 40px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,255,255,.06);
+}
+.success-title{color:#C6E0D6!important}
+.success-stats{color:#A7B0B1!important}
+.success-clear{background:rgba(156,201,184,.08)!important;border-color:rgba(156,201,184,.26)!important;color:#C6E0D6!important}
+
+.score-card.perfect{
+  background:
+    radial-gradient(110% 80% at 50% 0%,rgba(156,201,184,.08),transparent 60%),
+    linear-gradient(145deg,rgba(16,31,28,.86),rgba(7,14,12,.94))!important;
+  border-color:rgba(156,201,184,.24)!important;
+}
+.score-big.good{color:#BCDDD2!important}
+.score-big.mid{color:#D8C4A0!important}
+.score-big.low{color:#DFA7A1!important}
+.score-note,.trial-hint{background:rgba(255,255,255,.028)!important;border-left-color:rgba(200,169,118,.52)!important}
+.clear-row{border-color:rgba(244,239,230,.10)!important;background:rgba(255,255,255,.025)!important}
+.clear-row.hit{border-color:rgba(156,201,184,.30)!important;background:linear-gradient(90deg,rgba(20,39,34,.70),rgba(255,255,255,.02))!important}
+.clear-val{color:#D8C4A0!important}
+.clear-row.hit .clear-val{color:#BCDDD2!important}
+
+.diff-row.wrong{background:rgba(208,139,132,.075)!important}
+.diff-row.ok{background:rgba(156,201,184,.065)!important}
+.error-display{background:rgba(208,139,132,.075)!important;border-color:rgba(208,139,132,.22)!important;color:#E7BDB8!important}
+
+/* 判题引擎徽标 */
+.engine-badge.e-online{
+  background:rgba(156,201,184,.10)!important;
+  color:#B9D9CE!important;
+  border:1px solid rgba(156,201,184,.18);
+}
+.engine-badge.e-offline{
+  background:rgba(200,169,118,.10)!important;
+  color:#DEC9A7!important;
+  border:1px solid rgba(200,169,118,.18);
+}
+
+/* 科目外框：七个 subjects/*.html 的内联顶栏还留着旧青色，这里统一收口。 */
+.subbar{
+  background:linear-gradient(180deg,rgba(16,19,23,.97),rgba(6,8,11,.96))!important;
+  border-bottom-color:rgba(244,239,230,.09)!important;
+  box-shadow:0 10px 28px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+.home{
+  border-color:rgba(200,169,118,.30)!important;
+  background:
+    radial-gradient(120% 150% at 20% 0,rgba(255,255,255,.09),transparent 46%),
+    linear-gradient(145deg,rgba(200,169,118,.11),rgba(255,255,255,.025))!important;
+  color:#F1E7D8!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 4px 14px rgba(0,0,0,.20)!important;
+}
+.home:hover{
+  border-color:rgba(200,169,118,.52)!important;
+  background:
+    radial-gradient(120% 150% at 20% 0,rgba(255,255,255,.13),transparent 46%),
+    linear-gradient(145deg,rgba(200,169,118,.18),rgba(156,201,184,.05))!important;
+}
+.home:focus-visible{outline-color:rgba(200,169,118,.85)!important}
+.subtitle{color:#EDE7DB!important}
+.subtitle img{filter:grayscale(.30) sepia(.10) saturate(.55) brightness(.90) drop-shadow(0 0 7px rgba(200,169,118,.12))!important}
+.tip{display:none!important}
+.loader{background:#080A0E!important;color:#8D989B!important}
+.loader::before{border-color:rgba(200,169,118,.20)!important;border-top-color:#C8A976!important}
+
+/* z40 · Java 编译+运行预算：统一赌桌边的香槟刻度 */
+#stat-time{
+  color:#8D989B!important;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:.01em;
+  transition:color .18s ease;
+}
+#stat-time.time-over{color:#DFA7A1!important}
+.run-budget{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  padding:9px 12px;
+  border:1px solid rgba(200,169,118,.18);
+  border-radius:9px;
+  background:
+    radial-gradient(120% 180% at 0 0,rgba(255,255,255,.045),transparent 46%),
+    linear-gradient(105deg,rgba(200,169,118,.09),rgba(156,201,184,.035));
+  color:#A7B0B1;
+  font-size:11.5px;
+  line-height:1.55;
+}
+.run-budget .rb-main{display:inline-flex;align-items:baseline;gap:7px}
+.run-budget .rb-k{font-size:10.5px;letter-spacing:.07em;color:#7F898B}
+.run-budget .rb-main b{
+  font-family:var(--font-mono);
+  font-size:13px;
+  font-weight:600;
+  color:#F3EFE6;
+  letter-spacing:.02em;
+  font-variant-numeric:tabular-nums;
+}
+.run-budget .rb-sub{color:#8D989B;font-size:11px}
+.run-budget .rb-limit{
+  margin-left:auto;
+  padding-left:10px;
+  border-left:1px solid rgba(244,239,230,.09);
+  color:#8D989B;
+  font-size:11px;
+}
+.run-budget .rb-limit b{
+  font-family:var(--font-mono);
+  font-weight:600;
+  color:#D8C4A0;
+  font-variant-numeric:tabular-nums;
+}
+.run-budget .rb-over{
+  padding:2px 7px;
+  border:1px solid rgba(208,139,132,.24);
+  border-radius:5px;
+  color:#DFA7A1;
+  font-size:10.5px;
+  font-weight:600;
+  letter-spacing:.05em;
+}
+.run-budget.over{
+  border-color:rgba(208,139,132,.30);
+  background:
+    radial-gradient(120% 180% at 0 0,rgba(255,255,255,.04),transparent 46%),
+    linear-gradient(105deg,rgba(208,139,132,.10),rgba(200,169,118,.035));
+}
+.run-budget.over .rb-main b{color:#DFA7A1}
+@media(max-width:640px){
+  .run-budget{gap:7px;padding:8px 10px;border-radius:8px}
+  .run-budget .rb-limit{margin-left:0;padding-left:0;border-left:0}
+  .run-budget .rb-main b{font-size:12.5px}
+}

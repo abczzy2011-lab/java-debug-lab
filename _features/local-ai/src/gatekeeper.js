@@ -87,7 +87,7 @@ export function admission(state = {}) {
       showCheck: false,
       mode: 'search',
       label: '检索结果',
-      reason: '本机性能达标，但需先下载本地模型（1.5B 约 1.1GB / 3B 约 2.0GB）才能使用 AI',
+      reason: '本机性能达标，但需先下载本地模型（0.5B 约 0.4GB / 1.5B 约 1.1GB / 3B 约 2.0GB）才能使用 AI',
     };
   }
   return {

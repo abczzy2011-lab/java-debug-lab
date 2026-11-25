@@ -96,6 +96,19 @@ test('askCloud 429 -> degraded HYBRID_BUSY, no provider leak', async () => {
   assert.equal(r.error, 'HYBRID_BUSY');
   assert.doesNotMatch(JSON.stringify(r), /GLM|SenseNova|quota|额度/i);
 });
+test('askCloud user abort -> ABORTED, not degraded fallback', async () => {
+  const ac = new AbortController();
+  const fetchImpl = (_url, opts) => new Promise((_resolve, reject) => {
+    opts.signal.addEventListener('abort', () => reject(new Error('AbortError')));
+  });
+  const pending = askCloud({ question: 'q', fetchImpl, signal: ac.signal, timeout: 60000 });
+  ac.abort();
+  const r = await pending;
+  assert.equal(r.ok, false);
+  assert.equal(r.error, 'ABORTED');
+  assert.equal(r.degraded, false);
+});
+
 test('askCloud network error -> degraded, no raw error leak', async () => {
   const r = await askCloud({ question: 'q', siteCard: 'c', fetchImpl: async () => { throw new Error('ECONNRESET'); } });
   assert.equal(r.ok, false);

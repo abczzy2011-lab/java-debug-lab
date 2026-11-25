@@ -8,6 +8,11 @@ test('site_overview triggers', () => {
   }
 });
 
+test('negated site wording does not trigger site_overview', () => {
+  assert.notEqual(routeIntent('不要讲本站课程，用量子纠缠写一句比喻'), 'site_overview');
+  assert.equal(routeIntent('不要讲本站课程，用量子纠缠写一句比喻'), 'not_found');
+});
+
 test('course_overview triggers', () => {
   for (const q of ['第 8 课讲什么', '类加载器那门课重点', '这门课的内容']) {
     assert.equal(routeIntent(q, { hasHits: true }), 'course_overview', q);

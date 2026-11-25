@@ -10,7 +10,7 @@ export const GATE_CODES = {
 };
 
 const LIMIT_REQUIREMENTS = {
-  maxBufferSize: 512 * 1024 * 1024,
+  // 手机 GPU 的 maxBufferSize 常见只有 128–256MB；0.5B 模型用不到 512MB 单缓冲。
   maxStorageBufferBindingSize: 128 * 1024 * 1024,
   maxComputeWorkgroupStorageSize: 16 * 1024,
   maxComputeInvocationsPerWorkgroup: 256,
@@ -41,14 +41,21 @@ export function evaluateEnvironment(env = {}) {
   const hasF16 = !!(env.device && env.device.features && env.device.features.has?.('shader-f16'));
   A('f16', 'shader-f16 支持', hasF16, 'NO_F16', '');
 
+  // Safari 26+ / Chrome 113+ / 移动端 Safari 与 Chrome 都已支持 WebGPU。
+  // 是否真的能跑由 adapter/limits/benchmark 决定，不再用 UA 直接拒绝 Safari 或手机。
   const ua = String(env.ua || '');
-  const mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(ua);
-  const oldBrowser = !/(Chrome|Edg|Chromium)\//.test(ua);
-  A('browser', '桌面 Chrome/Edge 113+', !mobile && !oldBrowser, 'UNSUPPORTED_BROWSER', ua.slice(0, 80));
+  // 国产手机浏览器常带厂商 token 或只有 Android/Mobile，不能因为 UA 不在白名单就拒绝。
+  const mobile = /Android|iPhone|iPad|iPod|Mobile|Tablet|Phone|HarmonyOS|OpenHarmony|OppoBrowser|VivoBrowser|HeyTapBrowser|MiuiBrowser|HuaweiBrowser|HonorBrowser|UCBrowser|Quark|QQBrowser|MQQBrowser|SamsungBrowser/i.test(ua);
+  const knownBrowser = /Chrome|Chromium|CriOS|Edg|EdgiOS|Safari|Firefox|FxiOS|OppoBrowser|VivoBrowser|HeyTapBrowser|MiuiBrowser|HuaweiBrowser|HonorBrowser|UCBrowser|Quark|QQBrowser|MQQBrowser|SamsungBrowser|baidubrowser|SogouMobileBrowser|QihooBrowser/i.test(ua);
+  // 手机厂商浏览器即使 UA 没带白名单 token，只要有 WebKit/Android 特征也按真实浏览器放行。
+  const browserLike = knownBrowser || (mobile && /AppleWebKit|Linux; Android|iPhone|iPad/i.test(ua));
+  A('browser', '现代浏览器（Safari / Chrome / Edge / 手机厂商浏览器）', browserLike,
+    'UNSUPPORTED_BROWSER', (mobile ? '移动端 · ' : '桌面端 · ') + ua.slice(0, 72));
 
   // Stage B
   const limits = env.adapter?.limits || {};
-  for (const [name, min] of Object.entries(LIMIT_REQUIREMENTS)) {
+  const requirements = { ...LIMIT_REQUIREMENTS, maxBufferSize: (mobile ? 128 : 512) * 1024 * 1024 };
+  for (const [name, min] of Object.entries(requirements)) {
     const val = limits[name];
     const ok = typeof val === 'number' && val >= min;
     checks.push(check('limit.' + name, 'GPU 限制 ' + name, ok, `${val} (需 >= ${min})`));
@@ -57,9 +64,10 @@ export function evaluateEnvironment(env = {}) {
 
   // Stage C
   const mem = env.deviceMemory;               // GiB or undefined
+  const minMemory = mobile ? 4 : 8;
   if (typeof mem === 'number') {
-    checks.push(check('memory', '内存 >= 8 GiB', mem >= 8, mem + ' GiB'));
-    if (mem < 8 && code === 'PASS') code = 'LOW_MEMORY';
+    checks.push(check('memory', `内存 >= ${minMemory} GiB`, mem >= minMemory, mem + ' GiB'));
+    if (mem < minMemory && code === 'PASS') code = 'LOW_MEMORY';
   } else {
     checks.push(check('memory', '内存未知（依赖基准测试）', true, 'MEM_UNKNOWN'));
     if (code === 'PASS') code = 'MEM_UNKNOWN'; // soft: benchmark may still pass
@@ -70,9 +78,10 @@ export function evaluateEnvironment(env = {}) {
 
   const storage = env.storage || {};
   const free = (Number(storage.quota) || 0) - (Number(storage.usage) || 0);
-  checks.push(check('storage', '可用存储 >= 1.5GB', free >= 1.5 * 1024 ** 3,
+  const minStorage = (mobile ? 1 : 1.5) * 1024 ** 3;
+  checks.push(check('storage', `可用存储 >= ${mobile ? '1' : '1.5'}GB`, free >= minStorage,
     (free / 1024 ** 3).toFixed(2) + ' GiB'));
-  if (free < 1.5 * 1024 ** 3 && code === 'PASS') code = 'LOW_STORAGE';
+  if (free < minStorage && code === 'PASS') code = 'LOW_STORAGE';
   // persist() denial is a warning only, never a fail
   checks.push(check('persist', '持久化存储授权（仅提示）', true,
     env.storagePersisted === false ? '缓存可能被系统清理' : '已授权或未知'));

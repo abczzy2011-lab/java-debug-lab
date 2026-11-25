@@ -1,0 +1,1237 @@
+window.JS_DEBUG_TASKS = [
+  {
+    "id": "b1",
+    "level": "basic",
+    "title": "偶数求和",
+    "minutes": 6,
+    "summary": "循环里的奇偶判断写反了，导致该加的偶数没加、不该加的奇数全加了。",
+    "prompt": "实现 `solve(nums)`：返回数组中所有偶数的和。空数组返回 0。不要修改原数组。",
+    "source": "Head First JavaScript Programming 2nd · Ch.4；JavaScript 权威指南 7th · Ch.7",
+    "bug": "判断条件写成了 `n % 2 === 1`，把奇数当成了偶数。",
+    "code": "function solve(nums) {\n  let total = 0;\n  for (const n of nums) {\n    if (n % 2 === 1) total += n;\n  }\n  return total;\n}",
+    "tests": [
+      {
+        "args": [
+          [
+            1,
+            2,
+            3,
+            4
+          ]
+        ],
+        "expected": 6,
+        "public": true,
+        "label": "混合奇偶"
+      },
+      {
+        "args": [
+          [
+            2,
+            4,
+            6
+          ]
+        ],
+        "expected": 12,
+        "public": true,
+        "label": "全是偶数"
+      },
+      {
+        "args": [
+          []
+        ],
+        "expected": 0,
+        "public": false,
+        "label": "空数组"
+      }
+    ],
+    "hints": [
+      "先问自己：`n % 2` 的结果 0 代表偶数还是奇数？",
+      "把条件改成 `n % 2 === 0`，再用空数组验证初始值。"
+    ],
+    "analysis": "`n % 2 === 1` 在正数上是奇数，但负数余数可能是 -1。判断偶数最稳的是 `n % 2 === 0`。初始值 0 对空数组天然安全。",
+    "fixed": "function solve(nums) {\n  let total = 0;\n  for (const n of nums) {\n    if (n % 2 === 0) total += n;\n  }\n  return total;\n}",
+    "order": 1
+  },
+  {
+    "id": "b2",
+    "level": "basic",
+    "title": "元音计数",
+    "minutes": 7,
+    "summary": "大小写没有统一，Hello 里的大写 E 被漏掉了。",
+    "prompt": "实现 `solve(text)`：统计字符串中英文字母 a/e/i/o/u 的出现次数，大小写都算。非字母字符忽略。",
+    "source": "JavaScript for Kids · Ch.4；Head First JavaScript Programming 2nd · Ch.4",
+    "bug": "只匹配了小写元音，没有把字符统一转成小写。",
+    "code": "function solve(text) {\n  return text.split(\"\").filter(ch => \"aeiou\".includes(ch)).length;\n}",
+    "tests": [
+      {
+        "args": [
+          "Hello"
+        ],
+        "expected": 2,
+        "public": true,
+        "label": "大小写混合"
+      },
+      {
+        "args": [
+          "XYZ"
+        ],
+        "expected": 0,
+        "public": true,
+        "label": "没有元音"
+      },
+      {
+        "args": [
+          "AEIOU"
+        ],
+        "expected": 5,
+        "public": false,
+        "label": "全大写"
+      }
+    ],
+    "hints": [
+      "先把每个字符转成小写，再判断是否在 `aeiou` 里。",
+      "`filter` 的回调要返回布尔值，`includes` 本身就返回布尔值。"
+    ],
+    "analysis": "大小写是两套码点，`includes` 不会自动忽略大小写。用 `ch.toLowerCase()` 统一后再判断；不要用正则的 `i` 标志之前先想清楚是否需要保留原字符。",
+    "fixed": "function solve(text) {\n  return text.split(\"\").filter(ch => \"aeiou\".includes(ch.toLowerCase())).length;\n}",
+    "order": 2
+  },
+  {
+    "id": "b3",
+    "level": "basic",
+    "title": "反转单词",
+    "minutes": 6,
+    "summary": "单词顺序反了，但 join 时忘了空格，整句话被粘成一串。",
+    "prompt": "实现 `solve(text)`：按空格拆分单词，反转顺序后用单个空格重新连接。空字符串返回空字符串。",
+    "source": "Eloquent JavaScript 4th · Ch.5；JavaScript 权威指南 7th · Ch.7",
+    "bug": "`join(\"\")` 把单词直接粘在一起，没有分隔符。",
+    "code": "function solve(text) {\n  return text.split(\" \").reverse().join(\"\");\n}",
+    "tests": [
+      {
+        "args": [
+          "one two three"
+        ],
+        "expected": "three two one",
+        "public": true,
+        "label": "三个单词"
+      },
+      {
+        "args": [
+          "a b"
+        ],
+        "expected": "b a",
+        "public": true,
+        "label": "两个单词"
+      },
+      {
+        "args": [
+          ""
+        ],
+        "expected": "",
+        "public": false,
+        "label": "空字符串"
+      }
+    ],
+    "hints": [
+      "`split` 和 `join` 的分隔符要对称。",
+      "空字符串 split 后是 `[\"\"]`，join 空格仍然是空字符串。"
+    ],
+    "analysis": "`join` 的参数是分隔符，不是「是否加空格」的布尔值。拆分用 `\" \"`，连接也要用 `\" \"`；如果输入可能有连续空格，先 `trim` 再按 `/\\s+/` 拆分。",
+    "fixed": "function solve(text) {\n  const words = text.trim().split(/\\s+/).filter(Boolean);\n  return words.reverse().join(\" \");\n}",
+    "order": 3
+  },
+  {
+    "id": "b4",
+    "level": "basic",
+    "title": "找最大值",
+    "minutes": 7,
+    "summary": "初始值设成 0，全负数数组会错误返回 0；空数组也没有处理。",
+    "prompt": "实现 `solve(nums)`：返回数组中的最大值。空数组返回 `null`。数组元素都是数字。",
+    "source": "Head First JavaScript Programming 2nd · Ch.4；Secrets of the JavaScript Ninja 2nd · Ch.2",
+    "bug": "`max` 从 0 开始，负数永远比 0 小；空数组也返回 0。",
+    "code": "function solve(nums) {\n  let max = 0;\n  for (const n of nums) {\n    if (n > max) max = n;\n  }\n  return max;\n}",
+    "tests": [
+      {
+        "args": [
+          [
+            3,
+            9,
+            4
+          ]
+        ],
+        "expected": 9,
+        "public": true,
+        "label": "普通数组"
+      },
+      {
+        "args": [
+          [
+            -5,
+            -2,
+            -9
+          ]
+        ],
+        "expected": -2,
+        "public": true,
+        "label": "全是负数"
+      },
+      {
+        "args": [
+          []
+        ],
+        "expected": null,
+        "public": false,
+        "label": "空数组"
+      }
+    ],
+    "hints": [
+      "空数组要有单独的返回分支。",
+      "最大值初始值可以用 `-Infinity`，或者用第一个元素。"
+    ],
+    "analysis": "用 0 当最大值初始值隐含「数组里一定有非负数」的假设。更稳的写法是先处理空数组，再用 `-Infinity` 或 `nums[0]` 初始化。",
+    "fixed": "function solve(nums) {\n  if (nums.length === 0) return null;\n  let max = -Infinity;\n  for (const n of nums) {\n    if (n > max) max = n;\n  }\n  return max;\n}",
+    "order": 4
+  },
+  {
+    "id": "b5",
+    "level": "basic",
+    "title": "保持顺序去重",
+    "minutes": 7,
+    "summary": "用 Set 去重后顺手 sort，把原本的首次出现顺序打乱了。",
+    "prompt": "实现 `solve(items)`：去掉重复元素，保留每个值第一次出现的顺序。数组元素是字符串或数字。",
+    "source": "JavaScript 权威指南 7th · Ch.11；JavaScript 高级程序设计 4th · Ch.6",
+    "bug": "`sort()` 按字符串顺序重排，破坏了「首次出现顺序」。",
+    "code": "function solve(items) {\n  return [...new Set(items)].sort();\n}",
+    "tests": [
+      {
+        "args": [
+          [
+            3,
+            1,
+            3,
+            2
+          ]
+        ],
+        "expected": [
+          3,
+          1,
+          2
+        ],
+        "public": true,
+        "label": "数字去重"
+      },
+      {
+        "args": [
+          [
+            "b",
+            "a",
+            "b"
+          ]
+        ],
+        "expected": [
+          "b",
+          "a"
+        ],
+        "public": true,
+        "label": "字符串去重"
+      },
+      {
+        "args": [
+          []
+        ],
+        "expected": [],
+        "public": false,
+        "label": "空数组"
+      }
+    ],
+    "hints": [
+      "Set 本身就会保留插入顺序。",
+      "去掉 `sort()`，直接展开 Set 即可。"
+    ],
+    "analysis": "`new Set()` 按插入顺序迭代，展开后天然保持首次出现顺序。`sort()` 默认按字符串比较，既改变顺序，也会让 10 排在 2 前面。",
+    "fixed": "function solve(items) {\n  return [...new Set(items)];\n}",
+    "order": 5
+  },
+  {
+    "id": "b6",
+    "level": "basic",
+    "title": "姓名首字母",
+    "minutes": 7,
+    "summary": "首字母之间没有加点，也没有处理多余空格。",
+    "prompt": "实现 `solve(name)`：把姓名拆成单词，取每个单词首字母大写，用英文句点连接，例如 `Ada Lovelace` → `A.L.`。空字符串返回空字符串。",
+    "source": "Head First JavaScript Programming 2nd · Ch.4；JavaScript for Kids · Ch.6",
+    "bug": "`join(\"\")` 没有加点；连续空格会产生空单词并导致 `w[0]` 为 undefined。",
+    "code": "function solve(name) {\n  return name.split(\" \").map(w => w[0].toUpperCase()).join(\"\");\n}",
+    "tests": [
+      {
+        "args": [
+          "Ada Lovelace"
+        ],
+        "expected": "A.L.",
+        "public": true,
+        "label": "两个单词"
+      },
+      {
+        "args": [
+          "Grace Hopper"
+        ],
+        "expected": "G.H.",
+        "public": true,
+        "label": "另一个姓名"
+      },
+      {
+        "args": [
+          "Ada"
+        ],
+        "expected": "A.",
+        "public": false,
+        "label": "单个单词"
+      }
+    ],
+    "hints": [
+      "先用 `trim` 去掉首尾空格，再用 `/\\s+/` 拆分。",
+      "每个首字母后面补一个 `.`，最后直接 join 空字符串。"
+    ],
+    "analysis": "`split(\" \")` 遇到连续空格会产生空字符串，`w[0]` 就是 undefined。先 trim、按空白正则拆分并过滤空项，再映射成 `首字母 + \".\"`。",
+    "fixed": "function solve(name) {\n  const words = name.trim().split(/\\s+/).filter(Boolean);\n  if (!words.length) return \"\";\n  return words.map(w => w[0].toUpperCase() + \".\").join(\"\");\n}",
+    "order": 6
+  },
+  {
+    "id": "m1",
+    "level": "medium",
+    "title": "只展开一层",
+    "minutes": 9,
+    "summary": "题目要求只展开一层，代码却用了 Infinity，把深层嵌套也压平了。",
+    "prompt": "实现 `solve(arr)`：只展开一层嵌套数组，深层数组保持原样。例如 `[1,[2,[3]],4]` → `[1,2,[3],4]`。",
+    "source": "JavaScript 权威指南 7th · Ch.7；JavaScript 高级程序设计 4th · Ch.6",
+    "bug": "`flat(Infinity)` 会递归展开所有层级，超出题目要求。",
+    "code": "function solve(arr) {\n  return arr.flat(Infinity);\n}",
+    "tests": [
+      {
+        "args": [
+          [
+            1,
+            [
+              2,
+              3
+            ],
+            4
+          ]
+        ],
+        "expected": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "public": true,
+        "label": "一层嵌套"
+      },
+      {
+        "args": [
+          [
+            [
+              1,
+              [
+                2
+              ]
+            ],
+            3
+          ]
+        ],
+        "expected": [
+          1,
+          [
+            2
+          ],
+          3
+        ],
+        "public": true,
+        "label": "保留深层"
+      },
+      {
+        "args": [
+          []
+        ],
+        "expected": [],
+        "public": false,
+        "label": "空数组"
+      }
+    ],
+    "hints": [
+      "`flat()` 的参数是展开深度，不是布尔值。",
+      "只展开一层就传 `1`，或者省略参数。"
+    ],
+    "analysis": "`flat(depth)` 的默认 depth 是 1；传 Infinity 会一直展开到没有数组为止。题目只要一层，必须显式控制深度，深层结构要保留。",
+    "fixed": "function solve(arr) {\n  return arr.flat(1);\n}",
+    "order": 7
+  },
+  {
+    "id": "m2",
+    "level": "medium",
+    "title": "词频排序",
+    "minutes": 11,
+    "summary": "次数相同的单词没有按字母排序，结果依赖对象插入顺序。",
+    "prompt": "实现 `solve(text)`：统计每个单词出现次数（忽略大小写，按空白拆分），返回 `[word, count]` 数组。先按次数从高到低，次数相同按单词字母升序。",
+    "source": "Eloquent JavaScript 4th · Ch.5；JavaScript 权威指南 7th · Ch.7",
+    "bug": "排序只比较了次数，次数相同时没有比较单词，结果不稳定。",
+    "code": "function solve(text) {\n  const counts = {};\n  for (const w of text.toLowerCase().split(/\\s+/).filter(Boolean)) {\n    counts[w] = (counts[w] || 0) + 1;\n  }\n  return Object.entries(counts).sort((a, b) => b[1] - a[1]);\n}",
+    "tests": [
+      {
+        "args": [
+          "b a b"
+        ],
+        "expected": [
+          [
+            "b",
+            2
+          ],
+          [
+            "a",
+            1
+          ]
+        ],
+        "public": true,
+        "label": "一个高频词"
+      },
+      {
+        "args": [
+          "A a"
+        ],
+        "expected": [
+          [
+            "a",
+            2
+          ]
+        ],
+        "public": true,
+        "label": "大小写合并"
+      },
+      {
+        "args": [
+          "c b a"
+        ],
+        "expected": [
+          [
+            "a",
+            1
+          ],
+          [
+            "b",
+            1
+          ],
+          [
+            "c",
+            1
+          ]
+        ],
+        "public": false,
+        "label": "并列时按字母"
+      }
+    ],
+    "hints": [
+      "比较器返回 0 时，顺序由实现决定，不能依赖插入顺序。",
+      "次数相同就用 `a[0].localeCompare(b[0])`。"
+    ],
+    "analysis": "多字段排序要在比较器里显式写第二关键字：先比 `b[1]-a[1]`，相等时再比单词。`Object.entries` 的顺序不是排序结果。",
+    "fixed": "function solve(text) {\n  const counts = {};\n  for (const w of text.toLowerCase().split(/\\s+/).filter(Boolean)) {\n    counts[w] = (counts[w] || 0) + 1;\n  }\n  return Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));\n}",
+    "order": 8
+  },
+  {
+    "id": "m3",
+    "level": "medium",
+    "title": "奇偶分组",
+    "minutes": 9,
+    "summary": "两个桶的名字和推入条件对调了，偶数全进了 odd。",
+    "prompt": "实现 `solve(nums)`：返回 `{ even, odd }`，偶数和奇数分别放入对应数组，保持原顺序。负数也按能否被 2 整除判断。",
+    "source": "JavaScript 高级程序设计 4th · Ch.6；Head First JavaScript Programming 2nd · Ch.4",
+    "bug": "条件 `n % 2 === 0` 时推入了 `odd`，两个桶写反了。",
+    "code": "function solve(nums) {\n  const groups = { even: [], odd: [] };\n  for (const n of nums) {\n    if (n % 2 === 0) groups.odd.push(n);\n    else groups.even.push(n);\n  }\n  return groups;\n}",
+    "tests": [
+      {
+        "args": [
+          [
+            1,
+            2,
+            3,
+            4
+          ]
+        ],
+        "expected": {
+          "even": [
+            2,
+            4
+          ],
+          "odd": [
+            1,
+            3
+          ]
+        },
+        "public": true,
+        "label": "混合奇偶"
+      },
+      {
+        "args": [
+          [
+            0,
+            -2,
+            -3
+          ]
+        ],
+        "expected": {
+          "even": [
+            0,
+            -2
+          ],
+          "odd": [
+            -3
+          ]
+        },
+        "public": true,
+        "label": "包含 0 和负数"
+      },
+      {
+        "args": [
+          [
+            2,
+            4
+          ]
+        ],
+        "expected": {
+          "even": [
+            2,
+            4
+          ],
+          "odd": []
+        },
+        "public": false,
+        "label": "全是偶数"
+      }
+    ],
+    "hints": [
+      "`n % 2 === 0` 是偶数分支，应该进 even。",
+      "负数 -3 % 2 是 -1，不是 1；用 `=== 0` 判断偶数更稳。"
+    ],
+    "analysis": "偶数的判定是 `n % 2 === 0`，不要用 `=== 1` 判断奇数，因为负数余数可能是 -1。两个桶的键名要和业务语义一致，别靠位置记忆。",
+    "fixed": "function solve(nums) {\n  const groups = { even: [], odd: [] };\n  for (const n of nums) {\n    if (n % 2 === 0) groups.even.push(n);\n    else groups.odd.push(n);\n  }\n  return groups;\n}",
+    "order": 9
+  },
+  {
+    "id": "m4",
+    "level": "medium",
+    "title": "二分查找",
+    "minutes": 11,
+    "summary": "循环条件写成 `lo < hi`，最后一个元素永远检查不到。",
+    "prompt": "实现 `solve(nums, target)`：在升序数组中二分查找 target，返回下标；找不到返回 -1。数组可能有重复值，返回任意一个匹配下标即可，但测试只使用唯一值。",
+    "source": "JavaScript 权威指南 7th · Ch.7；Secrets of the JavaScript Ninja 2nd · Ch.2",
+    "bug": "`while (lo < hi)` 在只剩一个元素时直接退出，漏掉最后一个候选。",
+    "code": "function solve(nums, target) {\n  let lo = 0;\n  let hi = nums.length - 1;\n  while (lo < hi) {\n    const mid = (lo + hi) >> 1;\n    if (nums[mid] === target) return mid;\n    if (nums[mid] < target) lo = mid + 1;\n    else hi = mid - 1;\n  }\n  return -1;\n}",
+    "tests": [
+      {
+        "args": [
+          [
+            1,
+            3,
+            5
+          ],
+          5
+        ],
+        "expected": 2,
+        "public": true,
+        "label": "目标在末尾"
+      },
+      {
+        "args": [
+          [
+            1
+          ],
+          1
+        ],
+        "expected": 0,
+        "public": true,
+        "label": "单元素"
+      },
+      {
+        "args": [
+          [
+            1,
+            3,
+            5,
+            7
+          ],
+          1
+        ],
+        "expected": 0,
+        "public": false,
+        "label": "目标在开头"
+      }
+    ],
+    "hints": [
+      "闭区间二分的循环条件是 `lo <= hi`。",
+      "当 `lo === hi` 时，还需要检查这个唯一候选。"
+    ],
+    "analysis": "闭区间 `[lo, hi]` 的二分必须用 `lo <= hi`；否则最后一轮只剩一个元素时会跳过。`mid` 用 `(lo+hi)>>1` 在极大数组上可能溢出，工程里可用 `lo + Math.floor((hi-lo)/2)`。",
+    "fixed": "function solve(nums, target) {\n  let lo = 0;\n  let hi = nums.length - 1;\n  while (lo <= hi) {\n    const mid = lo + Math.floor((hi - lo) / 2);\n    if (nums[mid] === target) return mid;\n    if (nums[mid] < target) lo = mid + 1;\n    else hi = mid - 1;\n  }\n  return -1;\n}",
+    "order": 10
+  },
+  {
+    "id": "m5",
+    "level": "medium",
+    "title": "URL Slug",
+    "minutes": 9,
+    "summary": "只把空白替换成连字符，斜杠、标点和首尾空格都留了下来。",
+    "prompt": "实现 `solve(title)`：生成 URL slug。转小写，把任意连续的非字母数字字符替换成单个 `-`，去掉首尾 `-`。例如 `A/B Test` → `a-b-test`。",
+    "source": "JavaScript 权威指南 7th · Ch.11；Eloquent JavaScript 4th · Ch.9",
+    "bug": "只处理了空白，没有处理标点；也没有 trim，首尾会留下连字符。",
+    "code": "function solve(title) {\n  return title.toLowerCase().replace(/\\s+/g, \"-\");\n}",
+    "tests": [
+      {
+        "args": [
+          " Hello  World "
+        ],
+        "expected": "hello-world",
+        "public": true,
+        "label": "首尾和连续空格"
+      },
+      {
+        "args": [
+          "A/B Test"
+        ],
+        "expected": "a-b-test",
+        "public": true,
+        "label": "包含标点"
+      },
+      {
+        "args": [
+          "  "
+        ],
+        "expected": "",
+        "public": false,
+        "label": "只有空白"
+      }
+    ],
+    "hints": [
+      "先把所有非 `a-z0-9` 字符替换成 `-`。",
+      "连续替换可能产生多个 `-`，用 `+` 合并；最后去掉首尾 `-`。"
+    ],
+    "analysis": "slug 的核心是「只保留字母数字，其他一律变分隔符」。`[^a-z0-9]+` 一次匹配连续非法字符，避免多个连字符；最后 `replace(/^-+|-+$/g, \"\")` 清首尾。",
+    "fixed": "function solve(title) {\n  return title.toLowerCase().replace(/[^a-z0-9]+/g, \"-\").replace(/^-+|-+$/g, \"\");\n}",
+    "order": 11
+  },
+  {
+    "id": "m6",
+    "level": "medium",
+    "title": "订单汇总",
+    "minutes": 10,
+    "summary": "同一个 id 的多条记录被后一条覆盖，只留下了最后一次金额。",
+    "prompt": "实现 `solve(rows)`：每条记录是 `{ id, amount }`，按 id 汇总 amount，返回 `{ id, total }` 数组，按 id 升序。空数组返回空数组。",
+    "source": "JavaScript 高级程序设计 4th · Ch.6；Eloquent JavaScript 4th · Ch.5",
+    "bug": "`map.set(row.id, row.amount)` 直接覆盖，没有累加。",
+    "code": "function solve(rows) {\n  const map = new Map();\n  for (const row of rows) {\n    map.set(row.id, row.amount);\n  }\n  return [...map].map(([id, total]) => ({ id, total })).sort((a, b) => a.id.localeCompare(b.id));\n}",
+    "tests": [
+      {
+        "args": [
+          [
+            {
+              "id": "a",
+              "amount": 2
+            },
+            {
+              "id": "b",
+              "amount": 1
+            },
+            {
+              "id": "a",
+              "amount": 3
+            }
+          ]
+        ],
+        "expected": [
+          {
+            "id": "a",
+            "total": 5
+          },
+          {
+            "id": "b",
+            "total": 1
+          }
+        ],
+        "public": true,
+        "label": "重复 id"
+      },
+      {
+        "args": [
+          []
+        ],
+        "expected": [],
+        "public": true,
+        "label": "空数组"
+      },
+      {
+        "args": [
+          [
+            {
+              "id": "b",
+              "amount": 2
+            },
+            {
+              "id": "b",
+              "amount": 4
+            },
+            {
+              "id": "a",
+              "amount": 1
+            }
+          ]
+        ],
+        "expected": [
+          {
+            "id": "a",
+            "total": 1
+          },
+          {
+            "id": "b",
+            "total": 6
+          }
+        ],
+        "public": false,
+        "label": "多组重复"
+      }
+    ],
+    "hints": [
+      "每次写入前先取出已有值，再加当前 amount。",
+      "`Map.get(id) || 0` 可以给不存在的 id 一个 0 起点。"
+    ],
+    "analysis": "汇总不是赋值。`map.set(id, (map.get(id) || 0) + amount)` 才是累加；排序按 id 升序，输出对象字段名是 `total`。",
+    "fixed": "function solve(rows) {\n  const map = new Map();\n  for (const row of rows) {\n    map.set(row.id, (map.get(row.id) || 0) + row.amount);\n  }\n  return [...map].map(([id, total]) => ({ id, total })).sort((a, b) => a.id.localeCompare(b.id));\n}",
+    "order": 12
+  },
+  {
+    "id": "h1",
+    "level": "hard",
+    "title": "LRU 缓存",
+    "minutes": 16,
+    "summary": "更新已有 key 没有刷新最近使用顺序，get 也没有把命中项移到队尾。",
+    "prompt": "实现 `solve(capacity, ops)`：模拟 LRU 缓存。`put` 写入或更新，`get` 读取（不存在返回 -1），容量满时淘汰最久未使用的 key。返回所有 get 的结果。",
+    "source": "JavaScript 权威指南 7th · Ch.11；Secrets of the JavaScript Ninja 2nd · Ch.9；Effective JavaScript · Item 44",
+    "bug": "更新已有 key 时直接 `set`，Map 不会把它移到末尾；get 命中后也没有刷新顺序。",
+    "code": "function solve(capacity, ops) {\n  const cache = new Map();\n  const out = [];\n  for (const [op, key, value] of ops) {\n    if (op === \"put\") {\n      cache.set(key, value);\n      if (cache.size > capacity) cache.delete(cache.keys().next().value);\n    } else {\n      out.push(cache.has(key) ? cache.get(key) : -1);\n    }\n  }\n  return out;\n}",
+    "tests": [
+      {
+        "args": [
+          2,
+          [
+            [
+              "put",
+              1,
+              1
+            ],
+            [
+              "put",
+              2,
+              2
+            ],
+            [
+              "get",
+              1
+            ],
+            [
+              "put",
+              3,
+              3
+            ],
+            [
+              "get",
+              2
+            ],
+            [
+              "get",
+              3
+            ]
+          ]
+        ],
+        "expected": [
+          1,
+          -1,
+          3
+        ],
+        "public": true,
+        "label": "get 刷新顺序"
+      },
+      {
+        "args": [
+          2,
+          [
+            [
+              "put",
+              1,
+              1
+            ],
+            [
+              "put",
+              2,
+              2
+            ],
+            [
+              "put",
+              1,
+              10
+            ],
+            [
+              "put",
+              3,
+              3
+            ],
+            [
+              "get",
+              2
+            ],
+            [
+              "get",
+              1
+            ]
+          ]
+        ],
+        "expected": [
+          -1,
+          10
+        ],
+        "public": true,
+        "label": "put 更新已有 key"
+      },
+      {
+        "args": [
+          2,
+          [
+            [
+              "put",
+              "a",
+              1
+            ],
+            [
+              "put",
+              "b",
+              2
+            ],
+            [
+              "put",
+              "a",
+              3
+            ],
+            [
+              "get",
+              "b"
+            ],
+            [
+              "put",
+              "c",
+              4
+            ],
+            [
+              "get",
+              "a"
+            ],
+            [
+              "get",
+              "c"
+            ]
+          ]
+        ],
+        "expected": [
+          2,
+          -1,
+          4
+        ],
+        "public": false,
+        "label": "更新后的淘汰顺序"
+      }
+    ],
+    "hints": [
+      "Map 的插入顺序就是 LRU 的队列顺序，队头是最久未使用。",
+      "命中或更新时先 `delete` 再 `set`，才能把它移到队尾。"
+    ],
+    "analysis": "JS 的 Map 按插入顺序迭代，`set` 已存在的 key 不会改变位置。LRU 要在每次 get 命中、put 更新时先删除再插入；容量超限时删 `keys().next().value`。",
+    "fixed": "function solve(capacity, ops) {\n  const cache = new Map();\n  const out = [];\n  for (const [op, key, value] of ops) {\n    if (op === \"put\") {\n      if (cache.has(key)) cache.delete(key);\n      cache.set(key, value);\n      if (cache.size > capacity) cache.delete(cache.keys().next().value);\n    } else {\n      if (!cache.has(key)) {\n        out.push(-1);\n        continue;\n      }\n      const hit = cache.get(key);\n      cache.delete(key);\n      cache.set(key, hit);\n      out.push(hit);\n    }\n  }\n  return out;\n}",
+    "order": 13
+  },
+  {
+    "id": "h2",
+    "level": "hard",
+    "title": "按深度展开",
+    "minutes": 13,
+    "summary": "不管传什么 depth，都用了 Infinity，把多层数组全部压平。",
+    "prompt": "实现 `solve(arr, depth)`：按指定深度展开数组。depth 为 0 时返回原结构的浅拷贝；depth 为 1 只展开一层，依次类推。",
+    "source": "JavaScript 权威指南 7th · Ch.7；JavaScript 高级程序设计 4th · Ch.6",
+    "bug": "`flat(Infinity)` 忽略了 depth 参数。",
+    "code": "function solve(arr, depth) {\n  return arr.flat(Infinity);\n}",
+    "tests": [
+      {
+        "args": [
+          [
+            1,
+            [
+              2,
+              [
+                3,
+                [
+                  4
+                ]
+              ]
+            ]
+          ],
+          1
+        ],
+        "expected": [
+          1,
+          2,
+          [
+            3,
+            [
+              4
+            ]
+          ]
+        ],
+        "public": true,
+        "label": "深度 1"
+      },
+      {
+        "args": [
+          [
+            1,
+            [
+              2,
+              [
+                3,
+                [
+                  4
+                ]
+              ]
+            ]
+          ],
+          2
+        ],
+        "expected": [
+          1,
+          2,
+          3,
+          [
+            4
+          ]
+        ],
+        "public": true,
+        "label": "深度 2"
+      },
+      {
+        "args": [
+          [
+            1,
+            [
+              2,
+              [
+                3
+              ]
+            ]
+          ],
+          0
+        ],
+        "expected": [
+          1,
+          [
+            2,
+            [
+              3
+            ]
+          ]
+        ],
+        "public": false,
+        "label": "深度 0"
+      }
+    ],
+    "hints": [
+      "`flat` 的 depth 参数就是要展开的层数。",
+      "depth 为 0 时 `flat(0)` 会返回浅拷贝，不会修改原数组。"
+    ],
+    "analysis": "`flat(depth)` 的 depth 是层数，不是布尔开关。直接传 `depth` 即可；如果要兼容负数或非数字，先 `Math.max(0, Number(depth) || 0)`。",
+    "fixed": "function solve(arr, depth) {\n  return arr.flat(Math.max(0, Number(depth) || 0));\n}",
+    "order": 14
+  },
+  {
+    "id": "h3",
+    "level": "hard",
+    "title": "零钱兑换",
+    "minutes": 15,
+    "summary": "贪心每次拿最大面额，遇到 [1,3,4] 换 6 会得到 3 枚，而最优是 2 枚。",
+    "prompt": "实现 `solve(coins, amount)`：用最少数量的硬币凑出 amount，硬币数量不限。无法凑出返回 -1，amount 为 0 返回 0。",
+    "source": "JavaScript 权威指南 7th · Ch.7；Eloquent JavaScript 4th · Ch.5；Cracking Coding Interview 思路改写",
+    "bug": "贪心算法只考虑当前最大面额，局部最优不等于全局最优。",
+    "code": "function solve(coins, amount) {\n  let count = 0;\n  for (const coin of coins.sort((a, b) => b - a)) {\n    count += Math.floor(amount / coin);\n    amount %= coin;\n  }\n  return amount === 0 ? count : -1;\n}",
+    "tests": [
+      {
+        "args": [
+          [
+            1,
+            3,
+            4
+          ],
+          6
+        ],
+        "expected": 2,
+        "public": true,
+        "label": "贪心会失败的面额"
+      },
+      {
+        "args": [
+          [
+            2
+          ],
+          3
+        ],
+        "expected": -1,
+        "public": true,
+        "label": "无法凑出"
+      },
+      {
+        "args": [
+          [
+            1,
+            3,
+            4,
+            5
+          ],
+          7
+        ],
+        "expected": 2,
+        "public": false,
+        "label": "7 = 3 + 4"
+      }
+    ],
+    "hints": [
+      "这是完全背包问题，用 dp[i] 表示凑出 i 的最少硬币数。",
+      "dp[0] = 0，其余初始化为 Infinity；每个金额尝试所有硬币。"
+    ],
+    "analysis": "贪心在任意面额下不保证最优，例如 1/3/4 凑 6。正确做法是动态规划：`dp[i] = min(dp[i - coin] + 1)`，最后判断是否仍为 Infinity。",
+    "fixed": "function solve(coins, amount) {\n  if (amount === 0) return 0;\n  const dp = new Array(amount + 1).fill(Infinity);\n  dp[0] = 0;\n  for (let i = 1; i <= amount; i += 1) {\n    for (const coin of coins) {\n      if (i >= coin) dp[i] = Math.min(dp[i], dp[i - coin] + 1);\n    }\n  }\n  return dp[amount] === Infinity ? -1 : dp[amount];\n}",
+    "order": 15
+  },
+  {
+    "id": "h4",
+    "level": "hard",
+    "title": "括号匹配",
+    "minutes": 12,
+    "summary": "判断条件写反了：栈顶匹配时反而返回 false，不匹配时却继续。",
+    "prompt": "实现 `solve(s)`：判断只包含 `()[]{}` 的字符串是否括号正确配对。空字符串视为合法。",
+    "source": "JavaScript 权威指南 7th · Ch.11；Secrets of the JavaScript Ninja 2nd · Ch.9",
+    "bug": "`stack.pop() === pairs[ch]` 是匹配成功，却被写成了 `return false`。",
+    "code": "function solve(s) {\n  const stack = [];\n  const pairs = { \")\": \"(\", \"]\": \"[\", \"}\": \"{\" };\n  for (const ch of s) {\n    if (\"([{\".includes(ch)) stack.push(ch);\n    else if (stack.pop() === pairs[ch]) return false;\n  }\n  return stack.length === 0;\n}",
+    "tests": [
+      {
+        "args": [
+          "()"
+        ],
+        "expected": true,
+        "public": true,
+        "label": "一对圆括号"
+      },
+      {
+        "args": [
+          "(]"
+        ],
+        "expected": false,
+        "public": true,
+        "label": "类型不匹配"
+      },
+      {
+        "args": [
+          "([)]"
+        ],
+        "expected": false,
+        "public": false,
+        "label": "交叉嵌套"
+      }
+    ],
+    "hints": [
+      "遇到右括号时，栈顶必须等于它对应的左括号。",
+      "空栈时直接 pop 会得到 undefined，也要判为不匹配。"
+    ],
+    "analysis": "括号匹配用栈：左括号入栈，右括号弹出并比较。匹配成功应继续，不匹配才返回 false；循环结束还要检查栈是否为空。",
+    "fixed": "function solve(s) {\n  const stack = [];\n  const pairs = { \")\": \"(\", \"]\": \"[\", \"}\": \"{\" };\n  for (const ch of s) {\n    if (\"([{\".includes(ch)) stack.push(ch);\n    else {\n      const top = stack.pop();\n      if (top !== pairs[ch]) return false;\n    }\n  }\n  return stack.length === 0;\n}",
+    "order": 16
+  },
+  {
+    "id": "h5",
+    "level": "hard",
+    "title": "螺旋矩阵",
+    "minutes": 16,
+    "summary": "遍历完一条边后没有检查边界是否相交，单行或最后一层会重复输出。",
+    "prompt": "实现 `solve(matrix)`：按顺时针螺旋顺序返回矩阵中的所有元素。空矩阵返回空数组。",
+    "source": "JavaScript 权威指南 7th · Ch.7；JavaScript 高级程序设计 4th · Ch.6",
+    "bug": "下边和左边的遍历没有加 `top <= bottom` / `left <= right` 保护，边界相交后会重复读取。",
+    "code": "function solve(matrix) {\n  if (!matrix.length) return [];\n  const out = [];\n  let top = 0, bottom = matrix.length - 1;\n  let left = 0, right = matrix[0].length - 1;\n  while (top <= bottom && left <= right) {\n    for (let c = left; c <= right; c += 1) out.push(matrix[top][c]);\n    top += 1;\n    for (let r = top; r <= bottom; r += 1) out.push(matrix[r][right]);\n    right -= 1;\n    for (let c = right; c >= left; c -= 1) out.push(matrix[bottom][c]);\n    bottom -= 1;\n    for (let r = bottom; r >= top; r -= 1) out.push(matrix[r][left]);\n    left += 1;\n  }\n  return out;\n}",
+    "tests": [
+      {
+        "args": [
+          [
+            [
+              1,
+              2,
+              3
+            ],
+            [
+              4,
+              5,
+              6
+            ],
+            [
+              7,
+              8,
+              9
+            ]
+          ]
+        ],
+        "expected": [
+          1,
+          2,
+          3,
+          6,
+          9,
+          8,
+          7,
+          4,
+          5
+        ],
+        "public": true,
+        "label": "3×3"
+      },
+      {
+        "args": [
+          [
+            [
+              1,
+              2
+            ],
+            [
+              3,
+              4
+            ]
+          ]
+        ],
+        "expected": [
+          1,
+          2,
+          4,
+          3
+        ],
+        "public": true,
+        "label": "2×2"
+      },
+      {
+        "args": [
+          [
+            [
+              1,
+              2,
+              3
+            ]
+          ]
+        ],
+        "expected": [
+          1,
+          2,
+          3
+        ],
+        "public": false,
+        "label": "单行"
+      }
+    ],
+    "hints": [
+      "每走完上边和右边，先检查 `top <= bottom` 再走底边。",
+      "走完底边后再检查 `left <= right` 再走左边。"
+    ],
+    "analysis": "螺旋遍历的四个方向不是每轮都完整执行。上边、右边走完后，如果 top 已经越过 bottom，就不该再走底边；左边同理。加边界检查可以避免单行/单列重复。",
+    "fixed": "function solve(matrix) {\n  if (!matrix.length) return [];\n  const out = [];\n  let top = 0, bottom = matrix.length - 1;\n  let left = 0, right = matrix[0].length - 1;\n  while (top <= bottom && left <= right) {\n    for (let c = left; c <= right; c += 1) out.push(matrix[top][c]);\n    top += 1;\n    for (let r = top; r <= bottom; r += 1) out.push(matrix[r][right]);\n    right -= 1;\n    if (top <= bottom) {\n      for (let c = right; c >= left; c -= 1) out.push(matrix[bottom][c]);\n      bottom -= 1;\n    }\n    if (left <= right) {\n      for (let r = bottom; r >= top; r -= 1) out.push(matrix[r][left]);\n      left += 1;\n    }\n  }\n  return out;\n}",
+    "order": 17
+  },
+  {
+    "id": "h6",
+    "level": "hard",
+    "title": "深比较对象",
+    "minutes": 13,
+    "summary": "用 JSON.stringify 比较，键顺序不同就判不相等；undefined 也会被吞掉。",
+    "prompt": "实现 `solve(a, b)`：深比较两个 JSON 风格的值（对象、数组、原始值），结构相同且每个对应值相等返回 true。对象键顺序不影响结果。",
+    "source": "JavaScript 权威指南 7th · Ch.6；Secrets of the JavaScript Ninja 2nd · Ch.2；Effective JavaScript · Item 57",
+    "bug": "`JSON.stringify` 受键顺序影响，还会丢失 undefined、函数等类型。",
+    "code": "function solve(a, b) {\n  return JSON.stringify(a) === JSON.stringify(b);\n}",
+    "tests": [
+      {
+        "args": [
+          [
+            {
+              "a": 1,
+              "b": 2
+            }
+          ],
+          [
+            {
+              "b": 2,
+              "a": 1
+            }
+          ]
+        ],
+        "expected": true,
+        "public": true,
+        "label": "键顺序不同"
+      },
+      {
+        "args": [
+          [
+            1,
+            [
+              2,
+              3
+            ]
+          ],
+          [
+            1,
+            [
+              2,
+              4
+            ]
+          ]
+        ],
+        "expected": false,
+        "public": true,
+        "label": "数组元素不同"
+      },
+      {
+        "args": [
+          [
+            {
+              "x": {
+                "a": 1,
+                "b": 2
+              }
+            }
+          ],
+          [
+            {
+              "x": {
+                "b": 2,
+                "a": 1
+              }
+            }
+          ]
+        ],
+        "expected": true,
+        "public": false,
+        "label": "嵌套键顺序"
+      }
+    ],
+    "hints": [
+      "先处理原始值和 null，再比较两个对象的键集合。",
+      "键数量相同、每个键都存在，并且递归比较对应值。"
+    ],
+    "analysis": "JSON 序列化是有损的：键顺序、undefined、函数、Symbol、Date 都会出问题。深比较要递归：`Object.is` 处理原始值，`Object.keys` 比较键集合，再逐个递归。",
+    "fixed": "function solve(a, b) {\n  if (Object.is(a, b)) return true;\n  if (typeof a !== \"object\" || a === null || typeof b !== \"object\" || b === null) return false;\n  const ka = Object.keys(a);\n  const kb = Object.keys(b);\n  if (ka.length !== kb.length) return false;\n  return ka.every(key => Object.prototype.hasOwnProperty.call(b, key) && solve(a[key], b[key]));\n}",
+    "order": 18
+  }
+];

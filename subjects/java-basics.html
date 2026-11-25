@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050B14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Java 基础 · 练习室</title>
+<meta name="description" content="Java 基础 独立入口页，一键返回练习室主界面。">
+<style>
+:root{color-scheme:dark;--line:rgba(125,211,252,.14);--accent:#5EEAD4}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden;padding-bottom:env(safe-area-inset-bottom,0px);background:#050B14;color:#EAF2FF;font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif}
+.subbar{flex:0 0 auto;display:flex;align-items:center;gap:12px;min-height:58px;padding:calc(8px + env(safe-area-inset-top,0px)) 14px 8px;background:linear-gradient(180deg,rgba(11,22,40,.98),rgba(7,14,27,.94));border-bottom:1px solid var(--line);box-shadow:0 8px 24px rgba(0,0,0,.22);position:relative;z-index:2}
+.home{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:132px;min-height:44px;padding:0 15px;border-radius:13px;border:1px solid rgba(94,234,212,.30);background:linear-gradient(115deg,rgba(94,234,212,.12),rgba(167,139,250,.08));color:#E8FFFC;text-decoration:none;font-size:14px;font-weight:800;letter-spacing:.01em;box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 4px 14px rgba(0,0,0,.22);-webkit-tap-highlight-color:transparent}
+.home span{font-size:19px;line-height:1;font-weight:700}
+.home:hover{border-color:rgba(94,234,212,.58);background:linear-gradient(115deg,rgba(94,234,212,.20),rgba(167,139,250,.12))}
+.home:focus-visible{outline:2px solid rgba(153,246,228,.95);outline-offset:3px}
+.subtitle{display:flex;align-items:center;gap:8px;min-width:0;font-size:13px;font-weight:750;color:#DCEAFF;letter-spacing:.01em}
+.subtitle img{width:25px;height:25px;object-fit:contain;flex:none;filter:drop-shadow(0 0 7px rgba(94,234,212,.16))}
+.subtitle b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:750}
+.spacer{flex:1}
+.tip{font-size:11px;color:#7F91A9;white-space:nowrap}
+.frame-wrap{position:relative;flex:1;min-height:0;background:#050B14}
+.frame-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#050B14}
+.loader{position:absolute;inset:0;display:grid;place-items:center;background:#050B14;color:#8C9DB5;font-size:12px;letter-spacing:.04em;transition:opacity .25s ease;z-index:1}
+.loader::before{content:"";width:18px;height:18px;margin-right:9px;border-radius:50%;border:2px solid rgba(94,234,212,.22);border-top-color:#5EEAD4;animation:spin .8s linear infinite;display:inline-block;vertical-align:-4px}
+.frame-wrap.ready .loader{opacity:0;pointer-events:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (max-width:640px){
+  .subbar{gap:9px;min-height:60px;padding:calc(7px + env(safe-area-inset-top,0px)) 10px 7px}
+  .home{min-width:128px;min-height:46px;padding:0 13px;font-size:13px;border-radius:12px}
+  .home span{font-size:20px}
+  .subtitle{font-size:12px;gap:6px}
+  .subtitle img{width:23px;height:23px}
+  .tip{display:none}
+}
+</style>
+<link rel="stylesheet" href="../assets/css/liquid-glass.css?v=20261123z47">
+</head>
+<body>
+<header class="subbar">
+  <a class="home" href="../java-debug-lab.html?v=20261123z47" aria-label="返回练习室主界面"><span aria-hidden="true">←</span>返回主界面</a>
+  <div class="subtitle"><img src="../assets/icons/java.png" alt="" loading="eager" decoding="async"><b>Java 基础</b></div>
+  <div class="spacer"></div>
+  <div class="tip">返回按钮始终在左上角</div>
+</header>
+<div class="frame-wrap" id="frameWrap">
+  <div class="loader">正在打开 Java 基础…</div>
+  <iframe src="../java-debug-lab.html?mode=jbase&amp;embed=1&amp;v=20261123z47" title="Java 基础" allow="fullscreen" onload="document.getElementById('frameWrap').classList.add('ready')"></iframe>
+</div>
+</body>
+</html>

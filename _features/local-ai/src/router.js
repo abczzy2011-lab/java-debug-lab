@@ -4,8 +4,9 @@ export function routeIntent(query = '', { hasHits = true } = {}) {
   const q = String(query).trim().toLowerCase();
   if (!q) return 'not_found';
 
-  // site overview
-  if (/网站|本站|全站|整体|目录|怎么学|学习路线|有什么课|哪些科目|一共多少|总共多少/.test(q)) {
+  // site overview; “不要讲本站课程”是排除指令，不能反过来当成全站地图请求
+  const negatedSite = /(?:不要|别|不用|不需要|不想|禁止|别再).{0,8}(?:讲|提|说|聊|介绍|涉及).{0,8}(?:本站|网站|全站|课程)/.test(q);
+  if (!negatedSite && /网站|本站|全站|整体|目录|怎么学|学习路线|有什么课|哪些科目|一共多少|总共多少/.test(q)) {
     return 'site_overview';
   }
   // exercise
@@ -17,7 +18,7 @@ export function routeIntent(query = '', { hasHits = true } = {}) {
     return 'course_overview';
   }
   // no retrieval hits or clearly off-site
-  if (!hasHits || /量子计算|外星|彩票|股票推荐|明天天气/.test(q)) return 'not_found';
+  if (!hasHits || /量子纠缠|量子计算|外星|彩票|股票推荐|明天天气/.test(q)) return 'not_found';
   return 'specific';
 }
 

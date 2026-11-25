@@ -79,7 +79,16 @@ export async function runBenchmark(device, adapter, { timeout = BENCH.TIMEOUT_MS
       pass.end();
       const t0 = performance.now();
       device.queue.submit([enc.finish()]);
-      await device.queue.onSubmittedWorkDone();
+      const done = device.queue.onSubmittedWorkDone();
+      let timeoutId = null;
+      const guard = new Promise((_, reject) => {
+        timeoutId = setTimeout(() => reject(new Error('GPU_BENCH_TIMEOUT')), timeout);
+      });
+      try {
+        await Promise.race([done, guard]);
+      } finally {
+        clearTimeout(timeoutId);
+      }
       const dt = (performance.now() - t0) / 1000;
       if (i >= BENCH.WARMUPS) times.push(dt);
     } catch (e) {

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080A0E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Python 科目 · 练习室 / 输出实现场 / 学习资料 / Python API</title>
+<meta name="description" content="Python 科目入口：Python 改错练习室、Python 输出实现场、Python 学习资料、Python API 全量索引。">
+<link rel="icon" type="image/png" href="../assets/icons/python.png">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --line:rgba(244,239,230,.13);--line-strong:rgba(244,239,230,.25);
+  --text:#F3EFE6;--muted:#A7B0B1;--dim:#6F797D;
+  --accent:#C8A976;--violet:#9CC9B8;--yellow:#C8A976;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --mono:"SFMono-Regular","JetBrains Mono","Sarasa Gothic SC",Menlo,Consolas,"PingFang SC","Microsoft YaHei",monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+html,body{min-height:100%}
+body{color:var(--text);font-family:var(--font);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button,a{font:inherit;color:inherit}
+a{text-decoration:none}
+:focus-visible{outline:2px solid rgba(200,169,118,.85);outline-offset:3px}
+.subbar{
+  display:flex;align-items:center;gap:12px;min-height:58px;padding:calc(8px + env(safe-area-inset-top,0px)) 14px 8px;
+  border-bottom:1px solid var(--line);position:relative;z-index:3;
+  background:radial-gradient(70% 160% at 12% 0%,rgba(200,169,118,.10),transparent 64%),linear-gradient(180deg,rgba(16,20,25,.88),rgba(9,12,16,.94));
+  box-shadow:0 10px 28px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.055);
+  -webkit-backdrop-filter:blur(18px) saturate(150%);backdrop-filter:blur(18px) saturate(150%);
+}
+.home{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:0 14px;border-radius:13px;
+  border:1px solid rgba(200,169,118,.30);background:linear-gradient(115deg,rgba(200,169,118,.12),rgba(156,201,184,.08));
+  color:#F7F1E4;font-size:13px;font-weight:800;white-space:nowrap;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 4px 14px rgba(0,0,0,.22);
+}
+.home:hover{border-color:rgba(200,169,118,.58);background:linear-gradient(115deg,rgba(200,169,118,.20),rgba(156,201,184,.12))}
+.home span{font-size:19px;line-height:1;font-weight:700}
+.brand{display:flex;align-items:center;gap:8px;min-width:0;font-size:13px;font-weight:800}
+.brand img{width:26px;height:26px;object-fit:contain;filter:drop-shadow(0 0 8px rgba(200,169,118,.16))}
+.brand b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spacer{flex:1}
+.tip{font-size:11px;color:var(--dim);white-space:nowrap}
+.hub{max-width:1040px;margin:0 auto;padding:clamp(34px,7vh,72px) 20px 54px}
+.hero{text-align:center;display:flex;flex-direction:column;align-items:center}
+.hero-ico{
+  width:84px;height:84px;border-radius:22px;display:grid;place-items:center;margin-bottom:18px;
+  border:1px solid rgba(200,169,118,.30);
+  background:radial-gradient(circle at 28% 20%,rgba(200,169,118,.30),transparent 62%),linear-gradient(135deg,rgba(34,30,24,.88),rgba(7,16,29,.92));
+  box-shadow:0 20px 52px rgba(0,0,0,.34),0 0 42px rgba(200,169,118,.10),inset 0 1px 0 rgba(255,255,255,.16);
+}
+.hero-ico img{width:66px;height:66px;object-fit:contain;filter:drop-shadow(0 7px 16px rgba(0,0,0,.34))}
+.kicker{font-family:var(--mono);font-size:10.5px;font-weight:800;letter-spacing:.24em;color:var(--accent);text-transform:uppercase;margin-bottom:10px}
+h1{font-size:clamp(38px,6vw,64px);line-height:1.04;letter-spacing:-.045em;font-weight:850;text-align:center;background:linear-gradient(105deg,#FFFFFF 4%,#F3EFE6 42%,#D2BA97 74%,#D5C6A8 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{max-width:650px;margin-top:16px;color:var(--muted);font-size:14px;line-height:1.9;text-align:center}
+.hero p strong{color:#F7F1E4;font-weight:750}
+.entry-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:42px}
+.entry{
+  position:relative;overflow:hidden;display:flex;flex-direction:column;min-height:260px;padding:24px 24px 20px;border-radius:20px;
+  border:1px solid var(--line);background:linear-gradient(180deg,rgba(24,24,23,.62),rgba(9,12,16,.80));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 18px 42px rgba(0,0,0,.18);
+  transition:transform .2s var(--ease),border-color .2s,box-shadow .2s,background .2s;
+}
+.entry:hover{transform:translateY(-4px);border-color:var(--entry-color);box-shadow:0 26px 56px rgba(0,0,0,.30),0 0 0 1px rgba(255,255,255,.03) inset}
+.entry:active{transform:translateY(-1px) scale(.995)}
+.entry::before{content:"";position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,transparent,var(--entry-color),transparent);opacity:.76}
+.entry::after{content:"";position:absolute;right:-58px;bottom:-76px;width:190px;height:190px;border-radius:50%;background:radial-gradient(circle,var(--entry-glow),transparent 68%);pointer-events:none}
+.entry.practice{--entry-color:#C8A976;--entry-glow:rgba(200,169,118,.16)}
+.entry.study{--entry-color:#9CC9B8;--entry-glow:rgba(156,201,184,.15)}
+.entry.api{--entry-color:#8FB8FF;--entry-glow:rgba(143,184,255,.15)}
+.entry-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
+.entry-ico{width:52px;height:52px;display:grid;place-items:center;border-radius:14px;border:1px solid color-mix(in srgb,var(--entry-color) 26%,transparent);background:color-mix(in srgb,var(--entry-color) 8%,transparent)}
+.entry-ico img{width:38px;height:38px;object-fit:contain}
+.badge{font-size:10px;font-weight:800;letter-spacing:.02em;padding:4px 8px;border-radius:999px;border:1px solid color-mix(in srgb,var(--entry-color) 34%,transparent);background:color-mix(in srgb,var(--entry-color) 8%,transparent);color:var(--entry-color);white-space:nowrap}
+.entry h2{font-size:24px;line-height:1.25;font-weight:800;letter-spacing:-.02em;margin-bottom:7px}
+.entry p{font-size:12.5px;line-height:1.75;color:var(--muted);min-height:54px}
+.entry-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:14px;border-top:1px solid var(--line);font-size:10.5px;color:var(--dim);font-weight:650;line-height:1.6}
+.entry-meta span{padding:2px 0}
+.entry-cta{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:13px;color:var(--entry-color);font-size:12px;font-weight:800}
+.entry-cta span:last-child{font-size:18px;transition:transform .16s}
+.entry:hover .entry-cta span:last-child{transform:translateX(3px)}
+.note{margin-top:28px;padding:12px 15px;border:1px solid var(--line);border-radius:13px;background:rgba(10,13,17,.46);font-size:11.5px;line-height:1.8;color:var(--dim);text-align:center}
+.note b{color:var(--muted);font-weight:700}
+.output-spotlight{
+  position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1.22fr) minmax(220px,.78fr);gap:22px;align-items:center;
+  margin-top:36px;padding:24px 26px;border:1px solid rgba(200,169,118,.30);border-radius:22px;
+  background:
+    radial-gradient(48% 110% at 8% 0%,rgba(200,169,118,.17),transparent 67%),
+    radial-gradient(40% 90% at 96% 14%,rgba(156,201,184,.13),transparent 68%),
+    linear-gradient(145deg,rgba(27,28,28,.72),rgba(8,10,14,.88));
+  box-shadow:0 24px 58px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.09);
+  transition:transform .2s var(--ease),border-color .2s,box-shadow .2s;
+}
+.output-spotlight:hover{transform:translateY(-3px);border-color:rgba(200,169,118,.56);box-shadow:0 30px 68px rgba(0,0,0,.34),0 0 0 1px rgba(255,255,255,.03) inset}
+.output-spotlight:active{transform:translateY(-1px) scale(.997)}
+.output-spotlight::before{content:"";position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,transparent,rgba(200,169,118,.8),rgba(156,201,184,.7),transparent)}
+.spotlight-kicker{display:block;font-family:var(--mono);font-size:9px;font-weight:850;letter-spacing:.18em;color:#E9D6B3}
+.output-spotlight h2{margin-top:7px;font-size:clamp(28px,4vw,40px);line-height:1.12;letter-spacing:-.045em;font-weight:850;background:linear-gradient(100deg,#FFF9EE 4%,#F2DFBE 58%,#C9E7DC 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.output-spotlight p{max-width:590px;margin-top:9px;font-size:11.5px;line-height:1.8;color:var(--muted)}
+.output-spotlight p b{color:#F7F0E2;font-weight:750}
+.spotlight-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px}
+.spotlight-meta span{padding:3px 7px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.03);font-size:8.5px;font-weight:750;color:var(--dim)}
+.spotlight-cta{display:flex;align-items:center;gap:8px;margin-top:16px;font-size:11px;font-weight:850;color:#F2DFBE}
+.spotlight-cta span:last-child{font-size:18px;color:#C8A976;transition:transform .16s}
+.output-spotlight:hover .spotlight-cta span:last-child{transform:translateX(3px)}
+.spotlight-demo{padding:11px;border:1px solid rgba(156,201,184,.18);border-radius:13px;background:rgba(6,10,13,.58);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.demo-head,.demo-run{display:flex;align-items:center;justify-content:space-between;gap:7px;font-family:var(--mono);font-size:7.5px;font-weight:800;letter-spacing:.06em;color:#D8C39D}
+.demo-head{padding-bottom:7px;border-bottom:1px solid var(--line);color:#E8D7B7}
+.spotlight-demo pre{margin:0;padding:11px 2px 13px;font-family:var(--mono);font-size:11.5px;line-height:1.6;color:#F2E6D4;white-space:pre}
+.demo-run{padding-top:8px;border-top:1px solid var(--line)}
+.demo-run b{font-size:14px;color:#CDEBE0}
+
+@media (min-width:761px) and (max-width:940px){
+  .entry{padding:22px 18px 18px}
+  .entry h2{font-size:22px}
+  .entry p{font-size:12px}
+}
+@media (max-width:760px){
+  .subbar{gap:9px;padding-left:10px;padding-right:10px}
+  .home{min-height:42px;padding:0 11px;font-size:12px}
+  .brand{font-size:12px;gap:6px}
+  .brand img{width:23px;height:23px}
+  .tip{display:none}
+  .hub{padding:30px 14px 34px}
+  .hero-ico{width:72px;height:72px;border-radius:19px;margin-bottom:14px}
+  .hero-ico img{width:56px;height:56px}
+  .hero p{font-size:13px;line-height:1.8}
+  .entry-grid{grid-template-columns:1fr;gap:12px;margin-top:30px}
+  .entry{min-height:0;padding:19px 18px 17px;border-radius:17px}
+  .entry h2{font-size:21px}
+  .entry p{min-height:0;font-size:12px}
+  .entry-meta{padding-top:11px}
+  .output-spotlight{grid-template-columns:1fr;gap:15px;margin-top:28px;padding:19px 17px;border-radius:17px}
+  .output-spotlight p{font-size:10.5px}
+  .spotlight-demo pre{font-size:10.5px}
+}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important;animation-duration:.01ms!important}}
+</style>
+<link rel="stylesheet" href="../assets/css/liquid-glass.css?v=20261125z70">
+</head>
+<body>
+<header class="subbar">
+  <a class="home" href="../java-debug-lab.html?v=20261125z70" aria-label="返回练习室主界面"><span aria-hidden="true">←</span>返回主界面</a>
+  <div class="brand"><img src="../assets/icons/python.png" alt="" width="26" height="26"><b>Python 科目</b></div>
+  <div class="spacer"></div>
+  <div class="tip">Java 主站中的独立 Python 科目</div>
+</header>
+<main class="hub">
+  <section class="hero">
+    <div class="hero-ico"><img src="../assets/icons/python.png" alt="Python" width="66" height="66"></div>
+    <div class="kicker">SUBJECT · PYTHON · 4 CATEGORIES</div>
+    <h1>Python</h1>
+    <p>四条线：<strong>改错练习室</strong>练真实 CPython，<strong>输出实现场</strong>给目标输出、从空白写完整程序，<strong>学习资料</strong>五篇 18 章 58 节，<strong>Python API</strong> 接入官方 3.13 全量索引。</p>
+  </section>
+
+  <a class="output-spotlight" href="./python-output.html?v=20261125z70" aria-label="进入 Python 输出实现场">
+    <div class="spotlight-copy">
+      <span class="spotlight-kicker">NEW · OUTPUT → CODE · ONLY PYTHON</span>
+      <h2>Python 输出实现场</h2>
+      <p>没有待改的错误代码，也没有可抄答案。先给目标输出，你从 <b>main.py</b> 空函数体开始写；提交后由真实 CPython 跑 3 组用例，按 stdout 匹配度评分，并把运行毫秒计入成绩。</p>
+      <div class="spotlight-meta"><span>12 题 · 36 组测试</span><span>输出 85 分 + 速度 15 分</span><span>本机保存最佳</span></div>
+      <div class="spotlight-cta"><span>从零写一题</span><span aria-hidden="true">→</span></div>
+    </div>
+    <div class="spotlight-demo" aria-hidden="true">
+      <div class="demo-head"><span>目标输出 · SAMPLE</span><span>stdout</span></div>
+      <pre>1
+1 2
+1 2 3
+1 2 3 4</pre>
+      <div class="demo-run"><span>python3 main.py</span><b>26 ms</b></div>
+    </div>
+  </a>
+
+  <section class="entry-grid">
+    <a class="entry practice" href="../python-debug-lab.html?v=20261125z70" aria-label="进入 Python 改错练习室">
+      <div class="entry-top">
+        <div class="entry-ico"><img src="../assets/icons/python.png" alt="" width="38" height="38"></div>
+        <span class="badge">已开放</span>
+      </div>
+      <h2>Python 改错练习室</h2>
+      <p>随机出题、三档难度、埋错代码、目标输出。试跑只看结果，提交按 stdout 逐行给 0–100 分；改法不限，输出对上就算过。</p>
+      <div class="entry-meta"><span>36 个模板 · 三档各 12</span><span>真实 CPython / Judge0</span><span>逐行 diff · 提示 · 错题本</span></div>
+      <div class="entry-cta"><span>开始练习</span><span aria-hidden="true">→</span></div>
+    </a>
+
+    <a class="entry study" href="./python-course.html?v=20261125z70#overview" aria-label="进入 Python 学习资料五篇课程">
+      <div class="entry-top">
+        <div class="entry-ico"><img src="../assets/icons/study.png" alt="" width="38" height="38"></div>
+        <span class="badge">五篇已上线</span>
+      </div>
+      <h2>Python 学习资料</h2>
+      <p>三本教材综合成长课：五篇 18 章 58 节已写入，从基础、工程化到 HTTP/API、数据、自动化与综合项目。</p>
+      <div class="entry-meta"><span>18 章 · 58 节</span><span>3 本教材综合</span><span>长课正文 / 练习</span></div>
+      <div class="entry-cta"><span>进入完整课程</span><span aria-hidden="true">→</span></div>
+    </a>
+
+    <a class="entry api" href="./python-api.html?v=20261125z70" aria-label="打开 Python API 全量索引">
+      <div class="entry-top">
+        <div class="entry-ico"><img src="../assets/icons/api.png" alt="" width="38" height="38"></div>
+        <span class="badge">全量索引</span>
+      </div>
+      <h2>Python API</h2>
+      <p>Python 3.13 官方文档全量索引：模块、类、函数、方法、异常、属性、关键字与 C API，共 18,700+ 条，可直接搜索并阅读官方原文。</p>
+      <div class="entry-meta"><span>18,700+ 条索引</span><span>官方锚点定位</span><span>关键字 / C API</span></div>
+      <div class="entry-cta"><span>开始搜索</span><span aria-hidden="true">→</span></div>
+    </a>
+  </section>
+
+  <div class="note"><b>Python 现在是四个入口。</b> 改错练习室与输出实现场都走真实 CPython 判题，输出实现场按 3 组用例与运行毫秒评分；学习资料五篇 18 章 58 节与 Python API 全量索引继续独立可用。</div>
+</main>
+</body>
+</html>

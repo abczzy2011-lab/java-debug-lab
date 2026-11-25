@@ -38,13 +38,52 @@ test('no f16 -> NO_F16', () => {
   assert.equal(g.code, 'NO_F16');
 });
 
-test('mobile UA -> UNSUPPORTED_BROWSER', () => {
-  const g = evaluateEnvironment(baseEnv({ ua: 'Mozilla/5.0 (iPhone) Mobile Safari' }));
+test('mobile Safari UA is allowed; performance still decides', () => {
+  const g = evaluateEnvironment(baseEnv({
+    ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 26_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1',
+    deviceMemory: undefined,
+  }));
+  assert.equal(g.ok, true);
+  assert.equal(g.code, 'PASS');
+});
+
+test('OPPO / vivo / UC vendor browsers are allowed; WebGPU still decides', () => {
+  for (const ua of [
+    'Mozilla/5.0 (Linux; Android 14; PHK110) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/122.0.0.0 Mobile Safari/537.36 HeyTapBrowser/40.10.10.1.0',
+    'Mozilla/5.0 (Linux; Android 14; V2309A) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/122.0.0.0 Mobile Safari/537.36 VivoBrowser/15.0.0.0',
+    'Mozilla/5.0 (Linux; Android 14; 22101316C) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/122.0.0.0 Mobile Safari/537.36 UCBrowser/15.5.0.0',
+    'Mozilla/5.0 (Linux; Android 14; SM-S918B) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/25.0 Chrome/122.0.0.0 Mobile Safari/537.36',
+  ]) {
+    const g = evaluateEnvironment(baseEnv({ ua, deviceMemory: 6 }));
+    assert.equal(g.ok, true, ua);
+    assert.equal(g.code, 'PASS', ua);
+  }
+});
+
+test('unknown non-browser UA -> UNSUPPORTED_BROWSER', () => {
+  const g = evaluateEnvironment(baseEnv({ ua: 'SomeBot/1.0' }));
   assert.equal(g.code, 'UNSUPPORTED_BROWSER');
 });
 
-test('low memory -> LOW_MEMORY', () => {
+test('desktop 4GB -> LOW_MEMORY', () => {
   const g = evaluateEnvironment(baseEnv({ deviceMemory: 4 }));
+  assert.equal(g.code, 'LOW_MEMORY');
+});
+
+test('mobile 4GB passes the memory stage; benchmark still decides', () => {
+  const g = evaluateEnvironment(baseEnv({
+    ua: 'Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 Chrome/126.0 Mobile Safari/537.36',
+    deviceMemory: 4,
+  }));
+  assert.equal(g.ok, true);
+  assert.equal(g.code, 'PASS');
+});
+
+test('mobile 3GB still fails LOW_MEMORY', () => {
+  const g = evaluateEnvironment(baseEnv({
+    ua: 'Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 Chrome/126.0 Mobile Safari/537.36',
+    deviceMemory: 3,
+  }));
   assert.equal(g.code, 'LOW_MEMORY');
 });
 
