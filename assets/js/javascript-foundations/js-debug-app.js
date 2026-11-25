@@ -137,7 +137,7 @@
       '<div class="bank-note">题面取材于书单中的 JavaScript 教材，错误类型包括：条件写反、边界漏判、大小写、join 分隔符、浅拷贝、排序不稳定、Map 顺序、贪心失效等。每题都有可运行的修复代码与解析，提交后解锁。</div>' +
     '</div>';
     updateTop();
-    document.title = 'JavaScript 改错实验室 · 18 题';
+    document.title = 'JavaScript 改错实验室 · ' + tasks.length + ' 题';
     window.scrollTo(0, 0);
   }
 

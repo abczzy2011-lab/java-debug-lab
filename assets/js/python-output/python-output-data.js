@@ -1,6 +1,6 @@
-/* Python 输出实现场 · 12 题 / 36 组测试。数据由题库生成器产出，勿手改 expected。 */
+/* Python 输出实现场 · 18 题 / 54 组测试。数据由题库生成器产出，勿手改 expected。 */
 window.PYTHON_OUTPUT_BANK = {
-  "version": "20261125z70",
+  "version": "20261125z73",
   "title": "Python 输出实现场",
   "levels": [
     {
@@ -521,6 +521,252 @@ window.PYTHON_OUTPUT_BANK = {
       ],
       "sampleStdin": "4\n1 3\n2 6\n8 10\n15 18",
       "sampleStdout": "1 6\n8 10\n15 18"
+    },
+    {
+      "id": "b5",
+      "level": "basic",
+      "no": 13,
+      "title": "闰年判断",
+      "subtitle": "四个条件，两个分支",
+      "brief": "判断一年是不是闰年。",
+      "goal": "读入年份 year（1 ≤ year ≤ 3000）。闰年输出 YES，平年输出 NO。规则：能被 4 整除但不能被 100 整除，或者能被 400 整除。",
+      "hints": [
+        "把规则拆成两个条件：`year % 4 == 0 and year % 100 != 0`，或者 `year % 400 == 0`。",
+        "1900 能被 4 和 100 整除，但不是闰年；2000 能被 400 整除，是闰年。"
+      ],
+      "input": "一行，一个整数 year。",
+      "output": "YES 或 NO。",
+      "concepts": [
+        "取模",
+        "and/or",
+        "边界"
+      ],
+      "fastMs": 70,
+      "starter": "import sys\n\ndef main():\n    data = sys.stdin.read()\n    # 先解析输入，再在这里写你的解法\n\nif __name__ == \"__main__\":\n    main()",
+      "testCases": [
+        {
+          "label": "公开样例",
+          "stdin": "2024",
+          "expected": "YES"
+        },
+        {
+          "label": "隐藏用例 1",
+          "stdin": "1900",
+          "expected": "NO"
+        },
+        {
+          "label": "隐藏用例 2",
+          "stdin": "2000",
+          "expected": "YES"
+        }
+      ],
+      "sampleStdin": "2024",
+      "sampleStdout": "YES"
+    },
+    {
+      "id": "b6",
+      "level": "basic",
+      "no": 14,
+      "title": "数字反转",
+      "subtitle": "前导零不要在输出里出现",
+      "brief": "把一个非负整数的十进制数字倒过来。",
+      "goal": "读入非负整数 n（0 ≤ n ≤ 999999）。输出反转后的整数，不能带前导零；0 反转还是 0。",
+      "hints": [
+        "字符串切片 `[::-1]` 可以反转，再 `int(...)` 去掉前导零。",
+        "120 反转是 021，输出必须是 21；1000 反转是 0001，输出 1。"
+      ],
+      "input": "一行，一个非负整数。",
+      "output": "一行，反转后的整数。",
+      "concepts": [
+        "切片",
+        "int",
+        "前导零"
+      ],
+      "fastMs": 70,
+      "starter": "import sys\n\ndef main():\n    data = sys.stdin.read()\n    # 先解析输入，再在这里写你的解法\n\nif __name__ == \"__main__\":\n    main()",
+      "testCases": [
+        {
+          "label": "公开样例",
+          "stdin": "120",
+          "expected": "21"
+        },
+        {
+          "label": "隐藏用例 1",
+          "stdin": "7",
+          "expected": "7"
+        },
+        {
+          "label": "隐藏用例 2",
+          "stdin": "1000",
+          "expected": "1"
+        }
+      ],
+      "sampleStdin": "120",
+      "sampleStdout": "21"
+    },
+    {
+      "id": "i5",
+      "level": "intermediate",
+      "no": 15,
+      "title": "最大公约数",
+      "subtitle": "欧几里得算法",
+      "brief": "求两个正整数的最大公约数。",
+      "goal": "读入一行两个正整数 a b（1 ≤ a,b ≤ 100000），输出它们的最大公约数。",
+      "hints": [
+        "gcd(a,b) = gcd(b, a % b)，直到 b 为 0，答案是 a。",
+        "不要从 min(a,b) 向下枚举，数字大时会很慢。"
+      ],
+      "input": "一行，两个正整数，空格分隔。",
+      "output": "一个整数，表示 gcd(a, b)。",
+      "concepts": [
+        "欧几里得",
+        "while",
+        "取模"
+      ],
+      "fastMs": 70,
+      "starter": "import sys\n\ndef main():\n    data = sys.stdin.read()\n    # 先解析输入，再在这里写你的解法\n\nif __name__ == \"__main__\":\n    main()",
+      "testCases": [
+        {
+          "label": "公开样例",
+          "stdin": "12 18",
+          "expected": "6"
+        },
+        {
+          "label": "隐藏用例 1",
+          "stdin": "7 13",
+          "expected": "1"
+        },
+        {
+          "label": "隐藏用例 2",
+          "stdin": "100 75",
+          "expected": "25"
+        }
+      ],
+      "sampleStdin": "12 18",
+      "sampleStdout": "6"
+    },
+    {
+      "id": "i6",
+      "level": "intermediate",
+      "no": 16,
+      "title": "去重并排序",
+      "subtitle": "先 set，再按数字大小排",
+      "brief": "把一组整数去重后升序输出。",
+      "goal": "第一行读入 n，第二行读入 n 个整数。输出去重后的升序序列，用一个空格分隔。",
+      "hints": [
+        "`set(nums)` 去重，`sorted(...)` 返回升序列表。",
+        "set 不保证顺序，所以排序要单独做；输出用 `\" \".join(map(str, ...))`。"
+      ],
+      "input": "第一行 n；第二行 n 个整数。",
+      "output": "一行，去重且升序的整数序列。",
+      "concepts": [
+        "set",
+        "sorted",
+        "join"
+      ],
+      "fastMs": 70,
+      "starter": "import sys\n\ndef main():\n    data = sys.stdin.read()\n    # 先解析输入，再在这里写你的解法\n\nif __name__ == \"__main__\":\n    main()",
+      "testCases": [
+        {
+          "label": "公开样例",
+          "stdin": "5\n3 1 3 2 1",
+          "expected": "1 2 3"
+        },
+        {
+          "label": "隐藏用例 1",
+          "stdin": "3\n10 2 10",
+          "expected": "2 10"
+        },
+        {
+          "label": "隐藏用例 2",
+          "stdin": "4\n-1 0 -1 2",
+          "expected": "-1 0 2"
+        }
+      ],
+      "sampleStdin": "5\n3 1 3 2 1",
+      "sampleStdout": "1 2 3"
+    },
+    {
+      "id": "c5",
+      "level": "challenge",
+      "no": 17,
+      "title": "最大子数组和",
+      "subtitle": "Kadane 的一次遍历",
+      "brief": "求连续子数组的最大和。",
+      "goal": "第一行读入 n，第二行读入 n 个整数（可能为负）。输出所有非空连续子数组中的最大和。",
+      "hints": [
+        "维护 `cur = max(x, cur + x)`，`best = max(best, cur)`。",
+        "全负数时答案不是 0，而是最大的那个负数；初始化不能直接写 0。"
+      ],
+      "input": "第一行 n；第二行 n 个整数。",
+      "output": "一个整数，表示最大子数组和。",
+      "concepts": [
+        "动态规划",
+        "Kadane",
+        "负数"
+      ],
+      "fastMs": 80,
+      "starter": "import sys\n\ndef main():\n    data = sys.stdin.read()\n    # 先解析输入，再在这里写你的解法\n\nif __name__ == \"__main__\":\n    main()",
+      "testCases": [
+        {
+          "label": "公开样例",
+          "stdin": "9\n-2 1 -3 4 -1 2 1 -5 4",
+          "expected": "6"
+        },
+        {
+          "label": "隐藏用例 1",
+          "stdin": "3\n-5 -2 -9",
+          "expected": "-2"
+        },
+        {
+          "label": "隐藏用例 2",
+          "stdin": "4\n1 2 3 4",
+          "expected": "10"
+        }
+      ],
+      "sampleStdin": "9\n-2 1 -3 4 -1 2 1 -5 4",
+      "sampleStdout": "6"
+    },
+    {
+      "id": "c6",
+      "level": "challenge",
+      "no": 18,
+      "title": "螺旋矩阵",
+      "subtitle": "四条边界逐层收缩",
+      "brief": "按顺时针螺旋顺序输出矩阵元素。",
+      "goal": "第一行读入 rows cols，随后 rows 行每行 cols 个整数。从左上角开始顺时针螺旋遍历，输出一行，数字用单个空格分隔。",
+      "hints": [
+        "维护 top、bottom、left、right 四条边界，依次走完上边、右边、下边、左边，再收缩边界。",
+        "每一轮走完要检查边界是否仍然合法，否则单行或单列会重复输出。"
+      ],
+      "input": "第一行 rows cols；随后 rows 行矩阵。",
+      "output": "一行，螺旋顺序的所有元素。",
+      "concepts": [
+        "边界",
+        "四指针",
+        "矩阵"
+      ],
+      "fastMs": 80,
+      "starter": "import sys\n\ndef main():\n    data = sys.stdin.read()\n    # 先解析输入，再在这里写你的解法\n\nif __name__ == \"__main__\":\n    main()",
+      "testCases": [
+        {
+          "label": "公开样例",
+          "stdin": "3 3\n1 2 3\n4 5 6\n7 8 9",
+          "expected": "1 2 3 6 9 8 7 4 5"
+        },
+        {
+          "label": "隐藏用例 1",
+          "stdin": "2 3\n1 2 3\n4 5 6",
+          "expected": "1 2 3 6 5 4"
+        },
+        {
+          "label": "隐藏用例 2",
+          "stdin": "1 4\n1 2 3 4",
+          "expected": "1 2 3 4"
+        }
+      ],
+      "sampleStdin": "3 3\n1 2 3\n4 5 6\n7 8 9",
+      "sampleStdout": "1 2 3 6 9 8 7 4 5"
     }
   ]
 };

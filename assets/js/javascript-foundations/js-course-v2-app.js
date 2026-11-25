@@ -26,7 +26,7 @@
     apiHref: './javascript-reference.html?v=20261125z65',
     apiLabel: '查 JavaScript API',
     routeNote: '建议按篇推进；第 1–4 章打语言基础，第 5–9 章学函数、对象与模块，第 10–13 章练数据与标准库，第 14–17 章进入 DOM、网络与异步，第 18 章完成综合项目。',
-    overviewDocTitle: 'JavaScript 核心编程与浏览器实战 · 五篇 18 章 58 节',
+    overviewDocTitle: 'JavaScript 核心编程与浏览器实战 · 五篇 18 章 76 节',
     lessonDocSuffix: 'JavaScript 核心编程',
     defaultSource: '12 本 JavaScript 教材综合改写',
     sourceNote: '正文为课程改写，不逐字复制原书段落。',

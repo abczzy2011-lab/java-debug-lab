@@ -140,7 +140,29 @@
             topic: '拼接顺序', code, expected: first + second,
             bugs: [bug(code, '拼接顺序反了', 'print(second + first)', 'print(first + second)',
               'second + first 会先放 thon 再放 Py，顺序与目标相反。', '拼接按从左到右的顺序生成结果；写之前先念一遍目标字符串的先后。')] };
-        } }
+        } },
+
+
+      { id: 'py-b13', group: 'Python 基础 · 初始值', topic: '最大值 / 初始值', summary: '在负数列表里把最大值初始成 0，结果永远选不到真正的最大负数。',
+        gen: function (r) {
+          const nums = [-r.int(2, 9), -r.int(2, 8), -r.int(1, 7)];
+          const expected = Math.max(...nums);
+          const code = `nums = [${nums.join(', ')}]\nlargest = 0\nfor n in nums:\n    if n > largest:\n        largest = n\nprint(largest)`;
+          return { title: '负数里找最大', desc: '列表全是负数，目标是找出最大的那个，但输出总是 0。',
+            topic: '最大值 / 初始值', code, expected: String(expected),
+            bugs: [bug(code, '最大值初始值错误', 'largest = 0', 'largest = nums[0]',
+              '全负数时 0 比任何一个元素都大，largest 永远不会更新。', '最大值应初始化为第一个元素，或负无穷 float("-inf")；不要用 0 假设所有数都非负。')] };
+        } },
+      { id: 'py-b14', group: 'Python 基础 · 变量交换', topic: '临时变量 / 赋值顺序', summary: '交换时临时变量存错了，两个变量最后变成同一个值。',
+        gen: function (r) {
+          let a = r.int(2, 9), b = r.int(2, 9);
+          if (a === b) b = b + 1;
+          const code = `a = ${a}\nb = ${b}\ntemp = b\na = b\nb = temp\nprint(a, b)`;
+          return { title: '交换两个变量', desc: '目标是交换 a 和 b，但输出变成了两个相同的数。',
+            topic: '临时变量 / 赋值顺序', code, expected: `${b} ${a}`,
+            bugs: [bug(code, '临时变量存错', 'temp = b', 'temp = a',
+              'temp 应该先保存 a 的原值；存 b 会让 a 和 b 最后都变成 b。', '交换三步：temp = a；a = b；b = temp。Python 也可以直接写 a, b = b, a。')] };
+        } },
     ],
     intermediate: [
       { id: 'py-i01', group: 'Python 进阶 · 字典', topic: 'KeyError / 键名', summary: '字典键区分大小写。',
@@ -245,7 +267,30 @@
             topic: '别名 / 浅拷贝', code, expected: '[1, 2, 3]',
             bugs: [bug(code, '列表别名未复制', 'b = a', 'b = a[:]',
               'b = a 让两个变量指向同一个列表；改 b 等于改 a。', '要独立副本用 a[:]、list(a) 或 copy.copy(a)。赋值号不会复制可变对象。')] };
-        } }
+        } },
+
+
+      { id: 'py-i13', group: 'Python 进阶 · 字典排序', topic: 'sorted key / 按值排序', summary: '排序键写成了键名，不是分数。',
+        gen: function (r) {
+          const scores = { Ada: r.int(85, 92), Bob: r.int(93, 99), Cara: r.int(70, 80) };
+          const names = Object.keys(scores);
+          const expected = names.map(n => `('${n}', ${scores[n]})`).sort((x, y) => parseInt(y.split(', ')[1]) - parseInt(x.split(', ')[1]));
+          const code = `scores = {${names.map(n => `"${n}": ${scores[n]}`).join(', ')}}\nprint(sorted(scores.items(), key=lambda kv: kv[0], reverse=True))`;
+          return { title: '按分数排名', desc: '目标是按分数从高到低输出 (名字, 分数)，但现在按名字倒序排。',
+            topic: 'sorted key / 按值排序', code, expected: '[' + expected.join(', ') + ']',
+            bugs: [bug(code, '排序键取错', 'print(sorted(scores.items(), key=lambda kv: kv[0], reverse=True))', 'print(sorted(scores.items(), key=lambda kv: kv[1], reverse=True))',
+              'kv[0] 是键（名字），kv[1] 才是值（分数）；按分数排序要取 kv[1]。', 'sorted(items, key=...) 的 key 接收 (键, 值) 元组。先明确按哪一个排，再决定下标。')] };
+        } },
+      { id: 'py-i14', group: 'Python 进阶 · 去重', topic: 'set / 顺序保持', summary: 'set 去重会打乱原顺序。',
+        gen: function (r) {
+          const nums = [r.int(1, 4), r.int(1, 4), r.int(1, 4), r.int(1, 4)];
+          const expected = '[' + Array.from(new Set(nums)).join(', ') + ']';
+          const code = `nums = [${nums.join(', ')}]\nresult = list(set(nums))\nprint(result)`;
+          return { title: '去重但保留顺序', desc: '目标是去重并保留第一次出现的顺序，但 set 把顺序打乱了。',
+            topic: 'set / 顺序保持', code, expected,
+            bugs: [bug(code, 'set 丢失插入顺序', 'result = list(set(nums))', 'result = list(dict.fromkeys(nums))',
+              'set 只保证元素唯一，不保证插入顺序；dict.fromkeys 在 Python 3.7+ 保留首次出现顺序。', '要“去重且保序”，用 dict.fromkeys(nums) 再转 list；只想去重不在乎顺序才用 set。')] };
+        } },
     ],
     hard: [
       { id: 'py-h01', group: 'Python 困难 · 二维列表', topic: '行列下标 / IndexError', summary: '非方阵转置下标写反。',
@@ -347,7 +392,28 @@
             topic: 'yield / return', code, expected: '14',
             bugs: [bug(code, '生成器用了 return', 'return i * i', 'yield i * i',
               'return 会立刻结束函数；生成器要逐个产出，必须用 yield。', '生成器的关键字是 yield：每执行一次产出一个值，下次从暂停处继续。')] };
-        } }
+        } },
+
+
+      { id: 'py-h13', group: 'Python 困难 · 哈希表', topic: '两数之和 / 补数', summary: '查哈希表时查了当前数，没有查 target - n。',
+        gen: function (r) {
+          const a = r.int(1, 6), b = r.int(7, 12);
+          const nums = [a, b, r.int(13, 18), r.int(19, 24)];
+          const target = a + b;
+          const code = `nums = [${nums.join(', ')}]\ntarget = ${target}\nseen = {}\nfor i, n in enumerate(nums):\n    need = target - n\n    if n in seen:\n        print([seen[need], i])\n        break\n    seen[n] = i`;
+          return { title: '两数之和', desc: '目标是在列表里找两个数相加等于 target，但代码总是没有输出。',
+            topic: '两数之和 / 补数', code, expected: '[0, 1]',
+            bugs: [bug(code, '查表查了当前数', 'if n in seen:', 'if need in seen:',
+              '当前数是 n，需要找的补数是 target - n；查 n 只会找到重复值。', '哈希表存“值 → 下标”，每轮先查 target - n 是否出现过，再把当前值存进去。')] };
+        } },
+      { id: 'py-h14', group: 'Python 困难 · 字符串', topic: '最长公共前缀 / 切片', summary: '前缀每次从左边砍，应该从右边砍。',
+        gen: function (r) {
+          const code = `words = ["flower", "flow", "flight"]\nprefix = words[0]\nfor word in words[1:]:\n    while not word.startswith(prefix):\n        prefix = prefix[1:]\nprint(prefix)`;
+          return { title: '最长公共前缀', desc: '目标是输出 flower、flow、flight 的公共前缀，但现在输出空字符串。',
+            topic: '最长公共前缀 / 切片', code, expected: 'fl',
+            bugs: [bug(code, '前缀裁剪方向反了', 'prefix = prefix[1:]', 'prefix = prefix[:-1]',
+              'prefix[1:] 砍掉首字符，剩下的永远对不上；公共前缀应该每次去掉末尾一个字符。', '前缀不匹配时用 prefix[:-1] 从右边缩短；循环直到 word.startswith(prefix) 或 prefix 为空。')] };
+        } },
     ]
   };
   root.PY_TEMPLATES = T;

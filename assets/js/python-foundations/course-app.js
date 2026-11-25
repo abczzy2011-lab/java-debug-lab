@@ -26,7 +26,7 @@
     apiHref: './python-api.html?v=20261124z50g',
     apiLabel: '查 Python API',
     routeNote: '建议按篇推进；第 1–7 章打基础，第 8–9 章学组织代码与处理文件，第 10–13 章进入对象与工程化，第 14–17 章做 HTTP/API、数据、自动化与并发，第 18 章完成综合项目。',
-    overviewDocTitle: 'Python 核心编程与项目实战 · 五篇 18 章 58 节',
+    overviewDocTitle: 'Python 核心编程与项目实战 · 五篇 18 章 76 节',
     lessonDocSuffix: 'Python 综合课程',
     defaultSource: '三本教材综合改写',
     sourceNote: '正文为课程改写，不直接复制原书段落。',
