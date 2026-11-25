@@ -2297,8 +2297,94 @@
     transform-origin:50% 100%!important;
   }
 }
+/* ============================================================
+   Javis · 移动动画 v=20261126z74
+   1) 拖动时保留亚像素坐标，倾斜跟手、光晕反向拖尾；
+   2) 松手后按真实速度做短距离惯性，碰边阻尼回弹，不改变落点习惯；
+   3) 收起时先飞向最近的角落缩成小圆点，再从角落展开回来；
+   4) prefers-reduced-motion 下全部退化为即时定位。
+   ============================================================ */
+.jv-orb{
+  --jv-lean:0deg;
+  --jv-trail-x:0px;
+  --jv-trail-y:0px;
+  --jv-motion:0;
+}
+.jv-orb.is-dragging{--jv-scale:1.045}
+.jv-orb.is-gliding{--jv-scale:1.018}
+.jv-orb.is-dragging,.jv-orb.is-gliding{
+  transition:none!important;
+  will-change:left,top;
+}
+.jv-orb.is-dragging .jv-orb-halo,
+.jv-orb.is-gliding .jv-orb-halo{
+  opacity:calc(.60 + var(--jv-motion));
+  filter:blur(19px) saturate(118%);
+}
+.jv-orb.is-dragging .jv-orb-label,
+.jv-orb.is-gliding .jv-orb-label{
+  opacity:0!important;visibility:hidden!important;pointer-events:none;
+}
+.jv-orb.is-dragging .jv-orb-min,
+.jv-orb.is-gliding .jv-orb-min{
+  opacity:0!important;pointer-events:none!important;visibility:hidden!important;
+}
+.jv-orb-glyph{
+  rotate:var(--jv-lean);
+  transition:
+    translate .3s cubic-bezier(.2,.9,.24,1),
+    transform .24s cubic-bezier(.2,.9,.24,1),
+    rotate .18s cubic-bezier(.2,.9,.24,1),
+    text-shadow .24s ease;
+}
+.jv-orb-glass{
+  translate:calc(var(--jv-trail-x) * .18) calc(var(--jv-trail-y) * .18);
+  transition:translate .18s cubic-bezier(.2,.9,.24,1),box-shadow .2s ease;
+}
+.jv-orb-halo{
+  translate:var(--jv-trail-x) calc(var(--jv-shift) * .55 + var(--jv-trail-y));
+}
+.jv-orb.is-dragging .jv-orb-glass,
+.jv-orb.is-gliding .jv-orb-glass{
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,.54),
+    inset 0 -1px 1px rgba(255,255,255,.16),
+    inset 0 -16px 26px rgba(0,0,0,.20),
+    inset 0 0 30px rgba(94,234,212,.13);
+}
+
+/* 收起 / 展开：沿最短路径飞向角落，尺寸与透明度一起收束。 */
+.jv-orb.is-tucking{
+  animation:jv-orb-tuck .50s cubic-bezier(.22,.9,.24,1) both;
+  pointer-events:none;
+  transition:none!important;
+  will-change:transform,opacity;
+}
+@keyframes jv-orb-tuck{
+  0%{transform:translate3d(0,0,0) scale(1);opacity:1}
+  26%{transform:translate3d(calc(var(--jv-tuck-x) * .08),calc(var(--jv-tuck-y) * .08),0) scale(.985);opacity:.98}
+  68%{transform:translate3d(calc(var(--jv-tuck-x) * .76),calc(var(--jv-tuck-y) * .76),0) scale(.64);opacity:.76}
+  100%{transform:translate3d(var(--jv-tuck-x),var(--jv-tuck-y),0) scale(.405);opacity:0}
+}
+.jv-orb.is-untucking{
+  animation:jv-orb-untuck .52s cubic-bezier(.22,1,.36,1) both;
+  pointer-events:none;
+  transition:none!important;
+  will-change:transform,opacity;
+}
+@keyframes jv-orb-untuck{
+  0%{transform:translate3d(var(--jv-untuck-x),var(--jv-untuck-y),0) scale(.405);opacity:0}
+  58%{transform:translate3d(0,0,0) scale(1.045);opacity:1}
+  100%{transform:translate3d(0,0,0) scale(1);opacity:.7}
+}
+.jv-orb-restore.is-arriving{animation:jv-restore-arrive .26s cubic-bezier(.22,1,.36,1) both}
+@keyframes jv-restore-arrive{
+  0%{opacity:0;scale:.55}
+  62%{opacity:1;scale:1.12}
+  100%{opacity:.82;scale:1}
+}
 @media (prefers-reduced-motion:reduce){
-  .jv-panel.is-opening,.jv-orb.is-summoning,.jv-orb.is-activating{animation:none!important}
-  .jv-panel.is-opening{will-change:auto}
-  .jv-edge-halo.on{animation:none!important;opacity:0!important}
+  .jv-orb.is-dragging,.jv-orb.is-gliding{--jv-scale:1;will-change:auto}
+  .jv-orb-glyph,.jv-orb-glass,.jv-orb-halo{transition:none!important}
+  .jv-orb.is-tucking,.jv-orb.is-untucking,.jv-orb-restore.is-arriving{animation:none!important}
 }

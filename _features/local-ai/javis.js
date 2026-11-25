@@ -253,7 +253,7 @@ function bindUi() {
   const startMinimized = safeGet(LS.orbMinimized) === '1';
   if (startMinimized) {
     orbMinBtn.hidden = true;
-    requestAnimationFrame(() => minimizeOrb({ persist: false, focus: false }));
+    requestAnimationFrame(() => minimizeOrb({ persist: false, focus: false, animate: false }));
   } else {
     requestAnimationFrame(syncOrbBadge);
   }
@@ -293,6 +293,8 @@ let orbGlassTimer = 0;
 let panelCloseTimer = 0;
 let panelOpenTimer = 0;
 let orbActivateTimer = 0;
+let orbTuckTimer = 0;
+let orbArriveTimer = 0;
 function applyOrbGlass() {
   try {
     if (!orb || !window.Hyalite || !Hyalite.supported()) return;
@@ -310,7 +312,7 @@ function applyOrbGlass() {
 }
 
 function openPanel() {
-  if (state.orbMinimized) restoreOrb({ open: false, focus: false });
+  if (state.orbMinimized) restoreOrb({ open: false, focus: false, animate: false });
   if (state.panelOpen) return;
   clearTimeout(panelCloseTimer);
   clearTimeout(panelOpenTimer);
@@ -466,42 +468,132 @@ function syncOrbBadge() {
   orbMinBtn.hidden = false;
 }
 
-function minimizeOrb({ persist = true, focus = true } = {}) {
+function minimizeOrb({ persist = true, focus = true, animate = true } = {}) {
   if (!orb || state.orbMinimized) return;
   if (state.panelOpen) closePanel();
+  clearTimeout(orbTuckTimer);
+  clearTimeout(orbArriveTimer);
+  orb.classList.remove('is-untucking', 'is-tucking', 'is-scrolling', 'is-gliding');
+  orb.style.setProperty('--jv-shift', '0px');
+  orb.style.setProperty('--jv-tilt', '0deg');
+  orb.style.setProperty('--jv-glow', '0');
+  orb.style.setProperty('--jv-lean', '0deg');
+  orb.style.setProperty('--jv-trail-x', '0px');
+  orb.style.setProperty('--jv-trail-y', '0px');
+  orb.style.removeProperty('--jv-untuck-x');
+  orb.style.removeProperty('--jv-untuck-y');
   state.orbMinimized = true;
   if (persist) safeSet(LS.orbMinimized, '1');
   orbMinBtn.hidden = true;
-  orbRestoreBtn.dataset.corner = orbCorner();
-  orbRestoreBtn.hidden = false;
-  orb.classList.add('is-minimized');
+  const corner = orbCorner();
+  orbRestoreBtn.dataset.corner = corner;
   orb.setAttribute('aria-hidden', 'true');
   orb.tabIndex = -1;
-  if (focus) { try { orbRestoreBtn.focus({ preventScroll: true }); } catch {} }
+  const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches === true;
+  if (!animate || reduced) {
+    orb.classList.add('is-minimized');
+    orbRestoreBtn.hidden = false;
+    if (focus) { try { orbRestoreBtn.focus({ preventScroll: true }); } catch {} }
+    return;
+  }
+  // 让“收起”不是原地消失：先沿最短路径飞向角落，缩成与恢复点完全重合的圆点。
+  orbRestoreBtn.hidden = false;
+  orbRestoreBtn.style.visibility = 'hidden';
+  const rr = orbRestoreBtn.getBoundingClientRect();
+  orbRestoreBtn.style.visibility = '';
+  orbRestoreBtn.hidden = true;
+  const r = orb.getBoundingClientRect();
+  const targetX = rr.left + rr.width / 2;
+  const targetY = rr.top + rr.height / 2;
+  orb.style.setProperty('--jv-tuck-x', Math.round((targetX - (r.left + r.width / 2)) * 10) / 10 + 'px');
+  orb.style.setProperty('--jv-tuck-y', Math.round((targetY - (r.top + r.height / 2)) * 10) / 10 + 'px');
+  orb.classList.add('is-tucking');
+  orbTuckTimer = setTimeout(() => {
+    if (!state.orbMinimized) return;
+    orb.classList.remove('is-tucking');
+    orb.classList.add('is-minimized');
+    orb.style.removeProperty('--jv-tuck-x');
+    orb.style.removeProperty('--jv-tuck-y');
+    orbRestoreBtn.hidden = false;
+    orbRestoreBtn.classList.remove('is-arriving');
+    void orbRestoreBtn.offsetWidth;
+    orbRestoreBtn.classList.add('is-arriving');
+    clearTimeout(orbArriveTimer);
+    orbArriveTimer = setTimeout(() => orbRestoreBtn.classList.remove('is-arriving'), 320);
+    if (focus) { try { orbRestoreBtn.focus({ preventScroll: true }); } catch {} }
+  }, 500);
 }
 
-function restoreOrb({ open = false, focus = true } = {}) {
-  if (!orb) return;
+function restoreOrb({ open = false, focus = true, animate = true } = {}) {
+  if (!orb || !state.orbMinimized) return;
+  clearTimeout(orbTuckTimer);
+  clearTimeout(orbArriveTimer);
+  const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches === true;
+  const shouldAnimate = animate && !reduced;
   state.orbMinimized = false;
   safeSet(LS.orbMinimized, '0');
-  orbRestoreBtn.hidden = true;
-  orb.classList.remove('is-minimized');
   orb.removeAttribute('aria-hidden');
   orb.tabIndex = 0;
-  syncOrbBadge();
-  if (open) openPanel();
-  else if (focus) { try { orb.focus({ preventScroll: true }); } catch {} }
+  if (!shouldAnimate) {
+    orbRestoreBtn.hidden = true;
+    orb.classList.remove('is-minimized', 'is-tucking', 'is-untucking');
+    orb.style.removeProperty('--jv-tuck-x');
+    orb.style.removeProperty('--jv-tuck-y');
+    orb.style.removeProperty('--jv-untuck-x');
+    orb.style.removeProperty('--jv-untuck-y');
+    syncOrbBadge();
+    if (open) openPanel();
+    else if (focus) { try { orb.focus({ preventScroll: true }); } catch {} }
+    return;
+  }
+  const rr = orbRestoreBtn.getBoundingClientRect();
+  orbRestoreBtn.hidden = true;
+  const r = orb.getBoundingClientRect();
+  orb.style.setProperty('--jv-untuck-x', Math.round((rr.left + rr.width / 2 - (r.left + r.width / 2)) * 10) / 10 + 'px');
+  orb.style.setProperty('--jv-untuck-y', Math.round((rr.top + rr.height / 2 - (r.top + r.height / 2)) * 10) / 10 + 'px');
+  orb.classList.remove('is-minimized', 'is-tucking');
+  orb.classList.add('is-untucking');
+  orbTuckTimer = setTimeout(() => {
+    orb.classList.remove('is-untucking');
+    orb.style.removeProperty('--jv-untuck-x');
+    orb.style.removeProperty('--jv-untuck-y');
+    syncOrbBadge();
+    if (open) openPanel();
+    else if (focus) { try { orb.focus({ preventScroll: true }); } catch {} }
+  }, 520);
 }
 
-function placeOrb(left, top) {
-  const w = orb.offsetWidth || 74, h = orb.offsetHeight || 74;
+function orbBounds() {
+  const w = orb.offsetWidth || 74;
+  const h = orb.offsetHeight || 74;
   const pad = 6;
-  left = Math.max(pad, Math.min(Math.max(pad, innerWidth - w - pad), left));
-  top = Math.max(pad, Math.min(Math.max(pad, innerHeight - h - pad), top));
-  orb.style.left = Math.round(left) + 'px';
-  orb.style.top = Math.round(top) + 'px';
+  return {
+    w,
+    h,
+    pad,
+    maxX: Math.max(pad, innerWidth - w - pad),
+    maxY: Math.max(pad, innerHeight - h - pad),
+  };
+}
+
+function placeOrb(left, top, bounds) {
+  const b = bounds || orbBounds();
+  const x = Math.max(b.pad, Math.min(b.maxX, left));
+  const y = Math.max(b.pad, Math.min(b.maxY, top));
+  // 拖拽时保留亚像素坐标，避免 1px 取整让球在慢速移动时“一格一格”跳。
+  orb.style.left = Math.round(x * 100) / 100 + 'px';
+  orb.style.top = Math.round(y * 100) / 100 + 'px';
   orb.style.right = 'auto';
   orb.style.bottom = 'auto';
+  return { left: x, top: y, bounds: b };
+}
+
+function saveOrbPosition(left, top, bounds) {
+  const b = bounds || orbBounds();
+  safeSet(LS.orbPos, JSON.stringify({
+    x: Math.max(0, Math.min(1, left / b.maxX)),
+    y: Math.max(0, Math.min(1, top / b.maxY)),
+  }));
 }
 
 function restoreOrbPosition() {
@@ -510,63 +602,147 @@ function restoreOrbPosition() {
   try {
     const p = JSON.parse(raw);
     if (typeof p.x !== 'number' || typeof p.y !== 'number') return;
-    const w = orb.offsetWidth || 74, h = orb.offsetHeight || 74;
-    const maxX = Math.max(1, innerWidth - w);
-    const maxY = Math.max(1, innerHeight - h);
-    placeOrb(p.x * maxX, p.y * maxY);
+    const b = orbBounds();
+    const maxX = Math.max(1, b.maxX);
+    const maxY = Math.max(1, b.maxY);
+    placeOrb(p.x * maxX, p.y * maxY, b);
   } catch {}
 }
 
 function setupOrbDrag() {
   if (!orb) return;
+  const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)') || { matches: false };
+  const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
   let drag = null;
+  let drawFrame = 0;
+  let glideFrame = 0;
   let suppressClickUntil = 0;
 
-  const release = () => {
+  const resetMotionVars = () => {
+    orb.style.setProperty('--jv-lean', '0deg');
+    orb.style.setProperty('--jv-trail-x', '0px');
+    orb.style.setProperty('--jv-trail-y', '0px');
+    orb.style.setProperty('--jv-motion', '0');
+  };
+
+  const motionVars = (vx, vy) => {
+    // vx / vy 是 px·ms⁻¹；倾斜跟手、光晕反向拖尾，让玻璃球像有惯性。
+    const lean = clamp(vx * 9, -7, 7);
+    const trailX = clamp(-vx * 15, -12, 12);
+    const trailY = clamp(-vy * 15, -12, 12);
+    orb.style.setProperty('--jv-lean', lean.toFixed(2) + 'deg');
+    orb.style.setProperty('--jv-trail-x', trailX.toFixed(2) + 'px');
+    orb.style.setProperty('--jv-trail-y', trailY.toFixed(2) + 'px');
+    orb.style.setProperty('--jv-motion', clamp(Math.hypot(vx, vy) * 0.22, 0, 0.2).toFixed(3));
+  };
+
+  const finishGlide = () => {
+    if (glideFrame) { cancelAnimationFrame(glideFrame); glideFrame = 0; }
+    orb.classList.remove('is-gliding');
+    resetMotionVars();
+    const left = parseFloat(orb.style.left);
+    const top = parseFloat(orb.style.top);
+    if (Number.isFinite(left) && Number.isFinite(top)) saveOrbPosition(left, top);
+    syncOrbBadge();
+  };
+
+  const glide = (x, y, vx, vy, bounds) => {
+    if (glideFrame) cancelAnimationFrame(glideFrame);
+    orb.classList.add('is-gliding');
+    let last = performance.now();
+    const step = now => {
+      const dt = Math.min(34, Math.max(1, now - last));
+      last = now;
+      x += vx * dt;
+      y += vy * dt;
+      if (x <= bounds.pad) { x = bounds.pad; vx = Math.abs(vx) * 0.42; }
+      if (x >= bounds.maxX) { x = bounds.maxX; vx = -Math.abs(vx) * 0.42; }
+      if (y <= bounds.pad) { y = bounds.pad; vy = Math.abs(vy) * 0.42; }
+      if (y >= bounds.maxY) { y = bounds.maxY; vy = -Math.abs(vy) * 0.42; }
+      placeOrb(x, y, bounds);
+      motionVars(vx, vy);
+      const speed = Math.hypot(vx, vy);
+      const damping = Math.pow(0.90, dt / 16.667);
+      vx *= damping;
+      vy *= damping;
+      if (speed < 0.02) { finishGlide(); return; }
+      glideFrame = requestAnimationFrame(step);
+    };
+    glideFrame = requestAnimationFrame(step);
+  };
+
+  const release = (e, allowGlide) => {
     if (!drag) return;
-    const moved = drag.moved;
-    const pointerId = drag.pointerId;
+    if (drawFrame) { cancelAnimationFrame(drawFrame); drawFrame = 0; }
+    // 收尾时把最后一段还没绘制的位移补上，松手不会比指针慢半帧。
+    if (e && Number.isFinite(e.clientX)) {
+      drag.x = drag.left + e.clientX - drag.startX;
+      drag.y = drag.top + e.clientY - drag.startY;
+      drag.x = clamp(drag.x, drag.m.pad, drag.m.maxX);
+      drag.y = clamp(drag.y, drag.m.pad, drag.m.maxY);
+    }
+    placeOrb(drag.x, drag.y, drag.m);
+    const data = drag;
+    const moved = data.moved;
+    const pointerId = data.pointerId;
+    const idleFor = performance.now() - data.lastT;
+    // 160ms 内松手才继承速度：覆盖 30fps 触控采样，又不会让“停住再松手”突然滑走。
+    const vx = idleFor > 160 ? 0 : data.vx;
+    const vy = idleFor > 160 ? 0 : data.vy;
     drag = null;
     orb.classList.remove('is-dragging');
     try { orb.releasePointerCapture?.(pointerId); } catch {}
-    if (moved) {
-      const w = orb.offsetWidth || 74, h = orb.offsetHeight || 74;
-      const left = parseFloat(orb.style.left);
-      const top = parseFloat(orb.style.top);
-      if (Number.isFinite(left) && Number.isFinite(top)) {
-        const maxX = Math.max(1, innerWidth - w);
-        const maxY = Math.max(1, innerHeight - h);
-        safeSet(LS.orbPos, JSON.stringify({
-          x: Math.max(0, Math.min(1, left / maxX)),
-          y: Math.max(0, Math.min(1, top / maxY)),
-        }));
-      }
-      // 拖拽结束会补发一次 click；暂时吞掉，避免松手时误开面板。
-      suppressClickUntil = performance.now() + 420;
+    if (!moved) {
+      resetMotionVars();
+      syncOrbBadge();
+      return;
+    }
+    // 拖拽结束会补发一次 click；暂时吞掉，避免松手时误开面板。
+    suppressClickUntil = performance.now() + 520;
+    if (allowGlide && !reduce.matches && Math.hypot(vx, vy) > 0.06) {
+      glide(data.x, data.y, vx, vy, data.m);
+    } else {
+      resetMotionVars();
+      saveOrbPosition(data.x, data.y, data.m);
       syncOrbBadge();
     }
   };
 
   orb.addEventListener('pointerdown', e => {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
-    orb.classList.remove('is-scrolling');
+    if (glideFrame) { cancelAnimationFrame(glideFrame); glideFrame = 0; }
+    orb.classList.remove('is-gliding', 'is-scrolling');
+    // 先把滚动形变和位移归零，再取基准坐标，避免从缩小/上浮状态起手时跳一下。
+    orb.style.setProperty('--jv-shift', '0px');
+    orb.style.setProperty('--jv-tilt', '0deg');
+    orb.style.setProperty('--jv-glow', '0');
+    orb.style.setProperty('--jv-spin-duration', '9s');
     orb.classList.add('is-dragging');
-    // 先把滚动收缩恢复为 1:1，再取拖拽的基准坐标，避免缩小状态下起手跳动。
+    resetMotionVars();
     void orb.offsetWidth;
     const r = orb.getBoundingClientRect();
     drag = {
       pointerId: e.pointerId,
       startX: e.clientX,
       startY: e.clientY,
+      lastX: e.clientX,
+      lastY: e.clientY,
+      lastT: performance.now(),
+      vx: 0,
+      vy: 0,
       left: r.left,
       top: r.top,
+      x: r.left,
+      y: r.top,
       moved: false,
+      m: orbBounds(),
     };
     try { orb.setPointerCapture?.(e.pointerId); } catch {}
   });
 
   orb.addEventListener('pointermove', e => {
     if (!drag || e.pointerId !== drag.pointerId) return;
+    const now = performance.now();
     const dx = e.clientX - drag.startX;
     const dy = e.clientY - drag.startY;
     if (!drag.moved) {
@@ -574,12 +750,32 @@ function setupOrbDrag() {
       drag.moved = true;
     }
     if (e.cancelable) e.preventDefault();
-    placeOrb(drag.left + dx, drag.top + dy);
-    syncOrbBadge();
+    const dt = Math.max(4, now - drag.lastT);
+    if (dt < 160) {
+      const ivx = (e.clientX - drag.lastX) / dt;
+      const ivy = (e.clientY - drag.lastY) / dt;
+      drag.vx = clamp(drag.vx * 0.55 + ivx * 0.45, -1.1, 1.1);
+      drag.vy = clamp(drag.vy * 0.55 + ivy * 0.45, -1.1, 1.1);
+    } else {
+      drag.vx = drag.vy = 0;
+    }
+    drag.lastX = e.clientX;
+    drag.lastY = e.clientY;
+    drag.lastT = now;
+    drag.x = clamp(drag.left + dx, drag.m.pad, drag.m.maxX);
+    drag.y = clamp(drag.top + dy, drag.m.pad, drag.m.maxY);
+    if (!drawFrame) {
+      drawFrame = requestAnimationFrame(() => {
+        drawFrame = 0;
+        if (!drag) return;
+        placeOrb(drag.x, drag.y, drag.m);
+        motionVars(drag.vx, drag.vy);
+      });
+    }
   });
 
-  orb.addEventListener('pointerup', release);
-  orb.addEventListener('pointercancel', release);
+  orb.addEventListener('pointerup', e => release(e, true));
+  orb.addEventListener('pointercancel', e => release(e, false));
   orb.addEventListener('dragstart', e => e.preventDefault());
   // capture 阶段先于原来的 click，拖拽松手不会误触“打开/收起”。
   orb.addEventListener('click', e => {
@@ -590,6 +786,9 @@ function setupOrbDrag() {
   }, true);
 
   window.addEventListener('resize', () => {
+    if (glideFrame) { cancelAnimationFrame(glideFrame); glideFrame = 0; }
+    orb.classList.remove('is-gliding');
+    resetMotionVars();
     restoreOrbPosition();
     if (state.orbMinimized) { orbRestoreBtn.dataset.corner = orbCorner(); }
     else syncOrbBadge();
