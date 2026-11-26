@@ -189,7 +189,7 @@ function uiMarkup() {
         <div class="jv-kit-kicker">LAST RESORT · 无路可走时才打开</div>
         <h2 id="jv-kit-title">最后一扇门，给还在硬撑的你</h2>
         <p id="jv-kit-copy">如果你已经试过所有按钮，把同一句报错读到眼睛发酸，还是不懂——先停一下。不是你笨，也不是你不适合学编程，是这条解释线真的走到头了。</p>
-        <p class="jv-kit-only">我不保证门后一定有标准答案；但在你已经无路可走的这一刻，这是本站唯一还亮着的地方。</p>
+        <p class="jv-kit-only">我不保证门后一定有标准答案；但在你已经无路可走的这一刻，这是本站唯一还亮着的地方，也是你此刻唯一的解。</p>
         <div class="jv-kit-oath">这不是认输。是你终于愿意换一条路，把自己带出去。</div>
       </div>
       <div class="jv-kit-grid" id="jv-kit-grid"></div>
