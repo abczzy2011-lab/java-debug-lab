@@ -179,7 +179,7 @@
         '<div class="bug-note"><b>故障现象</b><p>' + inline(task.summary) + '</p></div>' +
         '<section class="brief-block"><div class="block-head"><h2>公开样例</h2><span>' + cases.length + ' 条可见</span></div>' +
           '<div class="case-list">' + caseList + '</div>' +
-          '<p class="block-note">还有 1 条隐藏用例，提交后才会显示结果。</p>' +
+          '<p class="block-note">还有 ' + (task.tests.length - cases.length) + ' 条隐藏用例，提交后才会显示结果。</p>' +
         '</section>' +
         '<section class="brief-block"><div class="block-head"><h2>提示</h2><span id="hintCount">' + state.hints + ' / ' + task.hints.length + '</span></div>' +
           '<ul class="hint-list" id="hintList">' + (hintList || '<li class="hint-empty">先自己定位，再看提示。</li>') + '</ul>' +
@@ -425,7 +425,7 @@
     var area = $('#resultArea');
     area.innerHTML = summary + logs + '<div class="test-list">' + rows + '</div>' +
       (isSubmit && passed === total ? '<div class="pass-note">通过。可以点「查看解析」对照修复思路，或回到题库继续下一题。</div>' :
-        (isSubmit ? '<div class="fail-note">先看失败用例的「实际」和「期望」差在哪里，再决定改条件、边界还是数据结构。</div>' : '<div class="run-note">公开样例通过后再提交；提交会额外运行 1 条隐藏用例。</div>'));
+        (isSubmit ? '<div class="fail-note">先看失败用例的「实际」和「期望」差在哪里，再决定改条件、边界还是数据结构。</div>' : '<div class="run-note">公开样例通过后再提交；提交会额外运行 ' + Math.max(0, task.tests.length - 1) + ' 条隐藏用例。</div>'));
     renderAnalysisButton(task, isSubmit);
   }
 

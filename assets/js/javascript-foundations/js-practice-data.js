@@ -1,4 +1,4 @@
-/* JavaScript 练习题库：3 档 × 8 题 = 24 题
+/* JavaScript 练习题库：3 档 × 8 题 = 24 题（z87 追加 30 题后共 54 题，每档 18）
    全部为输出预测 / 行为判断选择题，浏览器本地判分，不执行用户代码。 */
 window.JS_PRACTICE_LEVELS = [
   {
@@ -6,7 +6,7 @@ window.JS_PRACTICE_LEVELS = [
     label: '基础',
     en: 'FOUNDATIONS',
     title: '语法、类型与比较',
-    summary: '先把值、类型、相等比较和真假值判断稳住。这 8 题只考运行结果，不背名词。'
+    summary: '先把值、类型、相等比较和真假值判断稳住。这 18 题只考运行结果，不背名词。'
   },
   {
     id: 'core',

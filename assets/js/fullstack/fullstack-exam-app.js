@@ -379,7 +379,7 @@
   renderSheet();
   renderDock();
 
-  if (window.console && ALL.length !== 30) {
-    console.warn('[fullstack-exam] expected 30 questions, got ' + ALL.length);
+  if (window.console && ALL.length !== 60) {
+    console.warn('[fullstack-exam] expected 60 questions, got ' + ALL.length);
   }
 })();

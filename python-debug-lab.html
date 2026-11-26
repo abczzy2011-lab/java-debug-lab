@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080A0E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Python 改错实验室 · 真实 CPython 判题</title>
+<meta name="description" content="Python 改错实验室：三档难度、随机参数、真实 CPython 判题、逐行输出对比与错题本。">
+<link rel="icon" type="image/png" href="./assets/icons/python.png">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+:root{
+  --py-bg:#080A0E;
+  --py-panel:rgba(16,20,25,.72);
+  --py-panel-solid:#101419;
+  --py-panel-strong:rgba(10,13,17,.92);
+  --py-line:rgba(244,239,230,.13);
+  --py-line-strong:rgba(244,239,230,.24);
+  --py-text:#F3EFE6;
+  --py-muted:#A7B0B1;
+  --py-dim:#6F797D;
+  --py-accent:#C8A976;
+  --py-accent-2:#9BB6C1;
+  --py-violet:#9CC9B8;
+  --py-yellow:#C8A976;
+  --py-red:#D08B84;
+  --py-green:#9CC9B8;
+  --py-code:#090C10;
+  --py-font:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --py-mono:"SFMono-Regular","JetBrains Mono","Sarasa Gothic SC",Menlo,Consolas,"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",monospace;
+  --py-code-size:13.5px;
+  --py-code-line:22px;
+  --py-radius:18px;
+  --py-ease:cubic-bezier(.22,1,.36,1);
+}
+html,body{min-height:100%;background:var(--py-bg);color:var(--py-text);font-family:var(--py-font);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{overflow-x:hidden}
+button{font:inherit;color:inherit}
+button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:2px solid rgba(200,169,118,.85);outline-offset:3px}
+::selection{background:rgba(200,169,118,.26);color:#fff}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(200,169,118,.32),rgba(155,182,193,.28));border-radius:9px;border:2px solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ============ 公共按钮 / 玻璃 ============ */
+.py-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  min-height:38px;padding:0 15px;border-radius:12px;border:1px solid var(--py-line-strong);
+  background:linear-gradient(180deg,rgba(24,23,22,.82),rgba(16,20,25,.86));
+  color:var(--py-text);font-size:13px;font-weight:700;letter-spacing:.01em;cursor:pointer;white-space:nowrap;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 8px 18px rgba(0,0,0,.2);
+  transition:transform .16s var(--py-ease),border-color .16s,background .16s,box-shadow .16s,opacity .16s;
+  -webkit-tap-highlight-color:transparent;
+}
+.py-btn:hover{border-color:rgba(200,169,118,.48);background:linear-gradient(180deg,rgba(36,32,26,.9),rgba(20,20,20,.92));transform:translateY(-1px)}
+.py-btn:active{transform:translateY(0) scale(.98)}
+.py-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.py-btn.primary{
+  color:#18140F;border-color:rgba(255,250,240,.52);
+  background:linear-gradient(135deg,#F7F1E4 0%,#E9DECA 34%,#C8A976 66%,#B08A55 100%);
+  box-shadow:0 12px 30px rgba(176,138,85,.18),inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(0,0,0,.08);
+}
+.py-btn.primary:hover{filter:brightness(1.04);border-color:#fff;box-shadow:0 16px 36px rgba(176,138,85,.28),inset 0 1px 0 rgba(255,255,255,.65)}
+.py-btn.ghost{background:rgba(12,15,20,.56)}
+.py-btn.text{background:transparent;border-color:transparent;box-shadow:none;color:var(--py-muted);min-height:32px;padding:0 9px;font-weight:600}
+.py-btn.text:hover{color:var(--py-text);background:rgba(255,255,255,.04);transform:none}
+.py-btn.big{min-height:52px;border-radius:15px;font-size:15px;font-weight:800;letter-spacing:.02em}
+.py-btn.big kbd{font-family:var(--py-mono);font-size:10.5px;font-weight:600;padding:2px 6px;border-radius:5px;background:rgba(0,0,0,.16);border:1px solid rgba(0,0,0,.15);color:rgba(24,20,15,.7)}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:11px;border:1px solid var(--py-line);background:rgba(10,13,17,.5);color:var(--py-muted);cursor:pointer;font-size:16px;transition:all .16s}
+.icon-btn:hover{color:var(--py-text);border-color:rgba(200,169,118,.4)}
+.glass{background:linear-gradient(180deg,rgba(22,23,24,.70),rgba(9,12,16,.80));border:1px solid var(--py-line);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 18px 44px rgba(0,0,0,.22);-webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%)}
+.chip{display:inline-flex;align-items:center;gap:5px;min-height:24px;padding:0 9px;border-radius:999px;border:1px solid var(--py-line);background:rgba(9,20,34,.66);color:var(--py-muted);font-size:11px;font-weight:700;letter-spacing:.01em;white-space:nowrap}
+.chip b{color:var(--py-text);font-weight:750}
+.pulse-dot{width:8px;height:8px;border-radius:50%;background:var(--py-green);box-shadow:0 0 0 4px rgba(156,201,184,.10),0 0 16px rgba(156,201,184,.5);flex:none;animation:pyPulse 2.4s ease-in-out infinite}
+.pulse-dot.blue{background:var(--py-accent-2);box-shadow:0 0 0 4px rgba(155,182,193,.10),0 0 16px rgba(155,182,193,.5)}
+.pulse-dot.red{background:var(--py-red);box-shadow:0 0 0 4px rgba(208,139,132,.10),0 0 16px rgba(208,139,132,.45)}
+@keyframes pyPulse{0%,100%{opacity:.72;transform:scale(.94)}50%{opacity:1;transform:scale(1.06)}}
+
+/* ============ 开场页 ============ */
+.py-landing{
+  position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100vh;min-height:100dvh;padding:clamp(28px,6vh,70px) 20px 34px;overflow:hidden;
+}
+.py-landing::before{
+  content:"";position:absolute;inset:-10% -12% auto;height:58%;pointer-events:none;
+  background:
+    radial-gradient(38% 60% at 22% 18%,rgba(200,169,118,.14),transparent 68%),
+    radial-gradient(34% 50% at 78% 8%,rgba(156,201,184,.13),transparent 70%);
+  filter:blur(10px);
+}
+.py-landing-inner{width:100%;max-width:1080px;display:flex;flex-direction:column;align-items:center;position:relative;z-index:1}
+.hero-icon{
+  width:92px;height:92px;border-radius:24px;display:grid;place-items:center;margin-bottom:18px;
+  background:radial-gradient(circle at 28% 20%,rgba(200,169,118,.30),transparent 62%),linear-gradient(135deg,rgba(34,30,24,.88),rgba(9,12,16,.92));
+  border:1px solid rgba(200,169,118,.30);
+  box-shadow:0 20px 56px rgba(0,0,0,.36),0 0 46px rgba(200,169,118,.10),inset 0 1px 0 rgba(255,255,255,.16);
+  position:relative;
+}
+.hero-icon::after{content:"";position:absolute;inset:-12px;border-radius:30px;border:1px solid rgba(200,169,118,.10);pointer-events:none}
+.hero-icon img{width:72px;height:72px;object-fit:contain;filter:drop-shadow(0 8px 18px rgba(0,0,0,.35))}
+.hero-kicker{font-size:11px;font-weight:800;letter-spacing:.24em;color:var(--py-accent);text-transform:uppercase;margin-bottom:10px}
+.hero-title{font-size:clamp(38px,6vw,68px);line-height:1.04;letter-spacing:-.045em;font-weight:850;text-align:center;background:linear-gradient(105deg,#FFFFFF 4%,#F3EFE6 42%,#D2BA97 74%,#D5C6A8 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 8px 26px rgba(200,169,118,.10))}
+.hero-sub{max-width:690px;margin:18px 0 0;text-align:center;color:var(--py-muted);font-size:14.5px;line-height:1.9}
+.hero-sub em{color:#F7F1E4;font-style:normal;font-weight:750}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:24px}
+.hero-actions .py-btn{min-height:46px;padding:0 20px;font-size:14px}
+.engine-line{display:flex;align-items:center;gap:8px;margin-top:18px;font-size:11.5px;color:var(--py-dim);min-height:18px;text-align:center}
+.engine-line b{color:var(--py-muted);font-weight:650}
+.levels{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:36px}
+.level-card{
+  position:relative;overflow:hidden;text-align:left;padding:21px 20px 18px;border-radius:20px;border:1px solid var(--py-line);
+  background:linear-gradient(180deg,rgba(24,24,23,.62),rgba(9,12,16,.78));cursor:pointer;color:var(--py-text);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 18px 38px rgba(0,0,0,.18);
+  transition:transform .2s var(--py-ease),border-color .2s,box-shadow .2s,background .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.level-card:hover{transform:translateY(-4px);border-color:var(--level-color);box-shadow:0 24px 50px rgba(0,0,0,.28),0 0 0 1px rgba(255,255,255,.03) inset}
+.level-card:active{transform:translateY(-1px) scale(.99)}
+.level-card::before{content:"";position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,transparent,var(--level-color),transparent);opacity:.76}
+.level-card::after{content:"";position:absolute;right:-56px;bottom:-70px;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,var(--level-glow),transparent 68%);pointer-events:none}
+.level-card.basic{--level-color:#9CC9B8;--level-glow:rgba(156,201,184,.16)}
+.level-card.intermediate{--level-color:#C8A976;--level-glow:rgba(200,169,118,.15)}
+.level-card.hard{--level-color:#D08B84;--level-glow:rgba(208,139,132,.15)}
+.level-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px}
+.level-no{font-family:var(--py-mono);font-size:12px;font-weight:700;color:var(--level-color);letter-spacing:.09em;opacity:.9}
+.level-badge{font-size:10.5px;font-weight:800;color:var(--level-color);padding:4px 8px;border-radius:999px;border:1px solid color-mix(in srgb,var(--level-color) 34%,transparent);background:color-mix(in srgb,var(--level-color) 8%,transparent)}
+.level-card h2{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:5px}
+.level-card p{font-size:12.5px;color:var(--py-muted);line-height:1.7;min-height:43px}
+.level-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;padding-top:12px;border-top:1px solid var(--py-line);font-size:10.5px;color:var(--py-dim);font-weight:650}
+.level-meta span{padding:2px 0}
+.level-progress{height:5px;border-radius:99px;background:rgba(244,239,230,.10);overflow:hidden;margin-top:13px}
+.level-progress i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--level-color),color-mix(in srgb,var(--level-color) 50%,#9BB6C1));transition:width .4s var(--py-ease)}
+.landing-stats{display:flex;align-items:center;justify-content:center;gap:clamp(14px,4vw,36px);flex-wrap:wrap;margin-top:26px;padding:12px 20px;border:1px solid var(--py-line);border-radius:16px;background:rgba(10,13,17,.5);font-size:12px;color:var(--py-muted)}
+.landing-stats b{color:var(--py-text);font-size:15px;font-weight:800;margin-right:4px}
+.landing-stats + .landing-back{margin-top:18px}
+.landing-back{display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:0 12px;border-radius:10px;border:1px solid rgba(200,169,118,.18);background:rgba(200,169,118,.05);color:var(--py-muted);font-size:11.5px;font-weight:700;white-space:nowrap}
+.landing-back:hover{border-color:rgba(200,169,118,.42);background:rgba(200,169,118,.10);color:var(--py-text)}
+.landing-note{margin-top:22px;color:var(--py-dim);font-size:11.5px;line-height:1.8;text-align:center;max-width:720px}
+.landing-note strong{color:var(--py-muted);font-weight:650}
+
+/* ============ 练习页 ============ */
+.py-practice{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
+.py-topbar{
+  flex:0 0 auto;display:flex;align-items:center;gap:10px;min-height:56px;padding:calc(7px + env(safe-area-inset-top,0px)) 14px 7px;
+  border-bottom:1px solid var(--py-line);
+  background:
+    radial-gradient(70% 180% at 12% 0%,rgba(200,169,118,.10),transparent 62%),
+    linear-gradient(180deg,rgba(16,20,25,.86),rgba(9,12,16,.93));
+  box-shadow:0 10px 28px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.055);
+  -webkit-backdrop-filter:blur(18px) saturate(150%);backdrop-filter:blur(18px) saturate(150%);position:relative;z-index:4;
+}
+.py-back{display:inline-flex;align-items:center;gap:7px;min-height:36px;padding:0 11px;border-radius:10px;border:1px solid var(--py-line);background:rgba(10,13,17,.55);color:var(--py-muted);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .16s}
+.py-back:hover{color:var(--py-text);border-color:rgba(200,169,118,.38)}
+.py-brand{display:flex;align-items:center;gap:8px;min-width:0;font-size:13.5px;font-weight:800;letter-spacing:.01em;white-space:nowrap}
+.py-brand img{width:24px;height:24px;object-fit:contain;filter:drop-shadow(0 0 9px rgba(200,169,118,.16))}
+.py-brand .py-level{font-size:10.5px;font-weight:800;color:var(--py-accent);padding:3px 8px;border-radius:999px;border:1px solid rgba(200,169,118,.22);background:rgba(200,169,118,.08);letter-spacing:.02em}
+.py-engine{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--py-muted);padding:6px 9px;border-radius:9px;border:1px solid var(--py-line);background:rgba(10,13,17,.5);white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+.py-top-actions{display:flex;align-items:center;gap:6px;margin-left:auto}
+.py-top-actions .py-btn{min-height:34px;padding:0 10px;font-size:11.5px}
+
+.py-body{flex:1;display:flex;min-height:0;overflow:hidden}
+.py-left{
+  width:372px;min-width:320px;flex:0 0 auto;overflow-y:auto;padding:18px 17px calc(18px + env(safe-area-inset-bottom,0px));
+  border-right:1px solid var(--py-line);display:flex;flex-direction:column;gap:13px;
+  background:
+    radial-gradient(130% 58% at 0% 0%,rgba(200,169,118,.13),transparent 58%),
+    radial-gradient(100% 58% at 100% 100%,rgba(156,201,184,.09),transparent 64%),
+    linear-gradient(180deg,rgba(20,20,20,.68),rgba(9,12,16,.82));
+  -webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%);
+}
+.problem-eyebrow{font-family:var(--py-mono);font-size:10.5px;letter-spacing:.08em;color:var(--py-dim);text-transform:uppercase;display:flex;align-items:center;gap:7px}
+.problem-eyebrow .dot{width:5px;height:5px;border-radius:50%;background:var(--py-accent);box-shadow:0 0 10px rgba(200,169,118,.6);flex:none}
+.bug-pill{margin-left:auto;border-radius:999px;padding:2px 6px;background:rgba(200,169,118,.09);border:1px solid rgba(200,169,118,.24);color:#E3C58E;font-weight:800;letter-spacing:0;text-transform:none;white-space:nowrap}
+.problem-title{font-size:22px;line-height:1.28;font-weight:800;letter-spacing:-.025em;margin-top:4px}
+.problem-desc{font-size:12.5px;line-height:1.75;color:var(--py-muted);margin-top:6px}
+.tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.tag{padding:4px 8px;border-radius:8px;border:1px solid var(--py-line);background:rgba(10,13,17,.5);font-size:10.5px;font-weight:650;color:var(--py-dim)}
+.card-label{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:.06em;color:var(--py-dim);text-transform:uppercase}
+.card-label small{font-size:9.5px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--py-dim);opacity:.85}
+.target-card{padding:13px 14px 12px;border:1px solid rgba(200,169,118,.22);border-radius:14px;background:linear-gradient(180deg,rgba(34,30,24,.64),rgba(9,12,16,.82));box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 10px 24px rgba(0,0,0,.16)}
+.target-output{margin-top:9px;font-family:var(--py-mono);font-size:12.3px;line-height:20px;color:#F3EFE6;white-space:pre-wrap;word-break:break-word;max-height:156px;overflow:auto;padding-right:3px}
+.target-meta{display:flex;justify-content:space-between;gap:8px;margin-top:9px;padding-top:8px;border-top:1px solid rgba(200,169,118,.12);font-size:10px;color:var(--py-dim)}
+.bug-chip{padding:10px 12px;border-radius:12px;border:1px solid rgba(200,169,118,.20);background:rgba(200,169,118,.06);font-size:11.5px;color:#F5D58D;display:flex;align-items:center;gap:8px;line-height:1.55}
+.bug-chip b{color:#F3E3C8;font-weight:800;font-size:14px}
+.bug-chip .bug-note{color:#BFA77F;font-size:10.5px;font-weight:600}
+.actions{display:flex;flex-direction:column;gap:8px}
+.actions .py-btn.text{min-height:30px;font-size:11.5px}
+.sub-note{font-size:10.5px;line-height:1.65;color:var(--py-dim);text-align:center;padding:0 4px}
+.history-card{padding:11px 12px;border:1px solid var(--py-line);border-radius:12px;background:rgba(10,13,17,.42);display:flex;flex-direction:column;gap:7px}
+.history-list{display:flex;flex-direction:column;gap:5px;font-family:var(--py-mono);font-size:10.5px;color:var(--py-dim);line-height:1.5}
+.history-item{display:flex;align-items:center;gap:7px;min-width:0}
+.history-item i{width:5px;height:5px;border-radius:50%;flex:none;background:var(--py-dim)}
+.history-item span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.history-item.ok i{background:var(--py-green)}.history-item.warn i{background:var(--py-yellow)}.history-item.err i{background:var(--py-red)}
+.hint-card{padding:12px 13px;border:1px solid rgba(200,169,118,.22);border-radius:13px;background:linear-gradient(180deg,rgba(47,35,11,.72),rgba(21,17,8,.72));display:flex;flex-direction:column;gap:8px}
+.hint-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;font-weight:800;color:#F3E3C8;letter-spacing:.03em}
+.hint-head span{font-size:10px;font-weight:650;color:#BFA77F}
+.hint-line{font-family:var(--py-mono);font-size:11px;color:#C8A976;background:rgba(0,0,0,.18);border-radius:6px;padding:3px 7px;align-self:flex-start}
+.hint-why{font-size:12px;line-height:1.7;color:#E5D6B8}
+.hint-tip{font-size:11.5px;line-height:1.65;color:#C7B79C;border-top:1px solid rgba(200,169,118,.14);padding-top:7px}
+.hint-actions{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.hint-actions .py-btn{min-height:30px;font-size:11px;padding:0 9px}
+
+.py-right{flex:1;min-width:0;display:flex;flex-direction:column;min-height:0;background:var(--py-code)}
+.py-editor-pane{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.py-editor-toolbar{
+  flex:0 0 auto;display:flex;align-items:center;gap:8px;min-height:43px;padding:5px 12px;
+  background:linear-gradient(180deg,rgba(22,22,22,.92),rgba(10,13,17,.94));border-bottom:1px solid var(--py-line);
+}
+.file-pill{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 9px;border-radius:7px;border:1px solid var(--py-line-strong);background:rgba(10,13,17,.72);font-family:var(--py-mono);font-size:11.5px;color:#F3EFE6;white-space:nowrap}
+.file-pill i{width:7px;height:7px;border-radius:50%;background:var(--py-accent);box-shadow:0 0 9px rgba(200,169,118,.6)}
+.toolbar-note{font-size:10.5px;color:var(--py-dim);white-space:nowrap}
+.editor-tools{display:flex;align-items:center;gap:4px;margin-left:auto;flex:none}
+.editor-tools .py-btn{min-height:30px;padding:0 8px;font-size:10.8px;box-shadow:none}
+.editor-body{flex:1;display:flex;min-height:0;position:relative;overflow:hidden;background:
+  radial-gradient(90% 50% at 50% 0%,rgba(200,169,118,.035),transparent 70%),var(--py-code)}
+.line-gutter{
+  flex:0 0 46px;width:46px;overflow:hidden;border-right:1px solid rgba(244,239,230,.075);background:rgba(9,12,16,.58);
+  position:relative;z-index:1;
+}
+.line-gutter-inner{padding:16px 0 24px;transform:translateY(0);will-change:transform}
+.line-gutter-inner div{height:var(--py-code-line);line-height:var(--py-code-line);padding-right:10px;text-align:right;font-family:var(--py-mono);font-size:10.5px;color:#6F797D;user-select:none}
+.code-stage{position:relative;flex:1;min-width:0;overflow:hidden;background:var(--py-code)}
+.code-highlight{
+  position:absolute;top:0;left:0;min-width:100%;min-height:100%;padding:16px 18px 24px;margin:0;pointer-events:none;z-index:0;
+  font-family:var(--py-mono);font-size:var(--py-code-size);line-height:var(--py-code-line);white-space:pre;tab-size:4;
+  color:#D8E7F4;transform:translate(0,0);will-change:transform;overflow:visible;
+}
+.code-input{
+  position:absolute;inset:0;z-index:2;width:100%;height:100%;resize:none;border:0;outline:0;tab-size:4;
+  padding:16px 18px 24px;margin:0;background:transparent;
+  font-family:var(--py-mono);font-size:var(--py-code-size);line-height:var(--py-code-line);
+  white-space:pre;overflow:auto;caret-color:#E9FEFF;color:transparent;-webkit-text-fill-color:transparent;
+  text-shadow:none;
+}
+.code-input::selection{background:rgba(155,182,193,.24);color:transparent}
+.code-input::placeholder{color:rgba(111,121,125,.45);-webkit-text-fill-color:rgba(111,121,125,.45)}
+.code-highlight .tok-kw{color:#FF7B72}
+.code-highlight .tok-str{color:#A5D6FF}
+.code-highlight .tok-com{color:#6E7681;font-style:italic}
+.code-highlight .tok-num{color:#FFA657}
+.code-highlight .tok-bi{color:#79C0FF}
+.code-highlight .tok-op{color:#D2A8FF}
+.editor-foot{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:24px;padding:0 11px;border-top:1px solid rgba(244,239,230,.07);background:rgba(9,12,16,.74);font-family:var(--py-mono);font-size:9.8px;color:#6F797D}
+.editor-foot span:last-child{font-family:var(--py-font);text-align:right}
+.py-console{flex:0 0 auto;height:254px;min-height:168px;display:flex;flex-direction:column;border-top:1px solid var(--py-line);background:rgba(9,12,16,.82);overflow:hidden}
+.console-tabs{flex:0 0 auto;display:flex;align-items:center;gap:4px;min-height:40px;padding:5px 10px;border-bottom:1px solid var(--py-line);background:linear-gradient(180deg,rgba(18,18,18,.84),rgba(10,13,17,.86))}
+.console-tab{min-height:28px;padding:0 9px;border-radius:7px;border:1px solid transparent;background:transparent;color:var(--py-dim);font-size:11px;font-weight:750;cursor:pointer;white-space:nowrap}
+.console-tab:hover{color:var(--py-muted);background:rgba(255,255,255,.035)}
+.console-tab.active{color:var(--py-text);border-color:var(--py-line-strong);background:rgba(10,25,42,.8);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.status-pill{display:inline-flex;align-items:center;gap:5px;min-height:22px;padding:0 8px;border-radius:999px;border:1px solid var(--py-line);background:rgba(10,13,17,.5);font-size:9.8px;font-weight:750;color:var(--py-muted);white-space:nowrap}
+.status-pill::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.9}
+.s-info{color:#9BB6C1;border-color:rgba(155,182,193,.22);background:rgba(155,182,193,.07)}
+.s-ok{color:#9CC9B8;border-color:rgba(156,201,184,.22);background:rgba(156,201,184,.07)}
+.s-warn{color:#C8A976;border-color:rgba(200,169,118,.24);background:rgba(200,169,118,.07)}
+.s-err{color:#D08B84;border-color:rgba(208,139,132,.24);background:rgba(208,139,132,.07)}
+.console-body{flex:1;min-height:0;overflow:auto;padding:13px 15px 18px;font-size:12px;line-height:1.7}
+.console-empty{color:var(--py-dim);font-size:11.5px;line-height:1.85;max-width:650px}
+.console-empty b{color:var(--py-muted)}
+.run-output{margin:0;font-family:var(--py-mono);font-size:11.8px;line-height:19px;white-space:pre-wrap;word-break:break-word;color:#F3EFE6;max-width:100%}
+.run-output .out-label{display:inline-block;font-family:var(--py-font);font-size:10px;font-weight:800;letter-spacing:.06em;color:var(--py-dim);margin-bottom:5px;text-transform:uppercase}
+.out-empty{color:var(--py-dim);font-style:italic}
+.err-box{margin-top:9px;padding:9px 11px;border-radius:9px;border:1px solid rgba(208,139,132,.22);background:rgba(208,139,132,.06);font-family:var(--py-mono);font-size:11.2px;line-height:1.65;color:#E0B4B0;white-space:pre-wrap;word-break:break-word}
+.note-box{margin-top:9px;padding:8px 10px;border-radius:8px;border:1px solid rgba(200,169,118,.18);background:rgba(200,169,118,.055);font-size:10.5px;line-height:1.65;color:#E8CC8A}
+.score-card{padding:12px 14px;border:1px solid rgba(200,169,118,.24);border-radius:13px;background:
+  radial-gradient(80% 100% at 0% 0%,rgba(200,169,118,.13),transparent 64%),linear-gradient(180deg,rgba(20,20,20,.8),rgba(9,12,16,.9));display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:center;margin-bottom:11px}
+.score-card.perfect{border-color:rgba(156,201,184,.34);background:radial-gradient(80% 100% at 0% 0%,rgba(156,201,184,.16),transparent 64%),linear-gradient(180deg,rgba(28,30,25,.82),rgba(9,12,16,.9))}
+.score-ring{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--score-color) calc(var(--score) * 1%),rgba(244,239,230,.10) 0);position:relative}
+.score-ring::before{content:"";position:absolute;inset:5px;border-radius:50%;background:#081522;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.score-ring b{position:relative;z-index:1;font-family:var(--py-mono);font-size:15px;font-weight:800;color:var(--score-color)}
+.score-info h3{font-size:14px;font-weight:800;line-height:1.3}
+.score-info p{font-size:11px;color:var(--py-muted);margin-top:2px;line-height:1.6}
+.score-bar{height:4px;border-radius:99px;background:rgba(244,239,230,.10);overflow:hidden;margin-top:7px}
+.score-bar i{display:block;height:100%;width:0;background:var(--score-color);border-radius:99px;transition:width .5s var(--py-ease)}
+.score-stats{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.score-stats .chip{font-size:9.8px;min-height:21px}
+.diff-head{display:grid;grid-template-columns:34px minmax(0,1fr) 26px minmax(0,1fr);gap:5px;padding:5px 7px;font-size:9.5px;font-weight:800;color:var(--py-dim);border-bottom:1px solid var(--py-line);letter-spacing:.03em}
+.diff-row{display:grid;grid-template-columns:34px minmax(0,1fr) 26px minmax(0,1fr);gap:5px;align-items:start;padding:4px 7px;border-bottom:1px solid rgba(244,239,230,.06);font-family:var(--py-mono);font-size:11px;line-height:1.55}
+.diff-row.ok{background:rgba(156,201,184,.035)}
+.diff-row.wrong{background:rgba(208,139,132,.035)}
+.diff-no{color:#557086;text-align:right;font-size:10px;padding-top:2px}
+.diff-mark{text-align:center;font-size:10px;padding-top:2px;color:var(--py-dim)}
+.diff-mark.v{color:var(--py-green)}.diff-mark.half{color:var(--py-yellow)}.diff-mark.x{color:var(--py-red)}
+.diff-exp{color:#A9C1D4;word-break:break-word;white-space:pre-wrap}
+.diff-act{color:#D9F5FF;word-break:break-word;white-space:pre-wrap}
+.diff-act.bad{color:#E0B4B0}
+.diff-summary{margin-top:8px;font-size:10.5px;line-height:1.7;color:var(--py-dim)}
+.diff-more{padding:7px 8px;color:var(--py-dim);font-size:10.5px;line-height:1.6}
+.console-loading{display:flex;align-items:center;gap:9px;color:var(--py-muted);font-size:12px;padding:12px 3px}
+.spinner{width:16px;height:16px;border-radius:50%;border:2px solid rgba(200,169,118,.2);border-top-color:var(--py-accent);animation:pySpin .7s linear infinite;flex:none}
+@keyframes pySpin{to{transform:rotate(360deg)}}
+
+/* ============ 弹层 ============ */
+.py-modal{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(3,8,15,.66);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);animation:pyFade .18s ease both}
+.py-modal-card{width:min(820px,100%);max-height:min(84vh,760px);display:flex;flex-direction:column;border-radius:20px;border:1px solid var(--py-line-strong);background:
+  radial-gradient(80% 44% at 12% 0%,rgba(200,169,118,.11),transparent 64%),linear-gradient(180deg,rgba(20,20,20,.96),rgba(9,12,16,.98));
+  box-shadow:0 30px 90px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.08);overflow:hidden;animation:pyPop .22s var(--py-ease) both}
+@keyframes pyFade{from{opacity:0}to{opacity:1}}
+@keyframes pyPop{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+.modal-head{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px 12px;border-bottom:1px solid var(--py-line)}
+.modal-head h2{font-size:17px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+.modal-head h2 img{width:23px;height:23px;object-fit:contain}
+.modal-head .py-btn{min-height:32px;padding:0 9px;font-size:11px}
+.modal-body{flex:1;min-height:0;overflow:auto;padding:15px 18px 20px;font-size:12.5px;line-height:1.75;color:var(--py-muted)}
+.modal-body h3{font-size:13px;color:var(--py-text);font-weight:800;margin:14px 0 6px}
+.modal-body p{margin:0 0 8px}
+.modal-body ul{margin:4px 0 10px 18px;padding:0;line-height:1.85}
+.modal-body code{font-family:var(--py-mono);font-size:11.5px;color:#C8F8FF;background:rgba(155,182,193,.08);border:1px solid rgba(155,182,193,.10);border-radius:4px;padding:1px 5px}
+.modal-body .md-note{padding:9px 11px;border-radius:9px;border:1px solid rgba(200,169,118,.18);background:rgba(200,169,118,.055);color:#E8CC8A;font-size:11px}
+.wb-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:34px 10px;color:var(--py-dim);font-size:12px;text-align:center}
+.wb-empty b{color:var(--py-muted);font-size:14px}
+.wb-row{display:flex;align-items:center;gap:11px;padding:11px 10px;border:1px solid var(--py-line);border-radius:11px;background:rgba(10,13,17,.42);margin-bottom:7px;cursor:pointer;transition:border-color .15s,background .15s}
+.wb-row:hover{border-color:rgba(200,169,118,.32);background:rgba(18,21,25,.6)}
+.wb-score{width:39px;height:39px;border-radius:50%;display:grid;place-items:center;flex:none;font-family:var(--py-mono);font-size:12px;font-weight:800;border:1px solid rgba(200,169,118,.28);background:rgba(200,169,118,.09);color:#C8A976}
+.wb-score.ok{border-color:rgba(156,201,184,.28);background:rgba(156,201,184,.09);color:var(--py-green)}
+.wb-main{min-width:0;flex:1}
+.wb-main h4{font-size:12.5px;color:var(--py-text);font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wb-main p{font-size:10.5px;color:var(--py-dim);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wb-side{font-size:10px;color:var(--py-dim);text-align:right;flex:none}
+.wb-detail pre{margin:6px 0 12px;padding:10px 12px;border-radius:9px;border:1px solid var(--py-line);background:rgba(9,12,16,.72);font-family:var(--py-mono);font-size:11px;line-height:1.65;white-space:pre-wrap;word-break:break-word;color:#F3EFE6;max-height:220px;overflow:auto}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,12px);z-index:30;padding:10px 14px;border-radius:11px;border:1px solid var(--py-line-strong);background:rgba(10,13,17,.92);color:var(--py-text);font-size:12px;box-shadow:0 16px 40px rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:min(90vw,560px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.ok{border-color:rgba(156,201,184,.3)}.toast.err{border-color:rgba(208,139,132,.3)}.toast.warn{border-color:rgba(200,169,118,.3)}
+
+/* ============ 响应式 ============ */
+@media (max-width:980px){
+  .py-left{width:340px;min-width:300px}
+  .py-brand span.py-title{display:none}
+  .py-engine{max-width:170px}
+}
+@media (max-width:820px){
+  .levels{grid-template-columns:1fr;max-width:520px}
+  .level-card p{min-height:0}
+  .hero-title{font-size:clamp(34px,10vw,54px)}
+  .hero-sub{font-size:13.5px;line-height:1.8}
+  .py-body{flex-direction:column}
+  .py-left{width:100%;min-width:0;max-height:42vh;flex:0 1 auto;border-right:0;border-bottom:1px solid var(--py-line);padding:13px 14px 11px;gap:10px}
+  .py-left > section:first-of-type{order:1}
+  .py-left > .target-card{order:2}
+  .py-left > .actions{order:3}
+  .py-left > .bug-chip{order:4}
+  .py-left > .sub-note{order:5}
+  .py-left > .history-card{order:6}
+  .py-left > .hint-card{order:7}
+  .py-right{flex:1;min-height:0}
+  .py-console{height:32vh;min-height:140px}
+  .problem-desc{font-size:12px;line-height:1.65}
+  .target-output{max-height:104px;font-size:11.5px;line-height:18px}
+  .bug-chip{padding:7px 9px;font-size:10.5px}
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .actions .py-btn.big{min-height:44px;font-size:13px}
+  .actions .py-btn.primary{grid-column:1/-1}
+  .actions .py-btn.text{grid-column:1/-1;min-height:26px}
+  .sub-note{display:none}
+  .history-card{display:none}
+  .py-top-actions .py-btn span{display:none}
+  .py-engine{display:none}
+  .line-gutter{flex-basis:38px;width:38px}
+  .code-input,.code-highlight{padding:13px 12px 20px}
+  .line-gutter-inner{padding:13px 0 20px}
+  .editor-tools .py-btn span{display:none}
+  .console-body{padding:10px 11px 14px}
+}
+@media (max-width:560px){
+  .py-landing{padding:24px 14px 26px;justify-content:flex-start;overflow:auto}
+  .hero-icon{width:74px;height:74px;border-radius:20px;margin-bottom:14px}
+  .hero-icon img{width:58px;height:58px}
+  .hero-actions{width:100%;flex-direction:column;align-items:stretch}
+  .hero-actions .py-btn{width:100%}
+  .levels{margin-top:24px}
+  .level-card h2{font-size:20px}
+  .landing-stats{font-size:10.5px;gap:12px;padding:10px 12px}
+  .landing-stats b{font-size:13px}
+  .py-topbar{gap:7px;padding-left:9px;padding-right:9px}
+  .py-brand .py-level{display:none}
+  .py-brand span.py-title{display:inline;max-width:74px;overflow:hidden;text-overflow:ellipsis;font-size:11.5px}
+  .py-top-actions .py-btn{min-height:32px;padding:0 8px;font-size:10.5px}
+  .py-back{padding:0 9px;font-size:11px}
+  .py-left{max-height:44vh}
+  .py-console{height:28vh;min-height:128px}
+  .problem-title{font-size:19px}
+  .level-title-mobile{display:block}
+  .score-card{grid-template-columns:48px 1fr;gap:9px;padding:10px 11px}
+  .score-ring{width:46px;height:46px}
+  .score-ring b{font-size:13px}
+  .diff-head,.diff-row{grid-template-columns:26px minmax(0,1fr) 20px minmax(0,1fr);gap:4px;font-size:10px}
+  .modal-head h2{font-size:15px}
+  .modal-body{padding:12px 13px 16px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+</style>
+<link rel="stylesheet" href="./assets/css/liquid-glass.css?v=20261125z70">
+</head>
+<body>
+
+<div id="landing" class="py-landing">
+  <div class="py-landing-inner">
+    <div class="hero-icon"><img src="./assets/icons/python.png" alt="Python" width="72" height="72"></div>
+    <div class="hero-kicker">Python Debug Lab · CPython</div>
+    <h1 class="hero-title">Python 改错实验室</h1>
+    <p class="hero-sub">给你一段<em>埋了错的 Python 代码</em>，在编辑器里改到实际输出与目标输出逐行对齐。三档难度、随机参数、真实 CPython 判题；<em>改法不限，输出为准</em>。</p>
+    <div class="hero-actions">
+      <button class="py-btn primary" onclick="startLevel('basic')">从基础开始 <span aria-hidden="true">→</span></button>
+      <button class="py-btn ghost" onclick="openHelp()">怎么算分</button>
+      <button class="py-btn ghost" onclick="openWrongbook()">错题本 <span class="chip" id="wbBadge" style="min-height:18px;padding:0 7px"><b>0</b></span></button>
+    </div>
+    <div class="engine-line" id="engineLanding"><span class="pulse-dot"></span><b>正在探测真实 CPython…</b></div>
+    <div class="levels">
+      <button class="level-card basic" onclick="startLevel('basic')">
+        <div class="level-top"><span class="level-no">01 / BASIC</span><span class="level-badge">热身</span></div>
+        <h2>基础</h2>
+        <p>变量、循环、条件、字符串、列表。每道题 1–2 处埋错，先把 Python 的“手感”找回来。</p>
+        <div class="level-meta"><span>28 个模板</span><span>1–2 处埋点</span><span id="progressBasic">0 / 28 完成</span></div>
+        <div class="level-progress"><i id="barBasic"></i></div>
+      </button>
+      <button class="level-card intermediate" onclick="startLevel('intermediate')">
+        <div class="level-top"><span class="level-no">02 / INTER</span><span class="level-badge">进阶</span></div>
+        <h2>进阶</h2>
+        <p>函数、字典、集合、异常、推导式、参数与返回值。错误更像“逻辑错”，不止是拼写。</p>
+        <div class="level-meta"><span>28 个模板</span><span>1–2 处埋点</span><span id="progressIntermediate">0 / 28 完成</span></div>
+        <div class="level-progress"><i id="barIntermediate"></i></div>
+      </button>
+      <button class="level-card hard" onclick="startLevel('hard')">
+        <div class="level-top"><span class="level-no">03 / HARD</span><span class="level-badge">挑战</span></div>
+        <h2>困难</h2>
+        <p>递归、闭包、生成器、二维列表、可变对象与边界条件。需要先看懂数据流，再动手。</p>
+        <div class="level-meta"><span>28 个模板</span><span>1–2 处埋点</span><span id="progressHard">0 / 28 完成</span></div>
+        <div class="level-progress"><i id="barHard"></i></div>
+      </button>
+    </div>
+    <div class="landing-stats">
+      <span><b id="statSubmit">0</b>次提交</span>
+      <span><b id="statPerfect">0</b>次满分</span>
+      <span><b id="statWrong">0</b>道错题</span>
+      <span><b id="statStreak">0</b>天连练</span>
+    </div>
+    <a class="landing-back" href="subjects/python.html?v=20261125z70"><span aria-hidden="true">←</span> 返回 Python 科目</a>
+    <p class="landing-note"><strong>判定只用 stdout。</strong> 试跑不评分；提交才按目标输出逐行给 0–100 分。代码写得和参考答案不一样，只要输出一致也满分。<br>无网络且本机没有 Python 判题服务时，会明确提示启动后端，不会产生假分数。</p>
+  </div>
+</div>
+
+<div id="practice" class="py-practice" hidden>
+  <header class="py-topbar">
+    <button class="py-back" onclick="backToLanding()"><span aria-hidden="true">←</span>换难度</button>
+    <div class="py-brand">
+      <img src="./assets/icons/python.png" alt="" width="24" height="24">
+      <span class="py-title">Python 改错实验室</span>
+      <span class="py-level" id="levelPill">基础</span>
+    </div>
+    <div class="py-engine" id="enginePill"><span class="pulse-dot"></span><span>探测判题服务…</span></div>
+    <div class="py-top-actions">
+      <button class="py-btn ghost" onclick="openWrongbook()">错题本 <b id="wbBadge2">0</b></button>
+      <button class="py-btn ghost" onclick="openHelp()" aria-label="评分规则">?</button>
+    </div>
+  </header>
+
+  <main class="py-body">
+    <aside class="py-left">
+      <section>
+        <div class="problem-eyebrow"><span class="dot"></span><span id="problemNo">PY-BASIC · #01</span><span class="bug-pill" id="bugPill">1 处埋错</span><span id="problemRound">第 1 轮</span></div>
+        <h1 class="problem-title" id="problemTitle">正在出题…</h1>
+        <p class="problem-desc" id="problemDesc"></p>
+        <div class="tag-row" id="problemTags"></div>
+      </section>
+
+      <section class="target-card">
+        <div class="card-label">目标输出 <small>逐行对齐 · stdout 为准</small></div>
+        <pre class="target-output" id="targetOutput"></pre>
+        <div class="target-meta"><span id="targetLines">0 行</span><span>空格 / 大小写 / 换行都要对上</span></div>
+      </section>
+
+      <div class="bug-chip"><b id="bugCount">1</b><div><div>处埋错等你找</div><div class="bug-note">提示不会扣分；提交只看输出</div></div></div>
+
+      <div class="actions">
+        <button class="py-btn primary big" id="btnSubmit" onclick="runCode('submit')">提交判分 <kbd>⌘ / Ctrl ↵</kbd></button>
+        <button class="py-btn ghost big" id="btnTrial" onclick="runCode('trial')">试跑 · 不评分</button>
+        <button class="py-btn text" onclick="nextProblem()">换一题 <span aria-hidden="true">↻</span></button>
+      </div>
+      <div class="sub-note">提交后还能继续改，再提交分数会更新；不要求一次满分。</div>
+
+      <section class="history-card" id="historyCard">
+        <div class="card-label">本题记录 <small>最多 5 条</small></div>
+        <div class="history-list" id="historyList"><span style="color:var(--py-dim)">还没有提交或试跑</div>
+      </section>
+
+      <section class="hint-card" id="hintCard" hidden>
+        <div class="hint-head"><span>提示 <span id="hintCounter">1 / 1</span></span><button class="py-btn text" onclick="hideHint()">收起</button></div>
+        <div class="hint-line" id="hintLine">第 1 行</div>
+        <div class="hint-why" id="hintWhy"></div>
+        <div class="hint-tip" id="hintTip"></div>
+        <div class="hint-actions"><button class="py-btn ghost" onclick="nextHint()">下一条提示</button><button class="py-btn text" onclick="revealFix()">看修法</button></div>
+      </section>
+    </aside>
+
+    <section class="py-right">
+      <div class="py-editor-pane">
+        <div class="py-editor-toolbar">
+          <div class="file-pill"><i></i>main.py</div>
+          <span class="toolbar-note">Python 3.8 兼容 · 真实 CPython 执行</span>
+          <div class="editor-tools">
+            <button class="py-btn text" onclick="showHint()">提示</button>
+            <button class="py-btn text" onclick="formatCode()">整理缩进</button>
+            <button class="py-btn text" onclick="resetCode()">重置本题</button>
+          </div>
+        </div>
+        <div class="editor-body">
+          <div class="line-gutter" id="lineGutter"><div class="line-gutter-inner" id="lineGutterInner"></div></div>
+          <div class="code-stage" id="codeStage">
+            <pre class="code-highlight" id="codeHighlight" aria-hidden="true"></pre>
+            <textarea class="code-input" id="codeInput" spellcheck="false" autocapitalize="off" autocorrect="off" autocomplete="off" aria-label="Python 代码编辑器"></textarea>
+          </div>
+        </div>
+        <div class="editor-foot"><span id="cursorPos">Ln 1, Col 1</span><span>Tab 插入 4 空格 · 回车自动缩进 · 行号随滚动同步</span></div>
+      </div>
+
+      <div class="py-console">
+        <div class="console-tabs">
+          <button class="console-tab active" id="tabOutput" onclick="switchTab('output')">运行输出</button>
+          <button class="console-tab" id="tabDiff" onclick="switchTab('diff')">逐行对比</button>
+          <div style="flex:1"></div>
+          <span class="status-pill s-info" id="consoleStatus">等待运行</span>
+        </div>
+        <div class="console-body" id="consoleBody">
+          <div class="console-empty"><b>试跑只看输出，不评分。</b><br>点「提交判分」才会按目标输出逐行计算 0–100 分。代码可以随便改，不要求和参考答案一样；判题服务只执行 <code style="font-family:var(--py-mono);color:#F3EFE6">main.py</code>，比较 stdout。</div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="py-modal" id="modal" hidden onclick="if(event.target===this)closeModal()">
+  <div class="py-modal-card">
+    <div class="modal-head">
+      <h2><img src="./assets/icons/python.png" alt="" width="23" height="23"><span id="modalTitle">Python 改错实验室</span></h2>
+      <button class="py-btn ghost" onclick="closeModal()">关闭</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="./assets/js/python-problems.js?v=20261126z87g"></script>
+<script src="./assets/js/python-problems-extra.js?v=20261126z87g"></script>
+<script src="./assets/js/python-problems-z87.js?v=20261126z87g"></script>
+<script>
+/* ============================================================
+   Python 改错实验室 · 页面逻辑
+   设计原则与 Java 版一致：试跑不评分，提交只按 stdout 逐行给分；
+   改法不参与评分。判题优先本机真实 CPython，其次 Judge0。
+   ============================================================ */
+'use strict';
+const CFG = {
+  JUDGE0: 'https://ce.judge0.com',
+  LANG_ID: 71,
+  LOCAL_CANDIDATES: ['http://127.0.0.1:18082', 'http://127.0.0.1:18083', 'http://127.0.0.1:18080'],
+  NET_TIMEOUT: 30000,
+  PROBE_TIMEOUT: 1300,
+  UI_OUTPUT_MAX: 12000,
+  UI_DIFF_MAX_ROWS: 200,
+  UI_LINE_CLIP: 180,
+  SCORE_MAX_LINES: 600
+};
+const LEVEL_INFO = {
+  basic: { name: '基础', en: 'BASIC', limitMs: 4000 },
+  intermediate: { name: '进阶', en: 'INTER', limitMs: 5000 },
+  hard: { name: '困难', en: 'HARD', limitMs: 6000 }
+};
+const S = {
+  level: 'basic',
+  problem: null,
+  seed: 1,
+  round: 1,
+  running: false,
+  engine: 'judge0',
+  engineInfo: '',
+  localBase: '',
+  probed: false,
+  stats: null,
+  wrongbook: [],
+  history: [],
+  hintIndex: 0,
+  hintVisible: false,
+  lastSubmit: null,
+  activeTab: 'output'
+};
+
+/* ---------- 存储 ---------- */
+const STORE_KEY = 'pyDebugLab:v1';
+function loadStore() {
+  let d = null;
+  try { d = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch (e) {}
+  const base = {
+    submitted: 0, perfect: 0, wrong: 0, streak: 0, lastDay: '',
+    solved: {}, histories: {}, wrongbook: [], history: []
+  };
+  if (d && typeof d === 'object') {
+    for (const k of Object.keys(base)) if (d[k] !== undefined) base[k] = d[k];
+  }
+  S.stats = base;
+  S.wrongbook = Array.isArray(base.wrongbook) ? base.wrongbook : [];
+  S.history = Array.isArray(base.history) ? base.history : [];
+  if (!base.solved || typeof base.solved !== 'object') base.solved = {};
+  if (!base.histories || typeof base.histories !== 'object') base.histories = {};
+}
+function saveStore() {
+  if (!S.stats) return;
+  S.stats.wrongbook = S.wrongbook.slice(0, 80);
+  S.stats.history = S.history.slice(0, 30);
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(S.stats)); } catch (e) {}
+}
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function touchStreak() {
+  if (!S.stats) return;
+  const today = todayKey();
+  if (S.stats.lastDay === today) return;
+  const y = new Date(); y.setDate(y.getDate() - 1);
+  const yk = y.getFullYear() + '-' + String(y.getMonth() + 1).padStart(2, '0') + '-' + String(y.getDate()).padStart(2, '0');
+  S.stats.streak = (S.stats.lastDay === yk) ? (S.stats.streak || 0) + 1 : 1;
+  S.stats.lastDay = today;
+}
+
+/* ---------- 工具 ---------- */
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function clip(s, n) {
+  s = String(s == null ? '' : s);
+  return s.length > n ? s.slice(0, n - 1) + '…' : s;
+}
+function b64enc(s) {
+  try { return btoa(unescape(encodeURIComponent(String(s == null ? '' : s)))); }
+  catch (e) { return btoa(String(s == null ? '' : s)); }
+}
+function b64dec(s) {
+  if (!s) return '';
+  try { return decodeURIComponent(escape(atob(s))); }
+  catch (e) {
+    try { return atob(s); } catch (e2) { return ''; }
+  }
+}
+function toast(msg, type) {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'toast show ' + (type || '');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { el.className = 'toast ' + (type || ''); }, 2600);
+}
+function nowMs() { return (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now(); }
+function normLines(raw) {
+  const text = String(raw == null ? '' : raw).replace(/\r\n?/g, '\n').replace(/\s+$/g, '');
+  if (!text) return { lines: [], total: 0, truncated: false };
+  const all = text.split('\n');
+  const total = all.length;
+  return { lines: all.slice(0, CFG.SCORE_MAX_LINES), total, truncated: total > CFG.SCORE_MAX_LINES };
+}
+
+/* ---------- 随机 / 出题 ---------- */
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return function () {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function makeRng(seed) {
+  const fn = mulberry32(seed);
+  return {
+    next: fn,
+    int: function (min, max) { return min + Math.floor(fn() * (max - min + 1)); },
+    pick: function (arr) { return arr[Math.floor(fn() * arr.length)]; }
+  };
+}
+function pickTemplate(level, seed) {
+  const bank = (window.PY_TEMPLATES && window.PY_TEMPLATES[level]) || [];
+  if (!bank.length) return null;
+  const i = Math.abs(seed) % bank.length;
+  return bank[i];
+}
+function makeProblem(level, seed) {
+  const bank = (window.PY_TEMPLATES && window.PY_TEMPLATES[level]) || [];
+  const idx = Math.abs(seed) % bank.length;
+  const t = bank[idx];
+  if (!t) return null;
+  const data = t.gen(makeRng(seed));
+  const key = t.id + ':' + seed;
+  return Object.assign({}, data, {
+    id: t.id, level: level, seed: seed, key: key, templateIndex: idx,
+    buggyCode: data.code,
+    bugCount: (data.bugs || []).length,
+    expected: String(data.expected == null ? '' : data.expected)
+  });
+}
+
+/* ---------- 引擎探测 / 判题 ---------- */
+function isLocalHost() {
+  return location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\])$/i.test(location.hostname);
+}
+function setEngine(kind, info, base) {
+  S.engine = kind;
+  S.engineInfo = info || '';
+  if (base) S.localBase = base;
+  updateEngineUI();
+}
+function updateEngineUI() {
+  const dotClass = S.engine === 'local' ? '' : (S.engine === 'judge0' ? ' blue' : ' red');
+  const text = S.engine === 'local'
+    ? '本机 CPython' + (S.engineInfo ? ' · ' + S.engineInfo : '')
+    : (S.engine === 'judge0' ? 'Judge0 · Python 3.8' : '判题服务未连接');
+  const landing = document.getElementById('engineLanding');
+  if (landing) landing.innerHTML = '<span class="pulse-dot' + dotClass + '"></span><b>' + esc(text) + '</b>';
+  const pill = document.getElementById('enginePill');
+  if (pill) pill.innerHTML = '<span class="pulse-dot' + dotClass + '"></span><span>' + esc(text) + '</span>';
+}
+async function probeOne(base) {
+  const ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timer = setTimeout(() => { try { ctl && ctl.abort(); } catch (e) {} }, CFG.PROBE_TIMEOUT);
+  try {
+    const r = await fetch(base + '/health', { signal: ctl ? ctl.signal : undefined, cache: 'no-store' });
+    if (!r.ok) return null;
+    const d = await r.json();
+    if (d && d.python && d.python.available) {
+      return { base: base, version: d.python.version || 'Python' };
+    }
+  } catch (e) {
+  } finally { clearTimeout(timer); }
+  return null;
+}
+let detectPromise = null;
+async function detectEngine() {
+  if (detectPromise) return detectPromise;
+  detectPromise = (async () => {
+    const q = new URLSearchParams(location.search);
+    const judge = q.get('judge');
+    if (judge === 'off' || judge === '0' || judge === 'public') {
+      setEngine('judge0', '公共 API');
+      return;
+    }
+    if (judge && /^https?:\/\//i.test(judge)) {
+      const found = await probeOne(judge.replace(/\/$/, ''));
+      if (found) { setEngine('local', found.version, found.base); return; }
+    }
+    const live = (typeof navigator !== 'undefined') && navigator.onLine === false ? false : true;
+    if (live && (isLocalHost() || (judge && /^https?:\/\//i.test(judge)))) {
+      for (const base of CFG.LOCAL_CANDIDATES) {
+        const found = await probeOne(base);
+        if (found) { setEngine('local', found.version, found.base); return; }
+      }
+    }
+    if (live) setEngine('judge0', '公共 API');
+    else setEngine('none', '离线');
+  })();
+  return detectPromise;
+}
+async function execPython(code, timeoutMs) {
+  const body = JSON.stringify({
+    source_code: b64enc(code),
+    stdin: b64enc(''),
+    language_id: CFG.LANG_ID,
+    cpu_time_limit: 2,
+    wall_time_limit: Math.round((timeoutMs || CFG.NET_TIMEOUT) / 1000)
+  });
+  const url = (S.engine === 'local' && S.localBase ? S.localBase : CFG.JUDGE0) + '/submissions?base64_encoded=true&wait=true';
+  let ctl = null, timer = null;
+  const opt = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body, cache: 'no-store' };
+  if (typeof AbortController !== 'undefined') {
+    ctl = new AbortController();
+    opt.signal = ctl.signal;
+    timer = setTimeout(() => { try { ctl.abort(); } catch (e) {} }, (timeoutMs || CFG.NET_TIMEOUT) + 900);
+  }
+  const t0 = nowMs();
+  let resp;
+  try {
+    resp = await fetch(url, opt);
+  } finally { if (timer) clearTimeout(timer); }
+  if (!resp.ok) {
+    let msg = 'HTTP ' + resp.status;
+    try { const j = await resp.json(); if (j && j.error) msg = j.error; } catch (e) {}
+    throw new Error(msg);
+  }
+  const d = await resp.json();
+  return {
+    status: (d.status && d.status.description) || 'Unknown',
+    stdout: b64dec(d.stdout),
+    stderr: b64dec(d.stderr),
+    compileOutput: b64dec(d.compile_output),
+    message: b64dec(d.message),
+    time: d.time || '-',
+    exitCode: d.exit_code,
+    elapsedMs: Math.round(nowMs() - t0)
+  };
+}
+async function ensureEngine() {
+  if (S.engine === 'none') {
+    detectPromise = null;
+    await detectEngine();
+  }
+  if (S.engine === 'none') {
+    throw new Error('OFFLINE');
+  }
+}
+
+/* ---------- 切换页面 / 出题 ---------- */
+function startLevel(level) {
+  if (!LEVEL_INFO[level]) level = 'basic';
+  S.level = level;
+  S.round = 1;
+  const fromQuery = new URLSearchParams(location.search).get('seed');
+  const seed = fromQuery ? (Number(fromQuery) || 1) : (Math.floor(Math.random() * 2147483646) + 1);
+  S.seed = seed;
+  S.problem = makeProblem(level, seed);
+  document.getElementById('landing').hidden = true;
+  document.getElementById('practice').hidden = false;
+  document.getElementById('levelPill').textContent = LEVEL_INFO[level].name;
+  renderProblem();
+  updateEngineUI();
+  detectEngine();
+  setTimeout(() => { document.getElementById('codeInput').focus(); }, 80);
+}
+function backToLanding() {
+  if (S.running) return;
+  document.getElementById('practice').hidden = true;
+  document.getElementById('landing').hidden = false;
+  renderLandingStats();
+}
+function nextProblem() {
+  if (S.running) { toast('判题进行中，稍等一下', 'warn'); return; }
+  const bankSize = ((window.PY_TEMPLATES && window.PY_TEMPLATES[S.level]) || []).length || 12;
+  let nextIdx;
+  if (S.problem && bankSize > 1) {
+    nextIdx = (S.problem.templateIndex + 1 + Math.floor(Math.random() * (bankSize - 1))) % bankSize;
+  } else {
+    nextIdx = Math.floor(Math.random() * bankSize);
+  }
+  let nextSeed = Math.floor(Math.random() * 2147483646) + 1;
+  const cur = ((nextSeed % bankSize) + bankSize) % bankSize;
+  nextSeed += ((nextIdx - cur + bankSize) % bankSize);
+  const p = makeProblem(S.level, nextSeed);
+  if (!p) { toast('题库未装载', 'err'); return; }
+  S.round += 1;
+  S.seed = nextSeed;
+  S.problem = p;
+  renderProblem();
+  toast('换了一题 · 参数已重新随机', 'ok');
+}
+function renderProblem() {
+  const p = S.problem;
+  if (!p) return;
+  S.hintIndex = 0;
+  S.hintVisible = false;
+  S.history = [];
+  document.getElementById('hintCard').hidden = true;
+  document.getElementById('problemNo').textContent = 'PY-' + LEVEL_INFO[p.level].en + ' · #' + String(p.templateIndex + 1).padStart(2, '0');
+  document.getElementById('problemRound').textContent = '第 ' + S.round + ' 轮';
+  document.getElementById('problemTitle').textContent = p.title;
+  document.getElementById('problemDesc').textContent = p.desc;
+  document.getElementById('problemTags').innerHTML = '<span class="tag">' + esc(p.group) + '</span><span class="tag">' + esc(p.topic) + '</span><span class="tag">Python 3.8</span>';
+  document.getElementById('targetOutput').textContent = p.expected || '（无输出）';
+  document.getElementById('targetLines').textContent = (p.expected ? p.expected.split('\n').length : 0) + ' 行';
+  document.getElementById('bugCount').textContent = String(p.bugCount);
+  document.getElementById('codeInput').value = p.buggyCode;
+  updateCodeVisual();
+  updateHistory();
+  const st = document.getElementById('consoleStatus');
+  st.className = 'status-pill s-info';
+  st.textContent = '等待运行';
+  document.getElementById('consoleBody').innerHTML = '<div class="console-empty"><b>试跑只看输出，不评分。</b><br>点「提交判分」才会按目标输出逐行计算 0–100 分。代码可以随便改，不要求和参考答案一样；判题服务只执行 <code style="font-family:var(--py-mono);color:#F3EFE6">main.py</code>，比较 stdout。</div>';
+  switchTab('output');
+  document.getElementById('btnSubmit').disabled = false;
+  document.getElementById('btnTrial').disabled = false;
+}
+function resetCode() {
+  if (S.running) { toast('判题进行中', 'warn'); return; }
+  if (!S.problem) return;
+  document.getElementById('codeInput').value = S.problem.buggyCode;
+  updateCodeVisual();
+  toast('已恢复本题初始代码', 'info');
+}
+function formatCode() {
+  const ed = document.getElementById('codeInput');
+  let v = ed.value.replace(/\r\n?/g, '\n').replace(/\t/g, '    ');
+  const lines = v.split('\n').map(l => l.replace(/[ \t]+$/g, ''));
+  while (lines.length && lines[lines.length - 1] === '') lines.pop();
+  v = lines.join('\n');
+  ed.value = v;
+  updateCodeVisual();
+  toast('已整理缩进与行尾空格', 'ok');
+}
+
+/* ---------- 编辑器视觉 / 行号 / 高亮 ---------- */
+const PY_KEYWORDS = /^(False|None|True|and|as|assert|async|await|break|class|continue|def|del|elif|else|except|finally|for|from|global|if|import|in|is|lambda|nonlocal|not|or|pass|raise|return|try|while|with|yield)$/;
+const PY_BUILTINS = /^(print|len|range|sum|max|min|sorted|enumerate|zip|int|str|float|list|dict|set|tuple|abs|any|all|input|open|round|type|isinstance|map|filter|reversed|divmod|pow)$/;
+function syntaxHtml(code) {
+  let out = '';
+  let i = 0;
+  const n = code.length;
+  while (i < n) {
+    const ch = code[i];
+    if (ch === '#') {
+      let j = i;
+      while (j < n && code[j] !== '\n') j++;
+      out += '<span class="tok-com">' + esc(code.slice(i, j)) + '</span>';
+      i = j;
+      continue;
+    }
+    if (ch === '"' || ch === "'") {
+      const triple = code.slice(i, i + 3);
+      if (triple === '"""' || triple === "'''") {
+        let j = i + 3;
+        while (j < n && code.slice(j, j + 3) !== triple) j++;
+        j = Math.min(n, j + 3);
+        out += '<span class="tok-str">' + esc(code.slice(i, j)) + '</span>';
+        i = j;
+        continue;
+      }
+      let j = i + 1;
+      while (j < n && code[j] !== ch && code[j] !== '\n') {
+        if (code[j] === '\\') j++;
+        j++;
+      }
+      if (j < n) j++;
+      out += '<span class="tok-str">' + esc(code.slice(i, j)) + '</span>';
+      i = j;
+      continue;
+    }
+    if (/[0-9]/.test(ch)) {
+      let j = i;
+      while (j < n && /[0-9._]/.test(code[j])) j++;
+      out += '<span class="tok-num">' + esc(code.slice(i, j)) + '</span>';
+      i = j;
+      continue;
+    }
+    if (/[A-Za-z_]/.test(ch)) {
+      let j = i;
+      while (j < n && /[A-Za-z0-9_]/.test(code[j])) j++;
+      const word = code.slice(i, j);
+      if (PY_KEYWORDS.test(word)) out += '<span class="tok-kw">' + word + '</span>';
+      else if (PY_BUILTINS.test(word)) out += '<span class="tok-bi">' + word + '</span>';
+      else out += esc(word);
+      i = j;
+      continue;
+    }
+    if ('+-*/%=<>!&|^~'.indexOf(ch) >= 0) {
+      out += '<span class="tok-op">' + esc(ch) + '</span>';
+      i++;
+      continue;
+    }
+    out += esc(ch);
+    i++;
+  }
+  return out;
+}
+function updateCodeVisual() {
+  const ed = document.getElementById('codeInput');
+  const code = ed.value;
+  document.getElementById('codeHighlight').innerHTML = syntaxHtml(code) + '\n';
+  const count = Math.max(1, code.split('\n').length);
+  let nums = '';
+  for (let i = 1; i <= count; i++) nums += '<div>' + i + '</div>';
+  document.getElementById('lineGutterInner').innerHTML = nums;
+  syncEditorScroll();
+  updateCursor();
+}
+function syncEditorScroll() {
+  const ed = document.getElementById('codeInput');
+  document.getElementById('codeHighlight').style.transform = 'translate(' + (-ed.scrollLeft) + 'px,' + (-ed.scrollTop) + 'px)';
+  document.getElementById('lineGutterInner').style.transform = 'translateY(' + (-ed.scrollTop) + 'px)';
+}
+function updateCursor() {
+  const ed = document.getElementById('codeInput');
+  const before = ed.value.slice(0, ed.selectionStart);
+  const lines = before.split('\n');
+  const line = lines.length;
+  const col = lines[lines.length - 1].length + 1;
+  document.getElementById('cursorPos').textContent = 'Ln ' + line + ', Col ' + col;
+}
+function insertText(text) {
+  const ed = document.getElementById('codeInput');
+  const start = ed.selectionStart, end = ed.selectionEnd;
+  ed.value = ed.value.slice(0, start) + text + ed.value.slice(end);
+  ed.selectionStart = ed.selectionEnd = start + text.length;
+  updateCodeVisual();
+}
+
+/* ---------- 标签页 / 提示 / 记录 ---------- */
+function switchTab(tab) {
+  S.activeTab = tab;
+  document.getElementById('tabOutput').className = 'console-tab' + (tab === 'output' ? ' active' : '');
+  document.getElementById('tabDiff').className = 'console-tab' + (tab === 'diff' ? ' active' : '');
+  if (tab === 'diff') {
+    if (S.lastSubmit && S.lastSubmit.perfect) {
+      document.getElementById('consoleBody').innerHTML = '<div class="console-empty"><b>满分 · 没有差异。</b><br>目标输出与实际 stdout 逐行一致，切回「运行输出」可以看评分卡。代码写法不参与评分。</div>';
+    } else if (S.lastSubmit && S.lastSubmit.diffHtml) {
+      document.getElementById('consoleBody').innerHTML = S.lastSubmit.diffHtml;
+    } else {
+      document.getElementById('consoleBody').innerHTML = '<div class="console-empty">还没有提交结果。先点「提交判分」，这里会出现目标输出与实际输出的逐行对比。</div>';
+    }
+  } else if (S.lastSubmit && S.lastSubmit.outputHtml) {
+    document.getElementById('consoleBody').innerHTML = S.lastSubmit.outputHtml;
+  }
+}
+function showHint() {
+  const p = S.problem;
+  if (!p || !p.bugs || !p.bugs.length) { toast('本题没有提示条目', 'info'); return; }
+  S.hintVisible = true;
+  S.hintIndex = Math.min(S.hintIndex, p.bugs.length - 1);
+  document.getElementById('hintCard').hidden = false;
+  renderHint();
+}
+function hideHint() {
+  S.hintVisible = false;
+  document.getElementById('hintCard').hidden = true;
+}
+function renderHint() {
+  const p = S.problem, b = p && p.bugs[S.hintIndex];
+  if (!b) return;
+  document.getElementById('hintCounter').textContent = (S.hintIndex + 1) + ' / ' + p.bugs.length;
+  document.getElementById('hintLine').textContent = '第 ' + b.line + ' 行附近';
+  document.getElementById('hintWhy').textContent = b.why;
+  document.getElementById('hintTip').textContent = '提示：' + b.tip;
+  const btn = document.querySelector('#hintCard .hint-actions .py-btn.ghost');
+  if (btn) btn.textContent = S.hintIndex >= p.bugs.length - 1 ? '回到第一条' : '下一条提示';
+}
+function nextHint() {
+  const p = S.problem;
+  if (!p || !p.bugs.length) return;
+  S.hintIndex = (S.hintIndex + 1) % p.bugs.length;
+  renderHint();
+}
+function revealFix() {
+  const p = S.problem, b = p && p.bugs[S.hintIndex];
+  if (!b) return;
+  toast('修法参考：' + String(b.after).trim() + '（可自己写等价改法）', 'info');
+}
+function updateHistory() {
+  const box = document.getElementById('historyList');
+  if (!S.history.length) { box.innerHTML = '<span style="color:var(--py-dim)">还没有提交或试跑</span>'; return; }
+  box.innerHTML = S.history.slice(0, 5).map(h => '<div class="history-item ' + h.cls + '"><i></i><span>' + esc(h.text) + '</span></div>').join('');
+}
+function pushHistory(text, cls) {
+  S.history.unshift({ text: text, cls: cls || '' });
+  S.history = S.history.slice(0, 5);
+  updateHistory();
+}
+
+/* ---------- 评分：与 Java 版同一套逐行规则 ---------- */
+function lineCredit(expected, actual) {
+  if (expected === undefined || actual === undefined) return 0;
+  if (expected === actual) return 1;
+  const a = String(expected), b = String(actual);
+  const n = a.length, m = b.length;
+  if (!n && !m) return 1;
+  if (n > 4000 || m > 4000) return 0;
+  const prev = new Array(m + 1);
+  for (let j = 0; j <= m; j++) prev[j] = j;
+  for (let i = 1; i <= n; i++) {
+    let diag = prev[0]; prev[0] = i;
+    for (let j = 1; j <= m; j++) {
+      const tmp = prev[j];
+      prev[j] = Math.min(prev[j] + 1, prev[j - 1] + 1, diag + (a[i - 1] === b[j - 1] ? 0 : 1));
+      diag = tmp;
+    }
+  }
+  const sim = 1 - prev[m] / Math.max(n, m, 1);
+  return sim >= 0.6 ? 0.5 : 0;
+}
+function computeScore(exp, act, totalActual) {
+  const maxLen = Math.max(exp.length, totalActual == null ? act.length : totalActual);
+  if (!maxLen) return { score: 100, credits: [], full: 0, half: 0, zero: 0, maxLen: 0 };
+  const credits = [];
+  let sum = 0, full = 0, half = 0, zero = 0;
+  for (let i = 0; i < maxLen; i++) {
+    const c = lineCredit(i < exp.length ? exp[i] : undefined, i < act.length ? act[i] : undefined);
+    credits.push(c); sum += c;
+    if (c === 1) full++; else if (c === 0.5) half++; else zero++;
+  }
+  return { score: Math.round(sum / maxLen * 100), credits: credits, full: full, half: half, zero: zero, maxLen: maxLen };
+}
+function gradeText(s) {
+  if (s === 100) return '满分 · 输出与目标逐行一致';
+  if (s >= 90) return '优秀 · 只差一点点';
+  if (s >= 75) return '良好 · 继续对齐剩下的行';
+  if (s >= 60) return '及格 · 大半输出已经对了';
+  if (s > 0) return '继续改 · 对照逐行差异';
+  return '还没得分 · 先看运行信息';
+}
+
+function renderTrial(res) {
+  const out = String(res.stdout || '');
+  const err = String(res.stderr || '');
+  const compile = String(res.compileOutput || '');
+  let h = '<pre class="run-output"><span class="out-label">STDOUT</span>' + (out ? esc(clip(out, CFG.UI_OUTPUT_MAX)) : '<span class="out-empty">（没有输出）</span>') + '</pre>';
+  if (out.length > CFG.UI_OUTPUT_MAX) h += '<div class="note-box">输出过长，仅显示前 ' + CFG.UI_OUTPUT_MAX + ' 个字符；判题服务已接收完整输出。</div>';
+  const errText = err || compile || res.message || '';
+  if (errText) h += '<div class="err-box">' + esc(clip(errText, CFG.UI_OUTPUT_MAX)) + '</div>';
+  if (!errText && String(res.status || '').indexOf('Accepted') < 0) h += '<div class="note-box">状态：' + esc(res.status) + '</div>';
+  return h;
+}
+function renderScoreCard(score, exp, act, extra, totalActual) {
+  const color = score === 100 ? 'var(--py-green)' : (score >= 60 ? 'var(--py-yellow)' : 'var(--py-red)');
+  const full = exp.filter((l, i) => act[i] === l).length;
+  const maxLines = Math.max(exp.length, totalActual == null ? act.length : totalActual);
+  return '<div class="score-card' + (score === 100 ? ' perfect' : '') + '" style="--score:' + score + ';--score-color:' + color + '">'
+    + '<div class="score-ring"><b>' + score + '</b></div>'
+    + '<div class="score-info"><h3>' + esc(gradeText(score)) + '</h3>'
+    + '<p>按 stdout 逐行给分 · 代码本身不参与评分 · ' + (score === 100 ? '输出完全一致' : '还差 ' + (100 - score) + ' 分') + '</p>'
+    + '<div class="score-bar"><i style="width:' + score + '%"></i></div>'
+    + '<div class="score-stats"><span class="chip">对 <b>' + full + '</b> / ' + maxLines + ' 行</span><span class="chip">满分行 <b>' + full + '</b></span><span class="chip">总分 <b>' + score + '</b></span></div>'
+    + '</div></div>' + (extra || '');
+}
+function renderDiff(exp, act, credits, totalActual) {
+  const total = Math.max(exp.length, totalActual == null ? act.length : totalActual);
+  const shown = Math.min(total, CFG.UI_DIFF_MAX_ROWS);
+  let h = '<div class="diff-head"><span>#</span><span>目标输出</span><span>·</span><span>实际输出</span></div>';
+  for (let i = 0; i < shown; i++) {
+    const e = i < exp.length ? exp[i] : '';
+    const a = i < act.length ? act[i] : '';
+    const c = credits && credits[i] !== undefined ? credits[i] : (e === a ? 1 : 0);
+    const mark = c === 1 ? '✓' : (c === 0.5 ? '≈' : '✗');
+    const mk = c === 1 ? 'v' : (c === 0.5 ? 'half' : 'x');
+    h += '<div class="diff-row ' + (c === 1 ? 'ok' : 'wrong') + '">'
+      + '<span class="diff-no">' + (i + 1) + '</span>'
+      + '<span class="diff-exp">' + esc(clip(e, CFG.UI_LINE_CLIP)) + '</span>'
+      + '<span class="diff-mark ' + mk + '">' + mark + '</span>'
+      + '<span class="diff-act ' + (c === 1 ? '' : 'bad') + '">' + esc(clip(a, CFG.UI_LINE_CLIP)) + '</span>'
+      + '</div>';
+  }
+  if (total > shown) {
+    h += '<div class="diff-more">还有 ' + (total - shown) + ' 行未显示（界面最多显示前 ' + CFG.UI_DIFF_MAX_ROWS + ' 行；评分使用完整 stdout）。</div>';
+  }
+  const full = credits ? credits.filter(x => x === 1).length : 0;
+  const half = credits ? credits.filter(x => x === 0.5).length : 0;
+  h += '<div class="diff-summary">逐行得分：<b>' + full + '</b> 行完全一致' + (half ? ' · <b>' + half + '</b> 行内容接近（半分）' : '') + ' · 其余 0 分。≈ 表示只差一点，改一处再提交看分数变化。</div>';
+  return h;
+}
+function summarizeError(res) {
+  const s = String(res.stderr || res.compileOutput || res.message || '').trim();
+  if (!s) return '';
+  const lines = s.split('\n');
+  return lines.slice(-6).join('\n');
+}
+
+/* ---------- 运行 / 提交 ---------- */
+async function runCode(mode) {
+  if (S.running) return;
+  if (!S.problem) return;
+  const code = document.getElementById('codeInput').value;
+  if (!code.trim()) { toast('代码是空的', 'warn'); return; }
+  await detectEngine();
+  if (S.engine === 'none') {
+    detectPromise = null;
+    await detectEngine();
+  }
+  if (S.engine === 'none') {
+    const msg = '当前没有可用的 Python 判题服务。请在项目目录启动本机后端（默认端口 18082），或联网后使用 Judge0。';
+    document.getElementById('consoleStatus').className = 'status-pill s-err';
+    document.getElementById('consoleStatus').textContent = '判题服务未连接';
+    document.getElementById('consoleBody').innerHTML = '<div class="console-empty">' + esc(msg) + '<br><br>本机启动：<code style="font-family:var(--py-mono);color:#F3EFE6">cd backend && ./start.sh 18082</code>，或 <code style="font-family:var(--py-mono);color:#F3EFE6">java -jar backend-spring/target/judge-server-spring-1.0.0.jar --server.port=18082</code><br>离线时不会产生假分数，也不会用静态检查冒充判题。</div>';
+    toast('判题服务未连接', 'err');
+    return;
+  }
+  S.running = true;
+  S.lastSubmit = null;
+  const btnS = document.getElementById('btnSubmit'), btnT = document.getElementById('btnTrial');
+  btnS.disabled = true; btnT.disabled = true;
+  const status = document.getElementById('consoleStatus');
+  status.className = 'status-pill s-info';
+  status.textContent = mode === 'submit' ? '提交 · 判题中…' : '试跑 · 运行中…';
+  document.getElementById('consoleBody').innerHTML = '<div class="console-loading"><span class="spinner"></span><span>' + (mode === 'submit' ? '正在用真实 CPython 执行 main.py 并逐行评分…' : '正在用真实 CPython 执行 main.py…') + '</span></div>';
+  switchTab('output');
+  let res;
+  const t0 = nowMs();
+  let lastError = null;
+  try {
+    await ensureEngine();
+    res = await execPython(code, LEVEL_INFO[S.level].limitMs + 2500);
+  } catch (e) {
+    lastError = e;
+    /* 本机后端中途挂掉时，若联网则改走 Judge0；仍失败才报错，不产生假分数 */
+    if (S.engine === 'local' && navigator.onLine !== false) {
+      setEngine('judge0', '公共 API');
+      detectPromise = Promise.resolve();
+      try {
+        res = await execPython(code, LEVEL_INFO[S.level].limitMs + 2500);
+        lastError = null;
+        toast('本机 Python 后端不可用，已改用 Judge0', 'warn');
+      } catch (e2) {
+        lastError = e2;
+      }
+    }
+    if (!res) {
+      S.running = false;
+      btnS.disabled = false; btnT.disabled = false;
+      status.className = 'status-pill s-err';
+      status.textContent = '判题请求失败';
+      const raw = String(lastError && lastError.message || lastError);
+      let msg = raw === 'OFFLINE' ? '当前处于离线状态，且没有本机 Python 判题服务。' : '请求判题服务失败：' + raw;
+      document.getElementById('consoleBody').innerHTML = '<div class="console-empty">' + esc(msg) + '<br><br>检查：本机后端是否启动（18082 / 18083），或网络是否能访问 <code style="font-family:var(--py-mono);color:#F3EFE6">ce.judge0.com</code>。没有真实判题时不会给出分数。</div>';
+      toast('判题服务不可用', 'err');
+      return;
+    }
+  }
+  S.running = false;
+  btnS.disabled = false; btnT.disabled = false;
+  res.elapsedMs = res.elapsedMs || Math.round(nowMs() - t0);
+  handleResult(res, mode, code);
+}
+
+function handleResult(res, mode, code) {
+  const statusText = String(res.status || 'Unknown');
+  const status = document.getElementById('consoleStatus');
+  const out = String(res.stdout || '');
+  const err = String(res.stderr || '');
+  const compile = String(res.compileOutput || '');
+  const exp = normLines(S.problem.expected).lines;
+  const actual = normLines(out);
+
+  if (mode !== 'submit') {
+    status.className = 'status-pill s-info';
+    status.textContent = '试跑完成 · 未评分';
+    const html = renderTrial(res);
+    S.lastSubmit = { outputHtml: html, diffHtml: '' };
+    document.getElementById('consoleBody').innerHTML = html;
+    pushHistory('试跑 · 输出 ' + (actual.total || 0) + ' 行', '');
+    updateHistory();
+    return;
+  }
+
+  touchStreak();
+  S.stats.submitted += 1;
+  let score = 0, note = '', extra = '', credits = null, perfect = false;
+  let pillCls = 's-info', pillText = '', histCls = '';
+
+  if (statusText === 'Compilation Error') {
+    score = 0;
+    note = '语法没过，先修编译错误';
+    extra = '<div class="err-box">' + esc(clip(compile || res.stderr || res.message || 'Python 语法检查失败', CFG.UI_OUTPUT_MAX)) + '</div>';
+    status.className = 'status-pill s-err';
+    status.textContent = '提交 · 0 分 · 语法错误';
+    histCls = 'err';
+  } else if (statusText.indexOf('Runtime Error') >= 0 || statusText.indexOf('Time Limit') >= 0 || statusText.indexOf('signal') >= 0) {
+    const r = computeScore(exp, actual.lines, actual.total);
+    score = r.score;
+    note = statusText.indexOf('Time Limit') >= 0 ? '执行超时 · 崩溃前已正确的行照常给分' : '运行中断 · 崩溃前已正确的行照常给分';
+    const msg = summarizeError(res) || '进程异常退出';
+    extra = '<div class="err-box">' + esc(clip(msg, CFG.UI_OUTPUT_MAX)) + '</div>';
+    status.className = 'status-pill s-warn';
+    status.textContent = '提交 · ' + score + ' 分 · ' + (statusText.indexOf('Time Limit') >= 0 ? '超时' : '运行中断');
+    histCls = 'err';
+  } else {
+    const r = computeScore(exp, actual.lines, actual.total);
+    score = r.score;
+    credits = r.credits;
+    perfect = score === 100;
+    if (perfect) note = '输出与目标完全一致 · 代码写法不限';
+    else note = statusText + (actual.truncated ? ' · 输出超过 ' + CFG.SCORE_MAX_LINES + ' 行，超出部分按错误行计' : '');
+    status.className = perfect ? 'status-pill s-ok' : (score >= 60 ? 'status-pill s-warn' : 'status-pill s-err');
+    status.textContent = perfect ? '提交 · 100 分 · 满分' : '提交 · ' + score + ' 分 · 还差 ' + (100 - score) + ' 分';
+    histCls = perfect ? 'ok' : (score >= 60 ? 'warn' : 'err');
+  }
+
+  const card = renderScoreCard(score, exp, actual.lines, note ? '<div class="note-box">' + esc(note) + '</div>' : '', actual.total)
+    + (perfect ? '' : renderDiff(exp, actual.lines, credits, actual.total))
+    + extra;
+  document.getElementById('consoleBody').innerHTML = card;
+  S.lastSubmit = { outputHtml: card, diffHtml: perfect ? '' : renderDiff(exp, actual.lines, credits, actual.total), perfect: perfect };
+  S.lastSubmit.score = score;
+  pushHistory('提交 · ' + score + ' 分 · 对 ' + (credits ? credits.filter(x => x === 1).length : exp.filter((l, i) => actual.lines[i] === l).length) + ' / ' + exp.length + ' 行', histCls);
+  if (perfect) {
+    S.stats.perfect += 1;
+    if (!S.stats.solved) S.stats.solved = {};
+    S.stats.solved[S.problem.id] = true;
+    removeWrong(S.problem.key);
+  } else {
+    upsertWrong(score, code, actual);
+  }
+  if (score >= 60 || perfect) { /* 记录最高分 */ }
+  S.stats.levels = S.stats.levels || {};
+  const lv = S.stats.levels[S.level] || (S.stats.levels[S.level] = { submitted: 0, perfect: 0 });
+  lv.submitted = (lv.submitted || 0) + 1;
+  if (perfect) lv.perfect = (lv.perfect || 0) + 1;
+  saveStore();
+  renderLandingStats();
+}
+
+/* ---------- 错题本 / 统计 ---------- */
+function upsertWrong(score, code, actual) {
+  const p = S.problem;
+  const rec = {
+    key: p.key, id: p.id, level: p.level, title: p.title, topic: p.topic,
+    score: score, expected: p.expected, actual: String(actual.lines.join('\n')),
+    code: code, initialCode: p.buggyCode, date: Date.now(),
+    bugs: p.bugs || [], desc: p.desc, group: p.group
+  };
+  const i = S.wrongbook.findIndex(x => x.key === p.key);
+  if (i >= 0) S.wrongbook[i] = rec; else S.wrongbook.unshift(rec);
+  S.wrongbook = S.wrongbook.slice(0, 80);
+  S.stats.wrong = S.wrongbook.length;
+}
+function removeWrong(key) {
+  const before = S.wrongbook.length;
+  S.wrongbook = S.wrongbook.filter(x => x.key !== key);
+  if (S.wrongbook.length !== before) { S.stats.wrong = S.wrongbook.length; saveStore(); }
+  renderLandingStats();
+}
+function renderLandingStats() {
+  if (!S.stats) return;
+  const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  setTxt('statSubmit', S.stats.submitted || 0);
+  setTxt('statPerfect', S.stats.perfect || 0);
+  setTxt('statWrong', S.wrongbook.length);
+  setTxt('statStreak', S.stats.streak || 0);
+  setTxt('wbBadge', S.wrongbook.length);
+  const wb2 = document.getElementById('wbBadge2');
+  if (wb2) wb2.textContent = String(S.wrongbook.length);
+  const solved = S.stats.solved || {};
+  const countLevel = lv => ((window.PY_TEMPLATES && window.PY_TEMPLATES[lv]) || []).filter(t => solved[t.id]).length;
+  const totalLv = lv => ((window.PY_TEMPLATES && window.PY_TEMPLATES[lv]) || []).length || 12;
+  const c = { basic: countLevel('basic'), intermediate: countLevel('intermediate'), hard: countLevel('hard') };
+  const nm = { basic: 'Basic', intermediate: 'Intermediate', hard: 'Hard' };
+  for (const lv of ['basic', 'intermediate', 'hard']) {
+    const el = document.getElementById('progress' + nm[lv]);
+    if (el) el.textContent = c[lv] + ' / ' + totalLv(lv) + ' 完成';
+    const bar = document.getElementById('bar' + nm[lv]);
+    if (bar) bar.style.width = Math.round(c[lv] / totalLv(lv) * 100) + '%';
+  }
+}
+function openWrongbook() {
+  const body = document.getElementById('modalBody');
+  document.getElementById('modalTitle').textContent = 'Python 错题本 · ' + S.wrongbook.length + ' 道';
+  if (!S.wrongbook.length) {
+    body.innerHTML = '<div class="wb-empty"><b>还没有错题</b><span>提交后没到 100 分的题会自动收进来；满分后会自动移除。</span><span>先去做一道基础题试试。</span></div>';
+  } else {
+    body.innerHTML = S.wrongbook.map((w, i) => '<div class="wb-row" onclick="openWrongDetail(' + i + ')">'
+      + '<div class="wb-score">' + w.score + '</div>'
+      + '<div class="wb-main"><h4>' + esc(w.title) + '</h4><p>' + esc(LEVEL_INFO[w.level] ? LEVEL_INFO[w.level].name : w.level) + ' · ' + esc(w.topic || '') + ' · ' + esc(w.group || '') + '</p></div>'
+      + '<div class="wb-side">' + new Date(w.date).toLocaleDateString('zh-CN') + '<br>点击查看</div></div>').join('');
+  }
+  showModal();
+}
+function openWrongDetail(i) {
+  const w = S.wrongbook[i];
+  if (!w) return;
+  const bugs = (w.bugs || []).map((b, j) => '<li><b>第 ' + b.line + ' 行</b>：' + esc(b.why) + '</li>').join('');
+  document.getElementById('modalTitle').textContent = '错题详情 · ' + w.title;
+  document.getElementById('modalBody').innerHTML =
+    '<h3>题目</h3><p>' + esc(w.desc || '') + '</p>'
+    + '<div class="chip">' + esc(LEVEL_INFO[w.level] ? LEVEL_INFO[w.level].name : w.level) + '</div> <div class="chip">' + w.score + ' 分</div>'
+    + '<h3>目标输出</h3><pre>' + esc(w.expected) + '</pre>'
+    + '<h3>你提交时的输出</h3><pre>' + esc(clip(w.actual || '（空）', 1200)) + '</pre>'
+    + '<h3>你当时的代码</h3><pre>' + esc(clip(w.code || '', 2000)) + '</pre>'
+    + (bugs ? '<h3>可能的错因</h3><ul>' + bugs + '</ul>' : '')
+    + '<div class="md-note">错题本用于复盘；点下方按钮会把这道题的初始版本重新载入编辑器。</div>'
+    + '<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap"><button class="py-btn primary" onclick="retryWrong(' + i + ')">重做这道题</button><button class="py-btn ghost" onclick="closeModal()">关闭</button></div>';
+  showModal();
+}
+function retryWrong(i) {
+  const w = S.wrongbook[i];
+  if (!w) return;
+  S.problem = {
+    id: w.id, level: w.level, key: w.key, seed: 0, templateIndex: 0,
+    title: w.title, desc: w.desc || '', group: w.group || '', topic: w.topic || '',
+    expected: w.expected, buggyCode: w.initialCode || w.code, bugs: w.bugs || [], bugCount: (w.bugs || []).length
+  };
+  S.level = w.level;
+  S.round = 1;
+  closeModal();
+  document.getElementById('landing').hidden = true;
+  document.getElementById('practice').hidden = false;
+  document.getElementById('levelPill').textContent = LEVEL_INFO[w.level] ? LEVEL_INFO[w.level].name : w.level;
+  renderProblem();
+  toast('已载入错题 · 从初始错误版本重做', 'info');
+}
+function openHelp() {
+  document.getElementById('modalTitle').textContent = 'Python 改错实验室 · 评分规则';
+  document.getElementById('modalBody').innerHTML =
+    '<p>这套页面和 Java 改错实验室的判定方向保持一致：<b>只看程序实际写到 stdout 的内容</b>，不看你改了几行、也不要求改法和参考答案一样。</p>'
+    + '<h3>试跑 vs 提交</h3><ul><li><b>试跑</b>：真实执行代码，只显示 stdout / stderr，不计算分数，不写错题本。</li><li><b>提交判分</b>：真实执行后，把 stdout 与目标输出逐行比较，给出 0–100 的百分制。</li></ul>'
+    + '<h3>逐行评分</h3><ul><li>完全一致的行得 1 分；内容很接近（编辑距离相似度 ≥ 0.6）得 0.5 分；缺失、多打印或差异过大得 0 分。</li><li>总分 = 行得分总和 ÷ max(目标行数, 实际行数) × 100，四舍五入到整数。</li><li>代码写法、注释、变量名、缩进风格都不参与评分；只有 stdout 参与。</li></ul>'
+    + '<h3>环境</h3><p>本机优先使用真实 CPython；线上或本机服务不可用时使用 Judge0 的 Python 3.8。语法错误按 Compilation Error 处理，0 分；运行异常保留崩溃前已经打印的行照常给分。</p>'
+    + '<h3>快捷键</h3><p><code>Tab</code> 插入 4 个空格；<code>Enter</code> 自动沿用缩进，行尾是 <code>:</code> 时自动多缩进 4 格；<code>⌘/Ctrl + Enter</code> 提交判分。</p>'
+    + '<div class="md-note">无网络且本机没有判题服务时，页面会明确提示，不会用静态检查或内置解释器产生假分数。</div>';
+  showModal();
+}
+function showModal() { document.getElementById('modal').hidden = false; }
+function closeModal() { document.getElementById('modal').hidden = true; }
+
+/* ---------- 编辑器事件 ---------- */
+(function bindEditor() {
+  const ed = document.getElementById('codeInput');
+  ed.addEventListener('input', updateCodeVisual);
+  ed.addEventListener('scroll', syncEditorScroll, { passive: true });
+  ed.addEventListener('click', updateCursor);
+  ed.addEventListener('keyup', updateCursor);
+  ed.addEventListener('select', updateCursor);
+  ed.addEventListener('keydown', function (e) {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      insertText('    ');
+      return;
+    }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const start = ed.selectionStart, end = ed.selectionEnd;
+      const before = ed.value.slice(0, start);
+      const lineStart = before.lastIndexOf('\n') + 1;
+      const line = before.slice(lineStart);
+      const indent = (line.match(/^[ \t]*/) || [''])[0];
+      const extra = /:\s*$/.test(line) ? '    ' : '';
+      const insert = '\n' + indent + extra;
+      ed.value = ed.value.slice(0, start) + insert + ed.value.slice(end);
+      ed.selectionStart = ed.selectionEnd = start + insert.length;
+      updateCodeVisual();
+      return;
+    }
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      e.preventDefault();
+      runCode('submit');
+    }
+  });
+})();
+document.getElementById('modal').addEventListener('click', function (e) { if (e.target === this) closeModal(); });
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+/* ---------- 启动 ---------- */
+(function boot() {
+  loadStore();
+  renderLandingStats();
+  updateEngineUI();
+  detectEngine();
+  const q = new URLSearchParams(location.search);
+  const lv = q.get('level');
+  if (lv && LEVEL_INFO[lv]) startLevel(lv);
+})();
+</script>
+</body>
+</html>

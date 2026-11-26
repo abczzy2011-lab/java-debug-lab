@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
-<title>全栈结业考试 · 10 科 30 题 · 100 分</title>
-<meta name="description" content="全栈开发 10 个科目的结业考试：每科一道知识选择题、一道终端指令题、一道代码改错题，共 30 题 100 分。提交后自动给出整体评分、等级、分科成绩和薄弱科目。">
+<title>全栈结业考试 · 10 科 60 题 · 100 分</title>
+<meta name="description" content="全栈开发 10 个科目的结业考试：每科两道知识选择题、两道终端指令题、两道代码改错题，共 60 题 100 分。提交后自动给出整体评分、等级、分科成绩和薄弱科目。">
 <link rel="icon" type="image/png" href="../assets/icons/fullstack.png?v=20261126z86">
 <link rel="stylesheet" href="../assets/css/liquid-glass.css?v=20261123z47">
 <link rel="stylesheet" href="../assets/css/fullstack.css?v=20261126z85">
@@ -19,7 +19,7 @@
   <a class="home" href="./fullstack.html?v=20261126z85"><span aria-hidden="true">←</span>全栈路线</a>
   <div class="brand"><span class="brand-mark" aria-hidden="true">EX</span><b>全栈结业考试</b></div>
   <div class="spacer"></div>
-  <div class="tip">10 科 · 30 题 · 100 分 · 自动评分</div>
+  <div class="tip">10 科 · 60 题 · 100 分 · 自动评分</div>
 </header>
 
 <main class="wrap exam-wrap">
@@ -30,9 +30,9 @@
     <p id="examLead">10 个科目，每个科目一道知识选择题 + 一道终端指令题 + 一道代码改错题。不只背概念，还要会用命令定位问题、修掉真实工程里的错误。</p>
     <div class="exam-stats" aria-label="考试规模">
       <div><b>10</b><span>科目</span></div>
-      <div><b>30</b><span>题</span></div>
+      <div><b>60</b><span>题</span></div>
       <div><b>100</b><span>总分</span></div>
-      <div><b>75</b><span>分钟建议</span></div>
+      <div><b>120</b><span>分钟建议</span></div>
     </div>
     <div class="hero-actions">
       <a class="pill-link primary" href="#examDock" id="examStart"><span>开始答题</span><i aria-hidden="true">↓</i></a>
@@ -47,7 +47,7 @@
         <div class="section-kicker">EXAM BLUEPRINT · 10 × 10</div>
         <h2 id="blueprintTitle">考试范围与配分</h2>
       </div>
-      <span class="exam-section-note">每科 10 分 · 选择 2 + 指令 2 + 改错 6</span>
+      <span class="exam-section-note">每科 10 分 · 选择 2 + 指令 2 + 改错 2 · 共 6 题</span>
     </div>
     <div class="exam-scope" id="examBlueprint"></div>
   </section>
@@ -55,11 +55,11 @@
   <section class="exam-dock" id="examDock" aria-label="答题进度与提交">
     <div class="exam-dock-copy">
       <span class="exam-dock-kicker">ANSWER SHEET</span>
-      <b><span id="examAnswered">0</span> <i>/</i> 30 已答</b>
+      <b><span id="examAnswered">0</span> <i>/</i> 60 已答</b>
     </div>
     <div class="exam-dock-meter">
       <div class="exam-meter"><i id="examAnsweredBar"></i></div>
-      <span id="examRemaining">还剩 30 题</span>
+      <span id="examRemaining">还剩 60 题</span>
     </div>
     <button class="exam-submit" id="examSubmit" type="button">提交并评分 <span aria-hidden="true">→</span></button>
   </section>
@@ -86,7 +86,8 @@
 
 <noscript><div class="exam-noscript">这场考试需要 JavaScript 才能渲染题目和评分，请开启后刷新。</div></noscript>
 <script src="../assets/js/fullstack/fullstack-data.js?v=20261126z85"></script>
-<script src="../assets/js/fullstack/fullstack-exam-data.js?v=20261126z86"></script>
-<script src="../assets/js/fullstack/fullstack-exam-app.js?v=20261126z86"></script>
+<script src="../assets/js/fullstack/fullstack-exam-data.js?v=20261126z87g"></script>
+<script src="../assets/js/fullstack/fullstack-exam-z87.js?v=20261126z87g"></script>
+<script src="../assets/js/fullstack/fullstack-exam-app.js?v=20261126z87g"></script>
 </body>
 </html>

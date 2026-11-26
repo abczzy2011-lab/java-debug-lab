@@ -148,9 +148,9 @@
 
     $('#app').innerHTML = '<div class="panel">' +
       '<section class="practice-hero">' +
-        '<div class="kicker">JAVASCRIPT · PRACTICE · 24 QUESTIONS</div>' +
+        '<div class="kicker">JAVASCRIPT · PRACTICE · 54 QUESTIONS</div>' +
         '<h1>把“看懂”变成“答对”</h1>' +
-        '<p class="sub">3 档、24 道输出预测题。选择答案后立即判分，给出运行结果、原因和一条可迁移的结论；不执行你输入的代码，也不依赖后端。</p>' +
+        '<p class="sub">3 档、54 道输出预测题。选择答案后立即判分，给出运行结果、原因和一条可迁移的结论；不执行你输入的代码，也不依赖后端。</p>' +
         '<div class="hero-stats">' +
           '<span class="stat"><b>' + questions.length + '</b> 道题</span>' +
           '<span class="stat"><b>3</b> 档难度</span>' +
@@ -159,8 +159,8 @@
         '</div>' +
         '<div class="hero-actions">' +
           '<button class="btn" type="button" data-start-mode="random">随机 8 题 <span aria-hidden="true">→</span></button>' +
-          '<button class="btn ghost" type="button" data-start-mode="basic">从基础 8 题开始</button>' +
-          '<button class="btn ghost" type="button" data-start-mode="all">全部 24 题</button>' +
+          '<button class="btn ghost" type="button" data-start-mode="basic">从基础 18 题开始</button>' +
+          '<button class="btn ghost" type="button" data-start-mode="all">全部 54 题</button>' +
           (wrongCount ? '<button class="btn warn" type="button" data-start-mode="wrong">重练错题 · ' + wrongCount + '</button>' : '') +
         '</div>' +
         '<div class="outcomes">' +
@@ -185,7 +185,7 @@
     bindOverview();
     updateHeader();
     window.scrollTo(0, 0);
-    document.title = 'JavaScript 练习场 · 24 题';
+    document.title = 'JavaScript 练习场 · ' + questions.length + ' 题';
   }
 
   function renderQuiz() {
@@ -382,9 +382,9 @@
         if (mode === 'random') {
           start(shuffle(questions.map(function (q) { return q.id; })).slice(0, 8), 'random', '随机 8 题');
         } else if (mode === 'basic') {
-          start(questionOrderForLevel('basic'), 'level', '基础 · 8 题');
+          start(questionOrderForLevel('basic'), 'level', '基础 · ' + questionOrderForLevel('basic').length + ' 题');
         } else if (mode === 'all') {
-          start(questions.map(function (q) { return q.id; }), 'all', '全部 24 题');
+          start(questions.map(function (q) { return q.id; }), 'all', '全部 54 题');
         } else if (mode === 'wrong') {
           start(wrongIds.slice(), 'wrong', '错题重练');
         }
@@ -394,7 +394,7 @@
       btn.addEventListener('click', function () {
         var levelId = btn.getAttribute('data-start-level');
         var level = levelById[levelId];
-        start(questionOrderForLevel(levelId), 'level', (level ? level.label : levelId) + ' · 8 题');
+        start(questionOrderForLevel(levelId), 'level', (level ? level.label : levelId) + ' · ' + questionOrderForLevel(levelId).length + ' 题');
       });
     });
     $all('.q-card', $('#app')).forEach(function (btn) {

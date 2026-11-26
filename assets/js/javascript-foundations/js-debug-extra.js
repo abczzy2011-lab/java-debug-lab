@@ -1,5 +1,5 @@
 /* JavaScript 改错题库扩展 · 12 题（三档各 4 题） */
-window.JS_DEBUG_TASKS = [
+window.JS_DEBUG_TASKS = (window.JS_DEBUG_TASKS || []).concat([
   {
     "minutes": 7,
     "source": "Eloquent JavaScript 4th · Ch.5；Head First JavaScript Programming 2nd · Ch.6",
@@ -893,4 +893,4 @@ window.JS_DEBUG_TASKS = [
     "analysis": "拓扑排序的核心是“入度归零才入队”。只取队首却不减少后继入度，队列很快为空，order 长度不足 n，会被误判为有环。",
     "fixed": "function solve(n, prereqs) {\n  const adj = Array.from({ length: n }, () => []);\n  const indeg = new Array(n).fill(0);\n  for (const [a, b] of prereqs) {\n    adj[a].push(b);\n    indeg[b]++;\n  }\n  const queue = [];\n  for (let i = 0; i < n; i++) if (indeg[i] === 0) queue.push(i);\n  const order = [];\n  while (queue.length) {\n    const cur = queue.shift();\n    order.push(cur);\n    for (const next of adj[cur]) {\n      indeg[next]--;\n      if (indeg[next] === 0) queue.push(next);\n    }\n  }\n  return order.length === n ? order : [];\n}"
   }
-];
+]);
