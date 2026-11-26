@@ -773,24 +773,24 @@ span.apiref:hover{color:var(--accent);border-bottom-color:var(--accent)}
     <button class="btn btn-default btn-lg wrongbook-cta" onclick="openWrongbook()"><img class="ui-ico ui-ico-btn" src="./assets/icons/wrongbook.png" alt="" loading="lazy" decoding="async">错题本 <span id="wb-badge2">0</span></button>
   </div>
   <div class="subject-cards">
-    <div class="subject-card" style="--card-accent:#8FB8FF" onclick="location.href='subjects/java-hub.html?v=20261125z71'">
+    <div class="subject-card" style="--card-accent:#8FB8FF" onclick="location.href='subjects/java-hub.html?v=20261126z76'">
       <div class="subject-icon"><img class="ui-ico ui-ico-subject" src="./assets/icons/java.png" alt="" loading="lazy" decoding="async"></div>
       <div class="subject-name">Java 学科</div>
       <div class="subject-desc">改错实验室、Java 基础、50 课学习资料、API 文档、算法与代码逻辑，以及新增的“输出实现场”：给目标输出，从零写完整程序。</div>
       <div class="subject-meta">
         <span>6 个分类入口</span>
-        <span>177 道改错题 · 12 道输出实现题</span>
+        <span>189 道改错题 · 24 道输出实现题</span>
         <span>真实 javac · 输出比对 + 运行 ms</span>
       </div>
       <div class="subject-cta"><span>进入 Java 分类</span><span aria-hidden="true">→</span></div>
     </div>
-    <div class="subject-card" style="--card-accent:#C8A976" onclick="location.href='subjects/python.html?v=20261125z73'">
+    <div class="subject-card" style="--card-accent:#C8A976" onclick="location.href='subjects/python.html?v=20261126z76'">
       <div class="subject-icon"><img class="ui-ico ui-ico-subject" src="./assets/icons/python.png" alt="" loading="lazy" decoding="async"></div>
       <div class="subject-name">Python 学科</div>
       <div class="subject-desc">改错练习、输出实现场、18 章 76 节完整课程、18,703 条 API 全量索引。两套判题都走真实 CPython，课程和文档随时可查。</div>
       <div class="subject-meta">
         <span>4 个分类入口</span>
-        <span>42 个模板 · 18 道输出题</span>
+        <span>54 个模板 · 30 道输出题</span>
         <span>真实 CPython · 输出比对 + 运行 ms</span>
       </div>
       <div class="subject-cta"><span>进入 Python 分类</span><span aria-hidden="true">→</span></div>
@@ -806,7 +806,7 @@ span.apiref:hover{color:var(--accent);border-bottom-color:var(--accent)}
       </div>
       <div class="subject-cta"><span>进入 AI 分类</span><span aria-hidden="true">→</span></div>
     </div>
-    <div class="subject-card" style="--card-accent:#F7DF1E" onclick="location.href='subjects/javascript-hub.html?v=20261125z73'">
+    <div class="subject-card" style="--card-accent:#F7DF1E" onclick="location.href='subjects/javascript-hub.html?v=20261126z76'">
       <div class="subject-icon"><img class="ui-ico ui-ico-subject" src="./assets/icons/javascript.png" alt="" loading="lazy" decoding="async"></div>
       <div class="subject-name">JavaScript 学科</div>
       <div class="subject-desc">系统课程、改错实验室、输出实现场、练习场、速查手册五条线。课程已扩到五篇 18 章 76 节；改错与输出实现场都由浏览器 Worker 真实运行并逐用例评分。</div>
@@ -5122,7 +5122,29 @@ const JDEEP_HARD=[
 ];
 
 
+const JEXTRA_BASIC = [
+{id:"jb1",gen:function(r){return {title:"区间和查询",desc:"数组 {1, 2, 3, 4}，先输出前缀和，再回答 3 个区间查询。",tags:["前缀和","区间和","数组"],stdin:'',code:"public class Main {\n    public static void main(String[] args) {\n        int[] a = {1, 2, 3, 4};\n        int n = a.length;\n        int[] pre = new int[n + 1];\n        for (int i = 0; i < n; i++) pre[i + 1] = pre[i] + a[i];\n        System.out.print(\"前缀和:\");\n        for (int i = 0; i <= n; i++) System.out.print(\" \" + pre[i]);\n        System.out.println();\n        int[][] qs = {{1, 3}, {2, 4}, {1, 1}};\n        for (int i = 0; i < qs.length; i++) {\n            int l = qs[i][0], r = qs[i][1];\n            System.out.println(\"[\" + l + \",\" + r + \"] = \" + (pre[r] - pre[l - 1]));\n        }\n    }\n}",expected:"前缀和: 0 1 3 6 10\n[1,3] = 6\n[2,4] = 9\n[1,1] = 1\n",topic:"数组与循环",summary:"前缀和建对了，区间左端少减了一个前缀。"};}},
+{id:"jb2",gen:function(r){return {title:"矩阵对角线差",desc:"3×3 方阵，分别求主对角线与副对角线之和，输出两和与绝对差。",tags:["二维数组","对角线","Math.abs"],stdin:'',code:"public class Main {\n    public static void main(String[] args) {\n        int[][] m = {{1, 2, 3}, {4, 9, 6}, {7, 8, 5}};\n        int n = m.length;\n        int d1 = 0, d2 = 0;\n        for (int i = 0; i < n; i++) {\n            d1 += m[i][i];\n            d2 += m[i][n - 1 - i];\n        }\n        System.out.println(\"主对角线和: \" + d1);\n        System.out.println(\"副对角线和: \" + d2);\n        System.out.println(\"绝对差: \" + Math.abs(d1 - d2));\n    }\n}",expected:"主对角线和: 15\n副对角线和: 19\n绝对差: 4\n",topic:"二维数组",summary:"副对角线取成了主对角线下标，差值自然是 0。"};}},
+{id:"jb3",gen:function(r){return {title:"大小写统计",desc:"统计文本里的大写字母与小写字母，空格和数字不计入。",tags:["字符判断","循环","大小写"],stdin:'',code:"public class Main {\n    public static void main(String[] args) {\n        String text = \"Hello World 2026\";\n        int upper = 0, lower = 0;\n        for (int i = 0; i < text.length(); i++) {\n            char c = text.charAt(i);\n            if (c >= 'A' && c <= 'Z') upper++;\n            else if (c >= 'a' && c <= 'z') lower++;\n        }\n        System.out.println(\"大写 \" + upper + \" 小写 \" + lower);\n    }\n}",expected:"大写 2 小写 8\n",topic:"字符串处理",summary:"把所有非大写字符都算成了小写。"};}},
+{id:"jb4",gen:function(r){return {title:"相邻最大差",desc:"数组 {10, 1, 9}，求相邻两个元素差的绝对值的最大值。",tags:["绝对值","相邻元素","Math.abs"],stdin:'',code:"public class Main {\n    public static void main(String[] args) {\n        int[] nums = {10, 1, 9};\n        int best = 0;\n        for (int i = 1; i < nums.length; i++) {\n            best = Math.max(best, Math.abs(nums[i] - nums[i - 1]));\n        }\n        System.out.println(best);\n    }\n}",expected:"9\n",topic:"数组与循环",summary:"差值忘了取绝对值，下降段变成负数。"};}}
+];
+const JEXTRA_INTERMEDIATE = [
+{id:"jm1",gen:function(r){return {title:"质因数分解",desc:"把 360 分解成质因子的幂乘积，指数为 1 时省略 ^1。",tags:["质数","循环","StringBuilder"],stdin:'',code:"public class Main {\n    public static void main(String[] args) {\n        long n = 360;\n        StringBuilder sb = new StringBuilder();\n        for (long p = 2; p * p <= n; p++) {\n            if (n % p != 0) continue;\n            int e = 0;\n            while (n % p == 0) { n /= p; e++; }\n            if (sb.length() > 0) sb.append('*');\n            sb.append(p);\n            if (e > 1) sb.append('^').append(e);\n        }\n        if (n > 1) {\n            if (sb.length() > 0) sb.append('*');\n            sb.append(n);\n        }\n        System.out.println(sb.toString());\n    }\n}",expected:"2^3*3^2*5\n",topic:"数学与循环",summary:"指数统计了，但拼分解式时丢掉了。"};}},
+{id:"jm2",gen:function(r){return {title:"约瑟夫环",desc:"10 个人围成一圈报数，报到 4 的人出列，输出最后留下的人。",tags:["ArrayList","模拟","取模"],stdin:'',code:"import java.util.*;\npublic class Main {\n    public static void main(String[] args) {\n        int n = 10, k = 4;\n        List<Integer> people = new ArrayList<>();\n        for (int i = 1; i <= n; i++) people.add(i);\n        int idx = 0;\n        while (people.size() > 1) {\n            idx = (idx + k - 1) % people.size();\n            people.remove(idx);\n            if (idx == people.size()) idx = 0;\n        }\n        System.out.println(people.get(0));\n    }\n}",expected:"5\n",topic:"集合与模拟",summary:"出列下标多走了一步，k 被当成 k+1。"};}},
+{id:"jm3",gen:function(r){return {title:"合并区间",desc:"区间 [1,10]、[2,3]、[4,5] 有重叠，合并后输出一个区间。",tags:["排序","区间","二维数组"],stdin:'',code:"public class Main {\n    public static void main(String[] args) {\n        int[][] intervals = {{1, 10}, {2, 3}, {4, 5}};\n        int[][] merged = new int[intervals.length][2];\n        int size = 0;\n        for (int k = 0; k < intervals.length; k++) {\n            int l = intervals[k][0], r = intervals[k][1];\n            if (size == 0 || l > merged[size - 1][1]) {\n                merged[size][0] = l;\n                merged[size][1] = r;\n                size++;\n            } else {\n                merged[size - 1][1] = Math.max(merged[size - 1][1], r);\n            }\n        }\n        for (int i = 0; i < size; i++) System.out.println(\"[\" + merged[i][0] + \", \" + merged[i][1] + \"]\");\n    }\n}",expected:"[1, 10]\n",topic:"数组与排序",summary:"合并右端点时被短区间覆盖，没有取最大值。"};}},
+{id:"jm4",gen:function(r){return {title:"最长连续递增段",desc:"数组 {1, 2, 1, 2, 3, 4}，求相邻严格递增的最长连续段长度。",tags:["连续段","计数器","数组"],stdin:'',code:"public class Main {\n    public static void main(String[] args) {\n        int[] nums = {1, 2, 1, 2, 3, 4};\n        int best = 1, cur = 1;\n        for (int i = 1; i < nums.length; i++) {\n            if (nums[i] > nums[i - 1]) cur++;\n            else cur = 1;\n            best = Math.max(best, cur);\n        }\n        System.out.println(best);\n    }\n}",expected:"4\n",topic:"数组与循环",summary:"递减时计数器归零，当前元素被漏掉。"};}}
+];
+const JEXTRA_HARD = [
+{id:"jh1",gen:function(r){return {title:"最长递增子序列",desc:"数组 {6, 1, 2, 3, 0}，求最长严格递增子序列长度，子序列可不连续。",tags:["动态规划","LIS","子序列"],stdin:'',code:"public class Main {\n    public static void main(String[] args) {\n        int[] nums = {6, 1, 2, 3, 0};\n        int n = nums.length;\n        int[] dp = new int[n];\n        int best = 1;\n        for (int i = 0; i < n; i++) {\n            dp[i] = 1;\n            for (int j = 0; j < i; j++) {\n                if (nums[j] < nums[i]) dp[i] = Math.max(dp[i], dp[j] + 1);\n            }\n            best = Math.max(best, dp[i]);\n        }\n        System.out.println(best);\n    }\n}",expected:"3\n",topic:"算法与数据结构",summary:"直接返回 dp 最后一项，最长子序列不一定在末尾结束。"};}},
+{id:"jh2",gen:function(r){return {title:"滑动窗口最大值",desc:"数组 {1,3,-1,-3,5,3}，窗口大小 3，输出每个窗口的最大值。",tags:["滑动窗口","区间最值","数组"],stdin:'',code:"public class Main {\n    public static void main(String[] args) {\n        int[] nums = {1, 3, -1, -3, 5, 3};\n        int k = 3;\n        StringBuilder sb = new StringBuilder();\n        for (int i = 0; i <= nums.length - k; i++) {\n            int max = nums[i];\n            for (int j = i + 1; j < i + k; j++) max = Math.max(max, nums[j]);\n            if (i > 0) sb.append(' ');\n            sb.append(max);\n        }\n        System.out.println(sb.toString());\n    }\n}",expected:"3 3 5 5\n",topic:"算法与数据结构",summary:"循环少跑一格，最后一个窗口没有输出。"};}},
+{id:"jh3",gen:function(r){return {title:"0/1 背包",desc:"三件物品重量 1/2/3、价值 2/3/4，容量 5，每件最多选一次。",tags:["动态规划","背包","容量"],stdin:'',code:"public class Main {\n    public static void main(String[] args) {\n        int[] w = {1, 2, 3};\n        int[] v = {2, 3, 4};\n        int n = w.length, cap = 5;\n        int[][] dp = new int[n + 1][cap + 1];\n        for (int i = 1; i <= n; i++) {\n            for (int c = 0; c <= cap; c++) {\n                dp[i][c] = dp[i - 1][c];\n                if (c >= w[i - 1]) dp[i][c] = Math.max(dp[i][c], dp[i - 1][c - w[i - 1]] + v[i - 1]);\n            }\n        }\n        System.out.println(dp[n][cap]);\n    }\n}",expected:"7\n",topic:"算法与数据结构",summary:"容量转移用了当前行，物品会被重复选。"};}},
+{id:"jh4",gen:function(r){return {title:"课程安排",desc:"4 门课，先修关系 0→1、0→2、1→3、2→3，输出任意合法顺序。",tags:["拓扑排序","入度","邻接表"],stdin:'',code:"public class Main {\n    public static void main(String[] args) {\n        int n = 4;\n        int[][] edges = {{0, 1}, {0, 2}, {1, 3}, {2, 3}};\n        int[] indeg = new int[n];\n        for (int i = 0; i < edges.length; i++) indeg[edges[i][1]]++;\n        int[] queue = new int[n];\n        int head = 0, tail = 0;\n        for (int i = 0; i < n; i++) if (indeg[i] == 0) queue[tail++] = i;\n        StringBuilder order = new StringBuilder();\n        int count = 0;\n        while (head < tail) {\n            int cur = queue[head++];\n            if (count > 0) order.append(' ');\n            order.append(cur);\n            count++;\n            for (int e = 0; e < edges.length; e++) {\n                if (edges[e][0] != cur) continue;\n                int nxt = edges[e][1];\n                indeg[nxt]--;\n                if (indeg[nxt] == 0) queue[tail++] = nxt;\n            }\n        }\n        System.out.println(count == n ? order.toString() : \"[]\");\n    }\n}",expected:"0 1 2 3\n",topic:"算法与数据结构",summary:"取队首后没有减少后继入度，队列提前空了。"};}}
+];
+
 TEMPLATES.basic=TEMPLATES.basic.concat(JDEEP_BASIC);
+TEMPLATES.basic=TEMPLATES.basic.concat(JEXTRA_BASIC);
+TEMPLATES.intermediate=TEMPLATES.intermediate.concat(JEXTRA_INTERMEDIATE);
+TEMPLATES.hard=TEMPLATES.hard.concat(JEXTRA_HARD);
 TEMPLATES.intermediate=TEMPLATES.intermediate.concat(JDEEP_INTER);
 TEMPLATES.hard=TEMPLATES.hard.concat(JDEEP_HARD);
 /* 合并扩展题库，并给所有模板（含旧题）统一挂上考点与一句话概括 */
@@ -25386,6 +25408,10 @@ STUDY_LLM.courses=STUDY_LLM.courses.concat(E2_NEW_LLM_COURSES2);
 /* 离线兜底题库同步：为 18 个新 Java 模板各加一条 [tier,index,seed] */
 [['basic',67,6100001],['intermediate',47,6200001],['hard',45,6300001]].forEach(function(c){
   for(var j=0;j<6;j++)OFFLINE_BANK.push([c[0],c[1]+j,c[2]+j*37]);
+});
+/* 离线兜底题库同步：为 12 个新增 Java 模板各加一条 [tier,index,seed] */
+[['basic',73,7100001],['intermediate',53,7200001],['hard',51,7300001]].forEach(function(c){
+  for(var j=0;j<4;j++)OFFLINE_BANK.push([c[0],c[1]+j,c[2]+j*37]);
 });
 /* 题库 id 全局去重：同一科目内重复的 id 自动加后缀，避免错题本与统计串题 */
 (function(){

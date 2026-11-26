@@ -1,3 +1,4 @@
+/* JavaScript 改错题库 · 42 题 */
 window.JS_DEBUG_TASKS = [
   {
     "id": "b1",
