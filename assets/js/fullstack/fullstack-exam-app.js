@@ -279,7 +279,7 @@
       '<div class="result-lower">' +
         '<div class="result-weak"><span>NEXT · 薄弱科目</span>' + weakHtml + '</div>' +
         '<div class="result-actions">' +
-          (wrongCount ? '<button type="button" class="result-btn" data-exam-review>查看错题 · ' + wrongCount + '</button>' : '') +
+          (wrongCount ? '<button type="button" class="result-btn" data-exam-review>查看失分题 · ' + wrongCount + '</button>' : '') +
           '<button type="button" class="result-btn primary" data-exam-retry>重新考试</button>' +
           '<a class="result-btn" href="./fullstack.html?v=20261126z85">回到全栈路线</a>' +
         '</div>' +
@@ -325,7 +325,7 @@
   };
 
   var reviewWrong = function () {
-    var first = els.sheet && els.sheet.querySelector('.exam-q.is-wrong');
+    var first = els.sheet && (els.sheet.querySelector('.exam-q.is-wrong') || els.sheet.querySelector('.exam-q:not(.is-correct)'));
     if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
