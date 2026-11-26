@@ -37,6 +37,10 @@ const KIT_SITES = [
     why: '把完整报错原样粘进搜索框，先看别人有没有踩过同一个坑。优先挑带完整代码、能复现、评论里有纠错的那篇。',
   },
   {
+    name: 'GitHub', url: 'https://github.com/', tag: '真实项目 · 从 README 开始',
+    why: '不会读源码也能用：先看 README 的安装步骤和目录，再翻 issue 里别人怎么描述问题。搜同主题小项目，比只看教程更接近真实工程。',
+  },
+  {
     name: 'Stack Overflow', url: 'https://stackoverflow.com/', tag: '英文问答 · 找根因',
     why: '报错最后一行直接搜，英文答案往往更接近根因。读不动就用浏览器翻译，代码块不用翻。',
   },
@@ -59,10 +63,6 @@ const KIT_SITES = [
   {
     name: 'freeCodeCamp 中文', url: 'https://www.freecodecamp.org/chinese/', tag: '边写边学 · 免费',
     why: '完全不知道下一步做什么时，先做一小节交互练习。手先动起来，比继续盯着概念有用。',
-  },
-  {
-    name: 'GitHub', url: 'https://github.com/', tag: '真实项目 · 读源码',
-    why: '搜同主题的小项目，翻 issue 和 README。看别人真实怎么组织代码，比背结论更接近工程。',
   },
 ];
 
@@ -176,7 +176,6 @@ function uiMarkup() {
         <div class="jv-foot-right">
           <div class="jv-source-switch" id="jv-source-switch" role="group" aria-label="回答来源" hidden><button type="button" data-jv-action="source" data-source="cloud">云端</button><button type="button" data-jv-action="source" data-source="local">本地</button></div>
           <button class="jv-local-action" id="jv-local-action" type="button" data-jv-action="unload" title="卸载本地 AI，释放显存；下载的权重仍保留" hidden>卸载本地</button>
-          <button class="jv-kit-trigger" id="jv-kit-trigger" type="button" data-jv-action="kit" title="走投无路时，再打开" aria-label="走投无路时打开锦囊，里面是给初学者的人话网站"><span class="jv-kit-glyph" aria-hidden="true">✦</span><span class="jv-kit-caption">锦囊</span></button>
           <span>⌘K</span>
         </div>
       </div>
@@ -187,19 +186,21 @@ function uiMarkup() {
     <section class="jv-kit-sheet" role="dialog" aria-modal="true" aria-labelledby="jv-kit-title" aria-describedby="jv-kit-copy">
       <button class="jv-kit-close" type="button" data-kit-close aria-label="收起锦囊">×</button>
       <div class="jv-kit-head">
-        <div class="jv-kit-kicker">LAST RESORT · 走投无路专用</div>
-        <h2 id="jv-kit-title">锦囊：AI 也没接住的时候</h2>
-        <p id="jv-kit-copy">不是你笨，也不是你不适合学编程。只是眼前这条解释线走不通了。先离开对话框，去这些不高级、但有人味、有人踩过坑的地方。</p>
+        <div class="jv-kit-kicker">LAST RESORT · 无路可走时才打开</div>
+        <h2 id="jv-kit-title">最后一扇门，给还在硬撑的你</h2>
+        <p id="jv-kit-copy">如果你已经试过所有按钮，把同一句报错读到眼睛发酸，还是不懂——先停一下。不是你笨，也不是你不适合学编程，是这条解释线真的走到头了。</p>
+        <p class="jv-kit-only">我不保证门后一定有标准答案；但在你已经无路可走的这一刻，这是本站唯一还亮着的地方。</p>
+        <div class="jv-kit-oath">这不是认输。是你终于愿意换一条路，把自己带出去。</div>
       </div>
       <div class="jv-kit-grid" id="jv-kit-grid"></div>
       <div class="jv-kit-searchnote">
-        <b>搜之前，把问题缩成三行：</b>
+        <b>推门前，先把问题缩成三行：</b>
         <span>① 我在做什么　② 我期望发生什么　③ 实际发生了什么（附完整报错最后一行）</span>
         <em>带着这三行去搜，命中率会比只搜“为什么报错”高很多。</em>
       </div>
       <div class="jv-kit-foot">
-        <span>锦囊不保证答案，只保证你不用一个人硬扛。</span>
-        <button type="button" data-kit-close>收好，回去再试</button>
+        <span>今晚不用全部学会，先找到一句能让你继续走下去的话。</span>
+        <button type="button" data-kit-close>收好这扇门，回去再试</button>
       </div>
     </section>
   </div>`;
@@ -1841,7 +1842,7 @@ function renderChat() {
     const source = m.role === 'ai' && m.sources?.length ? `<div class="jv-msg-meta">参考：${m.sources.map(s => `<button class="jv-inline-link" type="button" data-jv-action="jump" data-msg="${m.id}" data-k="${s}">${esc(s)}</button>`).join(' · ')}</div>` : '';
     const typing = m.role === 'ai' && m.streaming && !m.text ? `<span class="jv-typing"><i></i><i></i><i></i></span>` : '';
     const cursor = m.role === 'ai' && m.streaming && m.text ? '<span class="jv-stream-cursor"></span>' : '';
-    const kit = m.role === 'ai' && m.kit ? '<button class="jv-kit-inline" type="button" data-jv-action="kit">AI 也没接住？打开锦囊 <span aria-hidden="true">✦</span></button>' : '';
+    const kit = m.role === 'ai' && m.kit ? '<button class="jv-kit-inline" type="button" data-jv-action="kit">所有路都试过了？推开最后一扇门 <span aria-hidden="true">✦</span></button>' : '';
     return `<div class="jv-msg ${m.role === 'user' ? 'user' : 'ai'}">${m.role === 'ai' && m.meta === '正在检索…' ? '' : ''}<div class="jv-bubble">${content}${typing}${cursor}</div>${meta}${source}${kit}</div>`;
   }).join('');
   msgBox.innerHTML = banner + welcome + html;

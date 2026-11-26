@@ -2477,21 +2477,6 @@
 /* ========== 锦囊：AI 也接不住时的最后一条退路 ========== */
 .jv-foot-right{display:flex;align-items:center;gap:5px;flex:none;min-width:0}
 #jv-foot-left{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.jv-kit-trigger{
-  display:inline-flex;align-items:center;gap:4px;flex:none;
-  min-width:18px;height:18px;padding:0 2px;border:0;border-radius:999px;
-  background:transparent;color:#9BA7BB;font-family:inherit;font-size:9px;
-  cursor:pointer;opacity:.30;transition:opacity .18s ease,color .18s ease,background .18s ease;
-}
-.jv-kit-trigger .jv-kit-glyph{font-size:10px;line-height:1;color:#C4B5FD;transition:color .18s ease,text-shadow .18s ease}
-.jv-kit-trigger .jv-kit-caption{max-width:0;opacity:0;overflow:hidden;white-space:nowrap;letter-spacing:.04em;transition:max-width .18s ease,opacity .18s ease}
-.jv-kit-trigger:hover,.jv-kit-trigger:focus-visible{
-  opacity:.92;color:#F5C98A;background:rgba(245,201,138,.07);outline:none;
-}
-.jv-kit-trigger:hover .jv-kit-glyph,.jv-kit-trigger:focus-visible .jv-kit-glyph{color:#F5C98A;text-shadow:0 0 10px rgba(245,201,138,.38)}
-.jv-kit-trigger:hover .jv-kit-caption,.jv-kit-trigger:focus-visible .jv-kit-caption{max-width:34px;opacity:.9}
-.jv-kit-trigger:active{transform:scale(.97)}
-
 .jv-kit-inline{
   align-self:flex-start;display:inline-flex;align-items:center;gap:5px;margin-top:2px;
   padding:5px 8px;border:1px dashed rgba(245,201,138,.34);border-radius:8px;
@@ -2551,6 +2536,15 @@
 .jv-kit-head p{
   max-width:700px;margin:12px 0 0;font-size:13px;line-height:1.9;color:#BFB4A5;
 }
+.jv-kit-only{
+  max-width:720px;margin:10px 0 0;font-size:12px;line-height:1.75;color:#C99B60;font-weight:750;
+}
+.jv-kit-oath{
+  max-width:720px;margin-top:12px;padding:9px 0 9px 14px;
+  border-left:2px solid rgba(245,201,138,.48);
+  font-size:13px;line-height:1.75;font-weight:700;letter-spacing:.01em;
+  color:#E7C99F;background:linear-gradient(90deg,rgba(245,201,138,.055),transparent 72%);
+}
 .jv-kit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:24px 0 14px}
 .jv-kit-card{
   position:relative;display:block;padding:15px 16px 13px 48px;border-radius:15px;
@@ -2597,10 +2591,6 @@
 
 @media (max-width:640px){
   .jv-foot-right{gap:4px}
-  /* 触屏没有 hover：锦囊只留一颗低对比星，不抢输入区的注意力。 */
-  .jv-kit-trigger{height:28px;min-width:24px;padding:0 4px;opacity:.46}
-  .jv-kit-trigger .jv-kit-glyph{font-size:11px}
-  .jv-kit-trigger .jv-kit-caption{display:none}
   .jv-kit-layer{padding:8px;align-items:flex-end}
   .jv-kit-sheet{
     width:100%;max-height:92vh;max-height:92dvh;padding:26px 16px 16px;border-radius:22px;
@@ -2611,6 +2601,8 @@
   .jv-kit-kicker{font-size:8px;letter-spacing:.13em}
   .jv-kit-head h2{font-size:25px;line-height:1.18}
   .jv-kit-head p{font-size:12px;line-height:1.8;margin-top:9px}
+  .jv-kit-only{font-size:11px;line-height:1.7;margin-top:8px}
+  .jv-kit-oath{font-size:12px;line-height:1.72;margin-top:10px;padding:8px 0 8px 11px}
   .jv-kit-grid{grid-template-columns:1fr;gap:8px;margin:18px 0 12px}
   .jv-kit-card{padding:12px 12px 11px 40px}
   .jv-kit-no{left:13px;top:13px;font-size:8px}
@@ -2623,6 +2615,6 @@
   .jv-kit-foot button{width:100%;min-height:40px;font-size:11px}
 }
 @media (prefers-reduced-motion:reduce){
-  .jv-kit-layer,.jv-kit-sheet,.jv-kit-card,.jv-kit-trigger,.jv-kit-caption{transition:none!important}
+  .jv-kit-layer,.jv-kit-sheet,.jv-kit-card{transition:none!important}
   .jv-kit-sheet,.jv-kit-layer.is-open .jv-kit-sheet{transform:none!important}
 }
