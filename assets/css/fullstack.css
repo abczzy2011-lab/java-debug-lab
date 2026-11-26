@@ -176,6 +176,7 @@ h1 {
 }
 .fs-module:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--mod-color) 48%, transparent); box-shadow: 0 26px 56px rgba(0, 0, 0, .30); }
 .fs-module.partial { --mod-color: var(--fs-gold); }
+.fs-module.ready { --mod-color: #5EEAD4; }
 .fs-module.missing { --mod-color: var(--fs-accent); }
 .fs-module::before { content: ""; position: absolute; inset: 0 0 auto; height: 2px; background: linear-gradient(90deg, transparent, var(--mod-color), transparent); opacity: .78; }
 .fs-module::after { content: ""; position: absolute; right: -66px; bottom: -78px; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--mod-color) 16%, transparent), transparent 68%); pointer-events: none; }

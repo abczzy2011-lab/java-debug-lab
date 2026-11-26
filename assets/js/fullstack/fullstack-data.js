@@ -1,7 +1,7 @@
 /* 全栈开发路线：10 个大科目、4 个阶段。
    这是课程框架数据，不代表内容已经写完；status 明确区分「已有底座」与「待建设」。 */
 window.FULLSTACK_TRACK = {
-  version: '20261126z77',
+  version: '20261127z79',
   title: '全栈开发',
   kicker: 'CAREER TRACK · FULL STACK · 10 SUBJECTS',
   lead: '从语言基础走到能独立交付、部署和维护一个真实产品。',
@@ -39,7 +39,8 @@ window.FULLSTACK_TRACK = {
     },
     {
       id: 'database', no: '03', stage: 'base', title: '数据库与数据建模', en: 'DATABASE & DATA MODELING',
-      status: 'missing', statusLabel: '待搭建 · 结构已定',
+      status: 'ready', statusLabel: '58 课已上线 · 项目待补',
+      course: { href: 'database-course.html?v=20261127z79', lessons: 58, chapters: 19 },
       summary: '后端真正的难点通常在数据。要会设计表、写 SQL、看执行计划，理解事务隔离、索引和缓存，而不是把一切塞进 JSON。',
       topics: ['SQL 查询、聚合与窗口函数', '表设计、范式、外键与约束', '索引、执行计划与慢查询', '事务、隔离级别、锁与连接池', 'Redis、NoSQL、迁移与备份'],
       deliverable: '为内容社区设计 8 张表，写迁移、索引和 10 条核心查询，并解释一次慢查询优化。'

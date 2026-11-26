@@ -54,6 +54,10 @@
   }
 
   var existingHtml = function (mod) {
+    if (mod.course) {
+      return '<div class="fs-existing fs-course-cta"><span>课程已上线</span>' +
+        '<a href="./' + esc(mod.course.href) + '">' + esc(mod.course.lessons) + ' 课 · 进入课程 →</a></div>';
+    }
     if (!mod.existing || !mod.existing.length) {
       return '<div class="fs-module-note"><span>内容框架已定</span><b>等待接入课程 / 题库 / 项目</b></div>';
     }
@@ -64,8 +68,9 @@
   };
 
   var moduleHtml = function (mod) {
-    var status = mod.status === 'partial' ? 'partial' : 'missing';
-    return '<article class="fs-module ' + status + '" id="module-' + esc(mod.id) + '" data-status="' + status + '">' +
+    var visual = mod.status === 'partial' || mod.status === 'ready' ? 'partial' : 'missing';
+    var stateClass = mod.status === 'ready' ? ' ready' : '';
+    return '<article class="fs-module ' + visual + stateClass + '" id="module-' + esc(mod.id) + '" data-status="' + esc(mod.status) + '">' +
       '<div class="fs-module-top"><span class="fs-no">' + esc(mod.no) + '</span>' +
         '<span class="fs-status ' + status + '"><i aria-hidden="true"></i>' + esc(mod.statusLabel || statusText(mod.status)) + '</span></div>' +
       '<h3>' + esc(mod.title) + '</h3>' +
