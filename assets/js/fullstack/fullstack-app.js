@@ -17,22 +17,23 @@
   var stageById = {};
   track.stages.forEach(function (stage) { stageById[stage.id] = stage; });
 
-  var stats = { modules: track.modules.length, partial: 0, missing: 0, topics: 0 };
+  var stats = { modules: track.modules.length, ready: 0, missing: 0, topics: 0, lessons: 0 };
   track.modules.forEach(function (mod) {
-    if (mod.status === 'partial') stats.partial++;
-    else if (mod.status === 'ready') stats.partial++;
+    if (mod.status === 'ready') stats.ready++;
     else stats.missing++;
     stats.topics += (mod.topics || []).length;
+    if (mod.course) stats.lessons += (mod.course.lessons || 0);
   });
   var setText = function (id, value) {
     var node = $(id);
     if (node) node.textContent = String(value);
   };
   setText('statModules', stats.modules);
-  setText('statPartial', stats.partial);
+  setText('statPartial', stats.ready);
   setText('statMissing', stats.missing);
+  setText('statLessons', stats.lessons);
   setText('statTopics', stats.topics);
-  setText('fsSummary', stats.modules + ' 大科目 · ' + stats.topics + ' 个知识单元 · ' + track.graduation.length + ' 条毕业验收');
+  setText('fsSummary', stats.modules + ' 大科目 · ' + stats.lessons + ' 课 · ' + track.graduation.length + ' 条毕业验收');
 
   var bases = $('fsBases');
   if (bases && track.bases) {
@@ -68,11 +69,11 @@
   };
 
   var moduleHtml = function (mod) {
-    var visual = mod.status === 'partial' || mod.status === 'ready' ? 'partial' : 'missing';
+    var visual = mod.status === 'ready' ? 'ready' : (mod.status === 'partial' ? 'partial' : 'missing');
     var stateClass = mod.status === 'ready' ? ' ready' : '';
     return '<article class="fs-module ' + visual + stateClass + '" id="module-' + esc(mod.id) + '" data-status="' + esc(mod.status) + '">' +
       '<div class="fs-module-top"><span class="fs-no">' + esc(mod.no) + '</span>' +
-        '<span class="fs-status ' + status + '"><i aria-hidden="true"></i>' + esc(mod.statusLabel || statusText(mod.status)) + '</span></div>' +
+        '<span class="fs-status ' + mod.status + '"><i aria-hidden="true"></i>' + esc(mod.statusLabel || statusText(mod.status)) + '</span></div>' +
       '<h3>' + esc(mod.title) + '</h3>' +
       '<div class="fs-en">' + esc(mod.en) + '</div>' +
       '<p>' + esc(mod.summary) + '</p>' +

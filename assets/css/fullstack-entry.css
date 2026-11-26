@@ -38,6 +38,7 @@
 .fs-sub-state{padding:2px 7px;border:1px solid color-mix(in srgb,var(--fs-sub-accent) 30%,transparent);border-radius:999px;background:color-mix(in srgb,var(--fs-sub-accent) 7%,transparent);color:var(--fs-sub-accent);font-size:9px;font-weight:800;white-space:nowrap}
 .fs-subject.missing .fs-sub-state{color:#AFCBFF;border-color:rgba(143,184,255,.28);background:rgba(143,184,255,.075)}
 .fs-subject.partial .fs-sub-state{color:#E9D6B3;border-color:rgba(200,169,118,.30);background:rgba(200,169,118,.075)}
+.fs-subject.ready .fs-sub-state{color:#7BE3D0;border-color:rgba(94,234,212,.30);background:rgba(94,234,212,.075)}
 .fs-subject h3{font-size:16px;line-height:1.28;letter-spacing:-.025em;font-weight:820;color:#F6F2E9}
 .fs-subject p{margin-top:6px;font-size:10px;line-height:1.65;color:#889296;min-height:33px}
 .fs-sub-foot{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:auto;padding-top:9px;border-top:1px solid rgba(244,239,230,.09);font-size:9px;font-weight:700;color:#6F797D}

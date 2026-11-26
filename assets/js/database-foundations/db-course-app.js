@@ -23,7 +23,7 @@
       { title: '把慢查询拆开', desc: 'EXPLAIN、索引选择性、连接算法和锁等待都落到真实执行计划，不停留在“加索引”三个字。' },
       { title: '一条项目主线', desc: '课程社区从用户、课程、选课、进度到帖子和评论，最终交付迁移、索引、API 契约和压测记录。' }
     ],
-    apiHref: './fullstack.html?v=20261127z79#module-database',
+    apiHref: './fullstack.html?v=20261126z83#module-database',
     apiLabel: '查看全栈科目位置',
     routeNote: '建议按篇推进；第 1–4 章打 SQL 与关系模型，第 5–8 章练连接、CTE、窗口和报表，第 9–12 章做 ER 建模与业务表，第 13–16 章进入事务、锁、索引和执行计划，第 17–19 章完成工程化、缓存、备份与毕业项目。',
     overviewDocTitle: '数据库系统与数据建模 · 五篇 19 章 58 课',

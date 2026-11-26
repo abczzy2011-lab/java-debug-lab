@@ -115,7 +115,9 @@ h1 {
 .stat b { display: block; font-family: var(--fs-mono); font-size: 25px; line-height: 1.15; color: #F8F6EF; }
 .stat span { display: block; margin-top: 5px; font-size: 10.5px; color: var(--fs-dim); font-weight: 750; letter-spacing: .02em; }
 .stat.partial b { color: var(--fs-gold); }
+.stat.ready b { color: #5EEAD4; }
 .stat.missing b { color: var(--fs-accent); }
+.stat.lessons b { color: #8FB8FF; }
 .stat.topics b { color: var(--fs-mint); }
 .fs-summary { margin-top: 13px; text-align: center; font-family: var(--fs-mono); font-size: 10px; letter-spacing: .08em; color: var(--fs-dim); }
 

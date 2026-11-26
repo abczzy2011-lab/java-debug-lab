@@ -21,7 +21,7 @@
     var href = mod.course
       ? 'subjects/' + mod.course.href
       : 'subjects/fullstack.html?v=' + encodeURIComponent(track.version) + '#module-' + encodeURIComponent(mod.id);
-    var visual = mod.status === 'partial' || mod.status === 'ready' ? 'partial' : 'missing';
+    var visual = mod.status === 'ready' ? 'ready' : (mod.status === 'partial' ? 'partial' : 'missing');
     var foot = mod.course ? '进入课程' : '结构已定';
     var label = mod.course ? '进入' + esc(mod.title) + '课程' : '查看' + esc(mod.title) + '科目框架';
     return '<a class="fs-subject ' + stageClass(mod.stage) + ' ' + visual + '" href="' + href + '" aria-label="' + label + '">' +
