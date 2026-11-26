@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080A0E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>全栈开发路线 · 10 大科目与毕业标准</title>
+<meta name="description" content="从 Java / Python / JavaScript 语言底座走向全栈开发：网络、数据库、后端工程、前端工程、API 与认证、测试、DevOps、安全性能、项目实战，共 10 大科目，4 个阶段，9 条毕业验收。">
+<link rel="icon" type="image/png" href="../assets/icons/study.png">
+<link rel="stylesheet" href="../assets/css/liquid-glass.css?v=20261123z47">
+<link rel="stylesheet" href="../assets/css/fullstack.css?v=20261126z77">
+</head>
+<body>
+<header class="subbar">
+  <a class="home" href="../java-debug-lab.html" aria-label="返回学科入口"><span aria-hidden="true">←</span>返回学科</a>
+  <div class="brand"><span class="brand-mark" aria-hidden="true">FS</span><b>全栈开发路线</b></div>
+  <div class="spacer"></div>
+  <div class="tip">10 大科目 · 4 阶段</div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="fs-mark" aria-hidden="true"><span>FS</span></div>
+    <div class="kicker">CAREER TRACK · FULL STACK · 10 SUBJECTS</div>
+    <h1>全栈开发</h1>
+    <p>现有 <strong>Java / Python / JavaScript</strong> 只是语言底座。要独立交付一个真实产品，还要补齐<strong>网络、数据库、后端框架、前端框架、API、测试、DevOps、安全与项目实战</strong>。</p>
+    <div class="hero-actions">
+      <a class="pill-link primary" href="#stage-base"><span>从基础层开始看</span><i aria-hidden="true">↓</i></a>
+      <a class="pill-link" href="#graduation"><span>看毕业验收标准</span><i aria-hidden="true">→</i></a>
+    </div>
+  </section>
+
+  <section class="status-board" aria-label="全栈路线统计">
+    <div class="stat"><b id="statModules">10</b><span>大科目</span></div>
+    <div class="stat partial"><b id="statPartial">3</b><span>已有部分底座</span></div>
+    <div class="stat missing"><b id="statMissing">7</b><span>从零搭建</span></div>
+    <div class="stat topics"><b id="statTopics">0</b><span>知识单元</span></div>
+  </section>
+  <div class="fs-summary" id="fsSummary">10 大科目 · 4 阶段 · 9 条毕业验收</div>
+
+  <section class="bases-block" aria-labelledby="basesTitle">
+    <div class="section-kicker" id="basesTitle">已有底座 · ALREADY COVERED</div>
+    <div class="bases" id="fsBases"></div>
+  </section>
+
+  <nav class="stage-nav" id="fsStageNav" aria-label="按阶段跳转"></nav>
+
+  <div id="fsModules"></div>
+
+  <section class="build-order" aria-labelledby="orderTitle">
+    <div class="section-kicker">BUILD ORDER · 先补什么</div>
+    <h2 id="orderTitle">建议建设顺序</h2>
+    <p>不要按“看起来高级”的顺序学。先把数据、网络和后端服务打通，再补前端框架与契约，最后用测试和部署把项目锁住。</p>
+    <div class="order-list">
+      <div class="order-step"><span>STEP 01</span><b>数据库 + 网络 + 后端框架</b><p>先能独立写 API、连数据库、看懂请求链路。</p></div>
+      <div class="order-step"><span>STEP 02</span><b>前端框架 + API / 认证</b><p>把真实接口接进 React / Vue，完成登录和权限。</p></div>
+      <div class="order-step"><span>STEP 03</span><b>测试 + DevOps</b><p>让核心链路可回归，让 push 能自动上线。</p></div>
+      <div class="order-step"><span>STEP 04</span><b>安全性能 + 毕业项目</b><p>做一次审计、压测和完整项目交付。</p></div>
+    </div>
+  </section>
+
+  <section class="graduation" id="graduation" aria-labelledby="graduationTitle">
+    <div>
+      <div class="section-kicker">GRADUATION · 毕业标准</div>
+      <h2 id="graduationTitle">学完不是“看过”，<br>是能独立交付。</h2>
+      <p class="lead">下面 9 条是路线验收线。每一条都要有可运行的项目、可复现的命令或可展示的结果，不接受只看懂。</p>
+      <div class="seal"><i aria-hidden="true">◆</i>9 条验收 · 缺一不可</div>
+    </div>
+    <ul class="checklist" id="fsChecklist"></ul>
+  </section>
+
+  <div class="fs-foot"><b>说明：</b>当前页面是课程框架，不代表 10 个科目都已写完。已有语言课、算法、改错与输出练习作为底座；“待建设”表示课程、题库与项目尚未接入。</div>
+</main>
+
+<script src="../assets/js/fullstack/fullstack-data.js?v=20261126z77"></script>
+<script src="../assets/js/fullstack/fullstack-app.js?v=20261126z77"></script>
+</body>
+</html>

@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
-<title>四大学科 · Java / Python / JavaScript / AI 练习室</title>
+<title>学科地图 · Java / Python / JavaScript / AI · 全栈开发</title>
 <link rel="icon" type="image/png" href="./assets/icons/java.png">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -760,14 +760,15 @@ span.apiref:hover{color:var(--accent);border-bottom-color:var(--accent)}
 </style>
 <link rel="stylesheet" href="./_features/local-ai/javis.css?v=20261126z75">
 <link rel="stylesheet" href="./assets/css/liquid-glass.css?v=20261123z47">
+<link rel="stylesheet" href="./assets/css/fullstack-entry.css?v=20261126z77">
 <link rel="stylesheet" href="./assets/css/java-doc.css?v=20261125z57">
 </head>
 <body>
 
 <!-- ==================== 学科选择 ==================== -->
 <div id="subject">
-  <div class="brand"><div class="brand-dot"></div><div class="brand-name">四大学科</div></div>
-  <div class="landing-sub">先选 Java / Python / JavaScript / AI 学科，再进入分类 —— 每个分类都有自己的练习、课程或文档；Java / Python 题目由程序实时生成，JavaScript 内容按五篇课程与改错题接入</div>
+  <div class="brand"><div class="brand-dot"></div><div class="brand-name">学科地图</div></div>
+  <div class="landing-sub">4 个语言/领域学科 + 10 个全栈大科目 —— 先用 Java / Python / JavaScript / AI 打语言底座，再按网络、数据库、后端、前端、API、测试、DevOps、安全架构与项目实战逐科补齐</div>
   <div class="subject-actions">
     <button class="btn btn-default btn-lg study-cta" onclick="openStudyHub()"><img class="ui-ico ui-ico-btn" src="./assets/icons/study.png" alt="" loading="lazy" decoding="async">学习中心 · 系统课程</button>
     <button class="btn btn-default btn-lg wrongbook-cta" onclick="openWrongbook()"><img class="ui-ico ui-ico-btn" src="./assets/icons/wrongbook.png" alt="" loading="lazy" decoding="async">错题本 <span id="wb-badge2">0</span></button>
@@ -812,13 +813,26 @@ span.apiref:hover{color:var(--accent);border-bottom-color:var(--accent)}
       <div class="subject-desc">系统课程、改错实验室、输出实现场、练习场、速查手册五条线。课程已扩到五篇 18 章 76 节；改错与输出实现场都由浏览器 Worker 真实运行并逐用例评分。</div>
       <div class="subject-meta">
         <span>5 个分类入口</span>
-        <span>76 节课程 · 42 道改错</span>
-        <span>24 道输出 · 198 组用例</span>
+        <span>76 节课程 · 54 道改错</span>
+        <span>36 道输出 · 108 组测试</span>
       </div>
       <div class="subject-cta"><span>进入 JavaScript 分类</span><span aria-hidden="true">→</span></div>
     </div>
   </div>
-  <div class="landing-footer">四大学科 · 18 个分类入口：Java 6 · Python 4 · JavaScript 5 · AI 3</div>
+  <section class="fullstack-subjects" aria-labelledby="fsSubjectsTitle">
+    <div class="fs-sub-head">
+      <div>
+        <span class="fs-entry-kicker">CAREER TRACK · FULL STACK</span>
+        <h2 id="fsSubjectsTitle">全栈必修 · <span id="fsSubjectCount">10</span> 个大科目</h2>
+        <p>现有四学科是语言/领域底座；全栈开发不塞进一个入口，而是拆成下面 <strong>10 个可独立建设的大科目</strong>：其中 <b id="fsSubjectPartial">3</b> 个已有部分底座，7 个从零搭建。</p>
+      </div>
+      <a class="fs-plan-link" href="subjects/fullstack.html?v=20261126z77">培养方案与毕业标准 <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="fs-sub-grid" id="fsSubjectGrid"></div>
+    <div class="fs-sub-note"><b>拆科逻辑：</b>语言课解决“会写代码”；网络、数据库、后端、前端、API、测试、DevOps、安全架构与项目实战解决“能交付产品”。</div>
+    <noscript><p class="fs-sub-note">全栈大科目：工程基础与 Git、计算机网络与 HTTP、数据库与数据建模、后端工程、前端工程、API 设计与身份认证、测试与质量、DevOps 与云部署、安全性能与架构、全栈项目实战。</p></noscript>
+  </section>
+  <div class="landing-footer">4 个现有学科 · 18 个分类入口：Java 6 · Python 4 · JavaScript 5 · AI 3 · 另设 10 个全栈大科目</div>
 </div>
 
 <!-- ==================== Java 难度选择 ==================== -->
@@ -27537,5 +27551,7 @@ window.__JAVA_DOC_LINKS__=function(){
   },{passive:true});
 })();
 </script>
+<script src="./assets/js/fullstack/fullstack-data.js?v=20261126z77"></script>
+<script src="./assets/js/fullstack/fullstack-entry.js?v=20261126z77"></script>
 </body>
 </html>
