@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#070A0E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>全栈结业考试 · 10 科 20 题 · 100 分</title>
+<meta name="description" content="全栈开发 10 个科目的结业考试：每科一道知识选择题、一道代码改错题，共 20 题 100 分。提交后自动给出整体评分、等级、分科成绩和薄弱科目。">
+<link rel="icon" type="image/png" href="../assets/icons/fullstack.png?v=20261126z85">
+<link rel="stylesheet" href="../assets/css/liquid-glass.css?v=20261123z47">
+<link rel="stylesheet" href="../assets/css/fullstack.css?v=20261126z85">
+<link rel="stylesheet" href="../assets/css/fullstack-exam.css?v=20261126z85">
+</head>
+<body class="exam-page">
+<header class="subbar">
+  <a class="home" href="./fullstack.html?v=20261126z85"><span aria-hidden="true">←</span>全栈路线</a>
+  <div class="brand"><span class="brand-mark" aria-hidden="true">EX</span><b>全栈结业考试</b></div>
+  <div class="spacer"></div>
+  <div class="tip">10 科 · 20 题 · 100 分 · 自动评分</div>
+</header>
+
+<main class="wrap exam-wrap">
+  <section class="exam-hero" aria-labelledby="examTitle">
+    <div class="exam-mark" aria-hidden="true"><span>100</span></div>
+    <div class="kicker">FULL STACK · FINAL EXAM · 10 SUBJECTS</div>
+    <h1 id="examTitle">全栈结业考试</h1>
+    <p id="examLead">10 个科目，每个科目一道知识选择题 + 一道代码改错题。不是背概念，是看你能不能定位并修掉真实工程里的问题。</p>
+    <div class="exam-stats" aria-label="考试规模">
+      <div><b>10</b><span>科目</span></div>
+      <div><b>20</b><span>题</span></div>
+      <div><b>100</b><span>总分</span></div>
+      <div><b>60</b><span>分钟建议</span></div>
+    </div>
+    <div class="hero-actions">
+      <a class="pill-link primary" href="#examDock" id="examStart"><span>开始答题</span><i aria-hidden="true">↓</i></a>
+      <a class="pill-link" href="./fullstack.html?v=20261126z85"><span>先回路线复习</span><i aria-hidden="true">→</i></a>
+    </div>
+    <div class="exam-rules" id="examRules" aria-label="考试规则"></div>
+  </section>
+
+  <section class="exam-blueprint" aria-labelledby="blueprintTitle">
+    <div class="exam-section-head">
+      <div>
+        <div class="section-kicker">EXAM BLUEPRINT · 10 × 10</div>
+        <h2 id="blueprintTitle">考试范围与配分</h2>
+      </div>
+      <span class="exam-section-note">每科 10 分 · 选择 4 + 改错 6</span>
+    </div>
+    <div class="exam-scope" id="examBlueprint"></div>
+  </section>
+
+  <section class="exam-dock" id="examDock" aria-label="答题进度与提交">
+    <div class="exam-dock-copy">
+      <span class="exam-dock-kicker">ANSWER SHEET</span>
+      <b><span id="examAnswered">0</span> <i>/</i> 20 已答</b>
+    </div>
+    <div class="exam-dock-meter">
+      <div class="exam-meter"><i id="examAnsweredBar"></i></div>
+      <span id="examRemaining">还剩 20 题</span>
+    </div>
+    <button class="exam-submit" id="examSubmit" type="button">提交并评分 <span aria-hidden="true">→</span></button>
+  </section>
+
+  <section class="exam-result" id="examResult" hidden aria-live="polite"></section>
+
+  <section class="exam-sheet" id="examSheet" aria-label="全栈结业考试题目"></section>
+
+  <footer class="exam-foot">
+    <span><b>评分说明：</b>每题只有一个正确补丁；未答按 0 分计。提交后可以查看正确答案、逐题解释和 10 科分项。</span>
+    <span><b>范围：</b>工程基础与 Git · 网络 · 数据库 · 后端 · 前端 · API 与认证 · 测试 · DevOps · 安全性能 · 项目实战。</span>
+  </footer>
+</main>
+
+<dialog class="exam-dialog" id="examDialog" aria-labelledby="examDialogTitle">
+  <div class="exam-dialog-mark" aria-hidden="true">!</div>
+  <h2 id="examDialogTitle">还有 <span id="examDialogCount">0</span> 题没答</h2>
+  <p id="examDialogText">未答按 0 分计。现在提交，整体评分会把这些题算作失分。</p>
+  <div class="exam-dialog-actions">
+    <button type="button" class="exam-dialog-cancel" data-dialog="cancel">继续作答</button>
+    <button type="button" class="exam-dialog-confirm" data-dialog="confirm">仍然提交</button>
+  </div>
+</dialog>
+
+<noscript><div class="exam-noscript">这场考试需要 JavaScript 才能渲染题目和评分，请开启后刷新。</div></noscript>
+<script src="../assets/js/fullstack/fullstack-data.js?v=20261126z85"></script>
+<script src="../assets/js/fullstack/fullstack-exam-data.js?v=20261126z85"></script>
+<script src="../assets/js/fullstack/fullstack-exam-app.js?v=20261126z85"></script>
+</body>
+</html>

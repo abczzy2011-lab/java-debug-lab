@@ -1,6 +1,6 @@
 /* 全栈开发路线：10 个大科目、4 个阶段、508 课全部上线。 */
 window.FULLSTACK_TRACK = {
-  version: '20261126z83',
+  version: '20261126z85',
   title: '全栈开发',
   kicker: 'CAREER TRACK · FULL STACK · 10 SUBJECTS',
   lead: '从语言基础走到能独立交付、部署和维护一个真实产品。',
