@@ -5,8 +5,8 @@
   var DATA = window.FULLSTACK_EXAM;
   if (!TRACK || !DATA || !Array.isArray(DATA.questions)) return;
 
-  var KEY = 'jdl.fullstack.exam.answers.v1';
-  var SUBMITTED_KEY = 'jdl.fullstack.exam.submitted.v1';
+  var KEY = 'jdl.fullstack.exam.answers.v2';
+  var SUBMITTED_KEY = 'jdl.fullstack.exam.submitted.v2';
   var LETTERS = ['A', 'B', 'C', 'D'];
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (value) {
@@ -102,12 +102,14 @@
     var score = subjects.reduce(function (sum, s) { return sum + s.score; }, 0);
     var choiceScore = ALL.filter(function (q) { return q.type === 'choice' && chosen(q) === q.answer; })
       .reduce(function (sum, q) { return sum + q.points; }, 0);
+    var commandScore = ALL.filter(function (q) { return q.type === 'command' && chosen(q) === q.answer; })
+      .reduce(function (sum, q) { return sum + q.points; }, 0);
     var debugScore = ALL.filter(function (q) { return q.type === 'debug' && chosen(q) === q.answer; })
       .reduce(function (sum, q) { return sum + q.points; }, 0);
     var grade = gradeFor(score);
     var weak = subjects.filter(function (s) { return s.score < 7; });
     return {
-      score: score, choiceScore: choiceScore, debugScore: debugScore,
+      score: score, choiceScore: choiceScore, commandScore: commandScore, debugScore: debugScore,
       subjects: subjects, grade: grade, weak: weak,
       correctSubjects: subjects.filter(function (s) { return s.score >= 7; }).length,
       answered: answeredCount(), total: ALL.length
@@ -129,7 +131,7 @@
       return '<a class="exam-scope-chip" href="#subject-' + esc(subject.id) + '" data-scope="' + esc(subject.id) + '">' +
         '<span class="scope-no">' + esc(subject.no) + '</span>' +
         '<b>' + esc(subject.title) + '</b>' +
-        '<em>0/2</em>' +
+        '<em>0/' + subject.questions.length + '</em>' +
       '</a>';
     }).join('');
   };
@@ -139,7 +141,7 @@
     var submitted = state.submitted;
     var correct = submitted && selected === q.answer;
     var wrong = submitted && selected !== null && selected !== q.answer;
-    var cls = 'exam-q ' + (q.type === 'debug' ? 'is-debug' : 'is-choice');
+    var cls = 'exam-q ' + (q.type === 'debug' ? 'is-debug' : q.type === 'command' ? 'is-command' : 'is-choice');
     if (isAnswered(q) && !submitted) cls += ' has-answer';
     if (correct) cls += ' is-correct';
     if (wrong) cls += ' is-wrong';
@@ -171,7 +173,7 @@
 
     return '<article class="' + cls + '" id="q-' + esc(q.id) + '" data-q="' + esc(q.id) + '">' +
       '<div class="exam-q-head">' +
-        '<span class="exam-type">' + (q.type === 'debug' ? '代码改错 · ' + q.points + ' 分' : '知识选择 · ' + q.points + ' 分') + '</span>' +
+        '<span class="exam-type">' + (q.type === 'debug' ? '代码改错' : q.type === 'command' ? '终端指令' : '知识选择') + ' · ' + q.points + ' 分</span>' +
         '<span class="exam-q-flag">' + esc(flag) + '</span>' +
       '</div>' +
       '<h3>' + esc(q.title) + '</h3>' +
@@ -201,7 +203,7 @@
         '<header class="exam-subject-head">' +
           '<span class="exam-sub-no">' + esc(subject.no) + '</span>' +
           '<div class="exam-sub-title"><h2>' + esc(subject.title) + '</h2>' +
-            '<p>4 分知识选择 + 6 分代码改错' + (course ? ' · ' + course : '') + '</p>' +
+            '<p>2 分知识选择 + 2 分终端指令 + 6 分代码改错' + (course ? ' · ' + course : '') + '</p>' +
           '</div>' +
           '<div class="exam-sub-score"><b>' + esc(subjectScore(subject.id)) + '</b><span>/ 10</span></div>' +
         '</header>' +
@@ -261,11 +263,12 @@
         '<div class="result-grade">' +
           '<div class="section-kicker">OVERALL SCORE · ' + r.correctSubjects + '/10 SUBJECTS PASSED</div>' +
           '<h2><i>' + esc(r.grade.code) + '</i>' + esc(r.grade.label) + '</h2>' +
-          '<p>' + esc(r.grade.note) + ' 选择题 ' + r.choiceScore + '/40，改错题 ' + r.debugScore + '/60；按单科 10 分计算，' + (r.correctSubjects === 10 ? '十科全部达标。' : '有 ' + (10 - r.correctSubjects) + ' 个科目低于 7/10。') + '</p>' +
+          '<p>' + esc(r.grade.note) + ' 选择题 ' + r.choiceScore + '/20，终端指令 ' + r.commandScore + '/20，改错题 ' + r.debugScore + '/60；按单科 10 分计算，' + (r.correctSubjects === 10 ? '十科全部达标。' : '有 ' + (10 - r.correctSubjects) + ' 个科目低于 7/10。') + '</p>' +
         '</div>' +
       '</div>' +
       '<div class="result-metrics">' +
-        '<div class="result-metric"><span>选择题</span><b>' + r.choiceScore + '<i>/40</i></b></div>' +
+        '<div class="result-metric"><span>知识选择</span><b>' + r.choiceScore + '<i>/20</i></b></div>' +
+        '<div class="result-metric"><span>终端指令</span><b>' + r.commandScore + '<i>/20</i></b></div>' +
         '<div class="result-metric"><span>代码改错</span><b>' + r.debugScore + '<i>/60</i></b></div>' +
         '<div class="result-metric"><span>单科达标</span><b>' + r.correctSubjects + '<i>/10</i></b></div>' +
       '</div>' +
@@ -376,7 +379,7 @@
   renderSheet();
   renderDock();
 
-  if (window.console && ALL.length !== 20) {
-    console.warn('[fullstack-exam] expected 20 questions, got ' + ALL.length);
+  if (window.console && ALL.length !== 30) {
+    console.warn('[fullstack-exam] expected 30 questions, got ' + ALL.length);
   }
 })();

@@ -1,4 +1,4 @@
-/* 全栈结业考试 · z85
+/* 全栈结业考试 · z86
    复用全栈路线的深色玻璃语言，考试页只新增答题卡、题目与评分面板。 */
 .exam-page{background:#070A0E;color:var(--fs-text)}
 .exam-wrap{max-width:1240px;padding-top:clamp(28px,5vh,54px)}
@@ -81,7 +81,7 @@
 .result-grade h2{display:flex;align-items:center;gap:10px;margin-top:7px;font-size:clamp(25px,3.1vw,38px);line-height:1.12;letter-spacing:-.045em;color:#F8F4EA}
 .result-grade h2 i{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:9px;border:1px solid color-mix(in srgb,var(--score-color,var(--fs-gold)) 45%,transparent);background:color-mix(in srgb,var(--score-color,var(--fs-gold)) 11%,transparent);font-style:normal;font-family:var(--fs-mono);font-size:15px;color:var(--score-color,var(--fs-gold))}
 .result-grade p{max-width:720px;margin-top:8px;color:#AEB8B9;font-size:12px;line-height:1.75}
-.result-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:18px}
+.result-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:18px}
 .result-metric{padding:10px 12px;border:1px solid rgba(244,239,230,.10);border-radius:10px;background:rgba(255,255,255,.025)}
 .result-metric span{display:block;font-size:9.5px;color:var(--fs-dim)}
 .result-metric b{display:block;margin-top:2px;font-family:var(--fs-mono);font-size:19px;color:#F2F7FA;letter-spacing:-.03em}
@@ -119,14 +119,17 @@
 .exam-sub-score b{display:block;font-family:var(--fs-mono);font-size:17px;line-height:1.1;color:#F3F7FA}
 .exam-sub-score span{display:block;margin-top:2px;font-size:8.5px;color:var(--fs-dim);letter-spacing:.06em}
 .exam-subject-grid{display:grid;grid-template-columns:1fr 1fr;align-items:start;gap:10px;margin-top:11px}
+.exam-subject-grid .exam-q.is-debug{grid-column:1/-1}
 .exam-q{position:relative;min-width:0;padding:14px 14px 13px;border:1px solid rgba(244,239,230,.11);border-radius:12px;background:rgba(5,11,19,.38);transition:border-color .18s,background .18s}
 .exam-q.is-debug{border-color:rgba(200,169,118,.16);background:linear-gradient(155deg,rgba(50,38,24,.14),rgba(5,11,19,.4))}
+.exam-q.is-command{border-color:rgba(94,234,212,.18);background:linear-gradient(155deg,rgba(13,50,45,.16),rgba(5,11,19,.4))}
 .exam-q.has-answer{border-color:rgba(143,184,255,.28)}
 .exam-q.is-correct{border-color:rgba(94,234,212,.30);background:linear-gradient(155deg,rgba(20,64,55,.15),rgba(5,11,19,.4))}
 .exam-q.is-wrong{border-color:rgba(253,164,175,.30);background:linear-gradient(155deg,rgba(78,25,32,.16),rgba(5,11,19,.4))}
 .exam-q-head{display:flex;align-items:center;gap:7px;min-height:20px}
 .exam-type{padding:2px 6px;border-radius:5px;font-size:8.5px;font-weight:850;letter-spacing:.04em;color:#BCD4FF;border:1px solid rgba(143,184,255,.24);background:rgba(143,184,255,.08)}
 .exam-q.is-debug .exam-type{color:#F2D6A7;border-color:rgba(200,169,118,.3);background:rgba(200,169,118,.09)}
+.exam-q.is-command .exam-type{color:#A7F3D0;border-color:rgba(94,234,212,.3);background:rgba(94,234,212,.09)}
 .exam-q-flag{margin-left:auto;font-size:8.5px;color:var(--fs-mint);font-family:var(--fs-mono)}
 .exam-q.is-wrong .exam-q-flag{color:#FDA4AF}
 .exam-q h3{margin:9px 0 5px;font-size:15px;line-height:1.4;letter-spacing:-.015em;color:#EFF5F8}
@@ -232,7 +235,7 @@
   .exam-opt-flag{display:block;font-size:7.5px;line-height:1.25;white-space:normal;max-width:34px;text-align:right}
   .exam-opt-text{font-size:10.3px}
   .exam-opt-code{font-size:9.4px}
-  .result-metrics{grid-template-columns:1fr 1fr 1fr;gap:5px}
+  .result-metrics{grid-template-columns:1fr 1fr;gap:5px}
   .result-metric{padding:8px}
   .result-metric b{font-size:16px}
   .result-metric span{font-size:8.5px}
