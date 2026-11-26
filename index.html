@@ -89,6 +89,16 @@ html,body{height:100%;background:var(--bg-canvas);color:var(--text-primary);font
   background:linear-gradient(180deg,rgba(35,42,52,.98),rgba(16,21,28,.94));
   box-shadow:0 18px 38px rgba(0,0,0,.34),0 0 0 1px rgba(88,166,255,.10) inset;
 }
+.subject-actions .terminal-cta{
+  color:#E9FFFB;border:1px solid rgba(94,234,212,.46);
+  background:linear-gradient(135deg,rgba(94,234,212,.20),rgba(56,189,248,.13) 55%,rgba(167,139,250,.14));
+  box-shadow:0 12px 30px rgba(0,0,0,.26),0 0 24px rgba(94,234,212,.09),0 1px 0 rgba(255,255,255,.14) inset;
+}
+.subject-actions .terminal-cta:hover{
+  transform:translateY(-2px);border-color:rgba(94,234,212,.72);
+  background:linear-gradient(135deg,rgba(94,234,212,.28),rgba(56,189,248,.18) 55%,rgba(167,139,250,.19));
+  box-shadow:0 18px 38px rgba(0,0,0,.32),0 0 30px rgba(94,234,212,.15),0 1px 0 rgba(255,255,255,.2) inset;
+}
 .subject-actions .btn-lg:focus-visible{outline:3px solid rgba(217,249,157,.48);outline-offset:4px}
 .back-link{margin-top:28px;font-size:12px;color:var(--text-muted);cursor:pointer;text-decoration:underline}
 .back-link:hover{color:var(--text-secondary)}
@@ -771,6 +781,7 @@ span.apiref:hover{color:var(--accent);border-bottom-color:var(--accent)}
   <div class="subject-actions">
     <button class="btn btn-default btn-lg study-cta" onclick="openStudyHub()"><img class="ui-ico ui-ico-btn" src="./assets/icons/study.png" alt="" loading="lazy" decoding="async">学习中心 · 系统课程</button>
     <button class="btn btn-default btn-lg wrongbook-cta" onclick="openWrongbook()"><img class="ui-ico ui-ico-btn" src="./assets/icons/wrongbook.png" alt="" loading="lazy" decoding="async">错题本 <span id="wb-badge2">0</span></button>
+    <button class="btn btn-default btn-lg terminal-cta" onclick="location.href='subjects/terminal.html?v=20261126z84'"><img class="ui-ico ui-ico-btn" src="./assets/icons/terminal.png" alt="" loading="lazy" decoding="async">终端常用指令 · macOS</button>
   </div>
   <div class="subject-cards">
     <div class="subject-card" style="--card-accent:#8FB8FF" onclick="location.href='subjects/java-hub.html?v=20261126z76'">
