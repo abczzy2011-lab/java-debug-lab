@@ -29,6 +29,43 @@ const LS = {
   localUnloaded: 'jdl.javis.localUnloaded.v1',
 };
 
+// 最后一条退路：不摆在明面上，也不在 AI 正常时打扰。AI 失败后才会露出「锦囊」，
+// 里面放的不是高级课，而是初学者真的能看懂、能搜到人话的地方。
+const KIT_SITES = [
+  {
+    name: 'CSDN', url: 'https://www.csdn.net/', tag: '中文社区 · 搜报错',
+    why: '把完整报错原样粘进搜索框，先看别人有没有踩过同一个坑。优先挑带完整代码、能复现、评论里有纠错的那篇。',
+  },
+  {
+    name: 'Stack Overflow', url: 'https://stackoverflow.com/', tag: '英文问答 · 找根因',
+    why: '报错最后一行直接搜，英文答案往往更接近根因。读不动就用浏览器翻译，代码块不用翻。',
+  },
+  {
+    name: '博客园', url: 'https://www.cnblogs.com/', tag: '中文长文 · 工程笔记',
+    why: '很多老工程师把完整实现和踩坑过程写在这里。适合耐心啃一篇长文，而不是只看三行结论。',
+  },
+  {
+    name: '菜鸟教程', url: 'https://www.runoob.com/', tag: '从零补基础',
+    why: '例子短、目录直，HTML、Java、Python、SQL 都能先跑一遍。看不懂课时，用它把最小例子跑通。',
+  },
+  {
+    name: '廖雪峰', url: 'https://liaoxuefeng.com/', tag: '系统教程 · 中文',
+    why: 'Java、Python、JavaScript 都有完整的中文主线。适合发现自己缺一整块基础时，从头顺一遍。',
+  },
+  {
+    name: 'MDN Web Docs', url: 'https://developer.mozilla.org/zh-CN/', tag: 'Web 标准 · 最稳',
+    why: 'JavaScript、DOM、HTTP、浏览器行为的第一手说明书。前端概念打架时，以这里为准。',
+  },
+  {
+    name: 'freeCodeCamp 中文', url: 'https://www.freecodecamp.org/chinese/', tag: '边写边学 · 免费',
+    why: '完全不知道下一步做什么时，先做一小节交互练习。手先动起来，比继续盯着概念有用。',
+  },
+  {
+    name: 'GitHub', url: 'https://github.com/', tag: '真实项目 · 读源码',
+    why: '搜同主题的小项目，翻 issue 和 README。看别人真实怎么组织代码，比背结论更接近工程。',
+  },
+];
+
 const $ = (sel, root = document) => root.querySelector(sel);
 const esc = (s = '') => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const isPortableDevice = () => {
@@ -62,7 +99,7 @@ const state = {
   searchOpen: false, searchQuery: '', searchBusy: false, searchError: '', searchResults: null,
   forceSearch: false, searchOnlyReason: '',
   resolveByMsg: {}, nextId: 1,
-  panelOpen: false, orbMinimized: false, initialized: false,
+  panelOpen: false, orbMinimized: false, kitOpen: false, initialized: false,
 };
 
 let panel, orb, orbMinBtn, orbRestoreBtn, gateBox, chatBox, msgBox, input, sendBtn, statusEl, searchView, searchInput, searchResultsBox;
@@ -134,10 +171,38 @@ function uiMarkup() {
         <button class="jv-retrieve" id="jv-retrieve" type="button" data-jv-action="retrieve" title="打开站内检索窗口，不调用 AI" aria-label="打开站内检索窗口">检索</button>
         <button class="jv-send" id="jv-send" type="submit" title="发送" aria-label="发送">↑</button>
       </form>
-      <div class="jv-foot"><span id="jv-foot-left">模型直答 · 不读取站内资料</span><div class="jv-source-switch" id="jv-source-switch" role="group" aria-label="回答来源" hidden><button type="button" data-jv-action="source" data-source="cloud">云端</button><button type="button" data-jv-action="source" data-source="local">本地</button></div><button class="jv-local-action" id="jv-local-action" type="button" data-jv-action="unload" title="卸载本地 AI，释放显存；下载的权重仍保留" hidden>卸载本地</button><span>⌘K</span></div>
+      <div class="jv-foot">
+        <span id="jv-foot-left">模型直答 · 不读取站内资料</span>
+        <div class="jv-foot-right">
+          <div class="jv-source-switch" id="jv-source-switch" role="group" aria-label="回答来源" hidden><button type="button" data-jv-action="source" data-source="cloud">云端</button><button type="button" data-jv-action="source" data-source="local">本地</button></div>
+          <button class="jv-local-action" id="jv-local-action" type="button" data-jv-action="unload" title="卸载本地 AI，释放显存；下载的权重仍保留" hidden>卸载本地</button>
+          <button class="jv-kit-trigger" id="jv-kit-trigger" type="button" data-jv-action="kit" title="走投无路时，再打开" aria-label="走投无路时打开锦囊，里面是给初学者的人话网站"><span class="jv-kit-glyph" aria-hidden="true">✦</span><span class="jv-kit-caption">锦囊</span></button>
+          <span>⌘K</span>
+        </div>
+      </div>
     </div>
     <div class="jv-resize" id="jv-resize" title="拖动调整大小"></div>
-  </section>`;
+  </section>
+  <div class="jv-kit-layer" id="jv-kit-layer" hidden>
+    <section class="jv-kit-sheet" role="dialog" aria-modal="true" aria-labelledby="jv-kit-title" aria-describedby="jv-kit-copy">
+      <button class="jv-kit-close" type="button" data-kit-close aria-label="收起锦囊">×</button>
+      <div class="jv-kit-head">
+        <div class="jv-kit-kicker">LAST RESORT · 走投无路专用</div>
+        <h2 id="jv-kit-title">锦囊：AI 也没接住的时候</h2>
+        <p id="jv-kit-copy">不是你笨，也不是你不适合学编程。只是眼前这条解释线走不通了。先离开对话框，去这些不高级、但有人味、有人踩过坑的地方。</p>
+      </div>
+      <div class="jv-kit-grid" id="jv-kit-grid"></div>
+      <div class="jv-kit-searchnote">
+        <b>搜之前，把问题缩成三行：</b>
+        <span>① 我在做什么　② 我期望发生什么　③ 实际发生了什么（附完整报错最后一行）</span>
+        <em>带着这三行去搜，命中率会比只搜“为什么报错”高很多。</em>
+      </div>
+      <div class="jv-kit-foot">
+        <span>锦囊不保证答案，只保证你不用一个人硬扛。</span>
+        <button type="button" data-kit-close>收好，回去再试</button>
+      </div>
+    </section>
+  </div>`;
 }
 
 function mount() {
@@ -228,6 +293,10 @@ function bindUi() {
   $('#jv-clear').addEventListener('click', clearChat);
   $('#jv-search-close').addEventListener('click', closeSearch);
   $('#jv-search-form').addEventListener('submit', e => { e.preventDefault(); runSearch(); });
+  const kitLayer = $('#jv-kit-layer');
+  if (kitLayer) kitLayer.addEventListener('click', e => {
+    if (e.target === kitLayer || e.target.closest('[data-kit-close]')) closeKit();
+  });
   $('#jv-form').addEventListener('submit', e => { e.preventDefault(); submit(); });
   input.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); }
@@ -243,6 +312,7 @@ function bindUi() {
   });
   document.addEventListener('keydown', e => {
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); state.panelOpen ? closePanel() : openPanel(); }
+    if (e.key === 'Escape' && state.kitOpen) { closeKit(); return; }
     if (e.key === 'Escape' && state.searchOpen) { closeSearch(); return; }
     if (e.key === 'Escape' && state.panelOpen) closePanel();
   });
@@ -322,6 +392,43 @@ function applyOrbGlass() {
       Hyalite.refresh(orb);
     }
   } catch (e) {}
+}
+
+let kitCloseTimer = 0;
+function renderKit() {
+  const grid = $('#jv-kit-grid');
+  if (!grid) return;
+  grid.innerHTML = KIT_SITES.map((site, i) => `<a class="jv-kit-card" href="${esc(site.url)}" target="_blank" rel="noopener noreferrer" aria-label="在新窗口打开 ${esc(site.name)}">
+    <span class="jv-kit-no">${String(i + 1).padStart(2, '0')}</span>
+    <span class="jv-kit-name">${esc(site.name)}</span>
+    <span class="jv-kit-tag">${esc(site.tag)}</span>
+    <span class="jv-kit-why">${esc(site.why)}</span>
+    <span class="jv-kit-go">去看看 <i aria-hidden="true">↗</i></span>
+  </a>`).join('');
+}
+
+function openKit() {
+  const layer = $('#jv-kit-layer');
+  if (!layer || state.kitOpen) return;
+  clearTimeout(kitCloseTimer);
+  state.kitOpen = true;
+  renderKit();
+  layer.hidden = false;
+  document.body.classList.add('jv-kit-lock');
+  void layer.offsetWidth;
+  layer.classList.add('is-open');
+  try { $('#jv-kit-layer .jv-kit-close')?.focus({ preventScroll: true }); } catch {}
+}
+
+function closeKit() {
+  const layer = $('#jv-kit-layer');
+  if (!layer || !state.kitOpen) return;
+  state.kitOpen = false;
+  layer.classList.remove('is-open');
+  document.body.classList.remove('jv-kit-lock');
+  clearTimeout(kitCloseTimer);
+  kitCloseTimer = setTimeout(() => { if (!state.kitOpen) layer.hidden = true; }, 180);
+  try { if (state.panelOpen) input?.focus({ preventScroll: true }); } catch {}
 }
 
 function openPanel() {
@@ -445,6 +552,7 @@ function stopActivation() {
 
 function closePanel() {
   if (!state.panelOpen && !panel.classList.contains('is-closing')) return;
+  if (state.kitOpen) closeKit();
   clearTimeout(panelCloseTimer);
   clearTimeout(panelOpenTimer);
   clearTimeout(orbActivateTimer);
@@ -1733,7 +1841,8 @@ function renderChat() {
     const source = m.role === 'ai' && m.sources?.length ? `<div class="jv-msg-meta">参考：${m.sources.map(s => `<button class="jv-inline-link" type="button" data-jv-action="jump" data-msg="${m.id}" data-k="${s}">${esc(s)}</button>`).join(' · ')}</div>` : '';
     const typing = m.role === 'ai' && m.streaming && !m.text ? `<span class="jv-typing"><i></i><i></i><i></i></span>` : '';
     const cursor = m.role === 'ai' && m.streaming && m.text ? '<span class="jv-stream-cursor"></span>' : '';
-    return `<div class="jv-msg ${m.role === 'user' ? 'user' : 'ai'}">${m.role === 'ai' && m.meta === '正在检索…' ? '' : ''}<div class="jv-bubble">${content}${typing}${cursor}</div>${meta}${source}</div>`;
+    const kit = m.role === 'ai' && m.kit ? '<button class="jv-kit-inline" type="button" data-jv-action="kit">AI 也没接住？打开锦囊 <span aria-hidden="true">✦</span></button>' : '';
+    return `<div class="jv-msg ${m.role === 'user' ? 'user' : 'ai'}">${m.role === 'ai' && m.meta === '正在检索…' ? '' : ''}<div class="jv-bubble">${content}${typing}${cursor}</div>${meta}${source}${kit}</div>`;
   }).join('');
   msgBox.innerHTML = banner + welcome + html;
   const body = $('#jv-body'); if (body) body.scrollTop = body.scrollHeight;
@@ -1743,7 +1852,7 @@ function renderChatBanner() {
   if (state.cloudOnly) return '';
   const picked = modelMeta();
   if (state.downloading) return `<div class="jv-gate-card" style="margin:4px 0 2px"><div class="jv-gate-title"><span class="jv-dot ok"></span>正在下载本地模型 · ${esc(picked.label)} · ${Math.round(state.downloadProgress * 100)}%</div><div class="jv-bar"><i style="width:${Math.max(2, Math.round(state.downloadProgress * 100))}%"></i></div><div class="jv-small">${esc(state.downloadStatus || '正在获取模型权重…')}</div></div>`;
-  if (state.downloadAttempted && state.gateError) return `<div class="jv-gate-card" style="margin:4px 0 2px"><div class="jv-gate-title"><span class="jv-dot bad"></span>本地模型没有加载成功</div><div class="jv-small">${esc(friendlyDownloadError(state.gateError))} 云端仍可直接用；也可以重试下载。</div><div class="jv-actions"><button class="jv-btn primary" data-jv-action="download" type="button">重新下载 ${esc(picked.label)}</button><button class="jv-btn ghost" data-jv-action="cloud" type="button">使用云端 Javis</button><button class="jv-btn ghost" data-jv-action="search" type="button">打开检索窗口</button></div></div>`;
+  if (state.downloadAttempted && state.gateError) return `<div class="jv-gate-card" style="margin:4px 0 2px"><div class="jv-gate-title"><span class="jv-dot bad"></span>本地模型没有加载成功</div><div class="jv-small">${esc(friendlyDownloadError(state.gateError))} 云端仍可直接用；也可以重试下载。</div><div class="jv-actions"><button class="jv-btn primary" data-jv-action="download" type="button">重新下载 ${esc(picked.label)}</button><button class="jv-btn ghost" data-jv-action="cloud" type="button">使用云端 Javis</button><button class="jv-btn ghost" data-jv-action="search" type="button">打开检索窗口</button><button class="jv-btn ghost jv-kit-banner-btn" data-jv-action="kit" type="button">打开锦囊</button></div></div>`;
   if (!state.gate?.ok || state.modelReady) return '';
   if (state.forceSearch) return `<div class="jv-gate-card" style="margin:4px 0 2px"><div class="jv-gate-title"><span class="jv-dot ok"></span>已打开站内检索</div><div class="jv-small">本机性能达标；可以直接用云端 Javis，也可以下载本地模型。</div><div class="jv-actions"><button class="jv-btn primary" data-jv-action="cloud" type="button">使用云端 Javis</button><button class="jv-btn ghost" data-jv-action="download" type="button">下载 ${esc(picked.label)}</button></div></div>`;
   return `<div class="jv-gate-card" style="margin:4px 0 2px"><div class="jv-gate-title"><span class="jv-dot ok"></span>本机性能达标</div><div class="jv-small">可以直接用云端 Javis，不需要先下载；想要本地回答，再下载 0.5B / 1.5B / 3B 中的一个。</div><div class="jv-actions"><button class="jv-btn primary" data-jv-action="cloud" type="button">使用云端 Javis</button><button class="jv-btn ghost" data-jv-action="download" type="button">下载 ${esc(picked.label)}</button><button class="jv-btn ghost" data-jv-action="search" type="button">打开检索窗口</button></div></div>`;
@@ -1896,6 +2005,7 @@ async function answerLocal(q, ai, seq, history = []) {
       ? `本地 ${modelLabel()} 这次没能回答：${friendlyDownloadError(localError)} 可以重新下载模型，或在底部切到云端。`
       : '本地模型这次没有生成可用的回答，可以再问一次，或在底部切换到云端。';
     ai.meta = localError ? `本地 ${modelLabel()} · 加载失败` : `本地 ${modelLabel()} · 未生成`;
+    ai.kit = true;
   }
   ai.streaming = false;
   state.activeSource = 'local'; state.localFault = false;
@@ -1993,6 +2103,7 @@ async function submit(prefill) {
       ai.text = (state.cloudOnly || triedCloud)
         ? '云端 Javis 没有连接成功。可以重试云端，或点输入框旁的“检索”查站内课程。'
         : '本地模型还没下载，云端也暂时没连上。可以点“先用云端 Javis”重试，或打开检索窗口查站内课程。';
+      ai.kit = true;
       state.history.push({ role: 'user', content: q }, { role: 'assistant', content: ai.text });
       return;
     }
@@ -2004,16 +2115,19 @@ async function submit(prefill) {
       ai.streaming = false;
       ai.meta = '云端 · 这次没有返回';
       ai.text = '云端这次没有返回答案，可能是网络或服务暂时不可用。可以再点一次“云端”重试，或手动切到本地模型；要查站内课程，点输入框旁的“检索”。';
+      ai.kit = true;
     }
     if (!answered && state.cloudOnly && seq === state.answerSeq && !state.stopRequested) {
       ai.streaming = false;
       ai.meta = '云端不可用';
       ai.text = '云端 Javis 暂时没有返回答案。可以点“重新检测”重试云端，或打开检索窗口查站内课程。';
+      ai.kit = true;
     }
   } catch (e) {
     if (seq === state.answerSeq) {
       ai.streaming = false; ai.meta = '回答失败';
       ai.text = '这次没有生成回答，请再试一次；要查站内资料，请打开检索窗口。';
+      ai.kit = true;
     }
   } finally {
     if (seq === state.answerSeq) {
@@ -2243,6 +2357,7 @@ function handleAction(action, el) {
   if (action === 'searchHit') { openSearchHit(el.dataset.id); return; }
   if (action === 'ask') { state.chatStarted = true; submit(el.dataset.q); return; }
   if (action === 'jump') { openCitation(el.dataset.msg, el.dataset.k); return; }
+  if (action === 'kit') { openKit(); return; }
 }
 
 /* ===================== 启动 ===================== */
@@ -2255,6 +2370,7 @@ try {
     open: openPanel, close: closePanel, minimize: minimizeOrb, restore: restoreOrb, state,
     ask: q => { state.chatStarted = true; submit(q); },
     gate: runGate,
+    kit: openKit,
   };
   window.__JAVIS_STAGE = 'exposed';
 } catch (e) {

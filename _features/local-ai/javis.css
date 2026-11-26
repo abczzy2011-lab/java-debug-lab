@@ -2473,3 +2473,156 @@
 @media (prefers-reduced-motion:reduce){
   .jv-orb-min,.jv-orb-min::before,.jv-min-glyph{transition:none!important}
 }
+
+/* ========== 锦囊：AI 也接不住时的最后一条退路 ========== */
+.jv-foot-right{display:flex;align-items:center;gap:5px;flex:none;min-width:0}
+#jv-foot-left{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.jv-kit-trigger{
+  display:inline-flex;align-items:center;gap:4px;flex:none;
+  min-width:18px;height:18px;padding:0 2px;border:0;border-radius:999px;
+  background:transparent;color:#9BA7BB;font-family:inherit;font-size:9px;
+  cursor:pointer;opacity:.30;transition:opacity .18s ease,color .18s ease,background .18s ease;
+}
+.jv-kit-trigger .jv-kit-glyph{font-size:10px;line-height:1;color:#C4B5FD;transition:color .18s ease,text-shadow .18s ease}
+.jv-kit-trigger .jv-kit-caption{max-width:0;opacity:0;overflow:hidden;white-space:nowrap;letter-spacing:.04em;transition:max-width .18s ease,opacity .18s ease}
+.jv-kit-trigger:hover,.jv-kit-trigger:focus-visible{
+  opacity:.92;color:#F5C98A;background:rgba(245,201,138,.07);outline:none;
+}
+.jv-kit-trigger:hover .jv-kit-glyph,.jv-kit-trigger:focus-visible .jv-kit-glyph{color:#F5C98A;text-shadow:0 0 10px rgba(245,201,138,.38)}
+.jv-kit-trigger:hover .jv-kit-caption,.jv-kit-trigger:focus-visible .jv-kit-caption{max-width:34px;opacity:.9}
+.jv-kit-trigger:active{transform:scale(.97)}
+
+.jv-kit-inline{
+  align-self:flex-start;display:inline-flex;align-items:center;gap:5px;margin-top:2px;
+  padding:5px 8px;border:1px dashed rgba(245,201,138,.34);border-radius:8px;
+  background:rgba(245,201,138,.055);color:#E8C08A;font-family:inherit;
+  font-size:10px;line-height:1.2;cursor:pointer;transition:background .18s ease,border-color .18s ease,color .18s ease;
+}
+.jv-kit-inline span{font-size:9px;color:#F5C98A}
+.jv-kit-inline:hover{background:rgba(245,201,138,.11);border-color:rgba(245,201,138,.58);color:#FFE0B2}
+.jv-kit-banner-btn{border-color:rgba(245,201,138,.34)!important;color:#F5C98A!important}
+.jv-kit-banner-btn:hover{background:rgba(245,201,138,.01)!important;border-color:rgba(245,201,138,.6)!important}
+
+.jv-kit-lock{overflow:hidden!important}
+.jv-kit-layer{
+  position:fixed;inset:0;z-index:1200;display:flex;align-items:center;justify-content:center;
+  padding:24px;background:
+    radial-gradient(ellipse at 50% 28%,rgba(176,122,68,.14),transparent 48%),
+    rgba(2,6,12,.74);
+  -webkit-backdrop-filter:blur(18px) saturate(1.1);backdrop-filter:blur(18px) saturate(1.1);
+  opacity:0;transition:opacity .2s ease;
+}
+.jv-kit-layer[hidden]{display:none!important}
+.jv-kit-layer.is-open{opacity:1}
+.jv-kit-sheet{
+  position:relative;width:min(860px,100%);max-height:min(88vh,800px);overflow:auto;overscroll-behavior:contain;
+  padding:36px 40px 26px;border-radius:28px;
+  background:
+    radial-gradient(ellipse at 12% 0%,rgba(245,185,113,.17),transparent 42%),
+    radial-gradient(ellipse at 95% 100%,rgba(130,105,190,.10),transparent 46%),
+    linear-gradient(145deg,rgba(31,26,23,.985),rgba(10,13,20,.99));
+  border:1px solid rgba(245,201,138,.27);
+  box-shadow:0 40px 120px rgba(0,0,0,.66),inset 0 1px 0 rgba(255,236,204,.12);
+  color:#F5EFE5;transform:translateY(10px) scale(.985);
+  transition:transform .22s cubic-bezier(.16,1,.3,1);
+  scrollbar-width:thin;scrollbar-color:rgba(245,201,138,.24) transparent;
+}
+.jv-kit-layer.is-open .jv-kit-sheet{transform:none}
+.jv-kit-sheet::-webkit-scrollbar{width:8px}
+.jv-kit-sheet::-webkit-scrollbar-thumb{background:rgba(245,201,138,.22);border-radius:99px}
+.jv-kit-close{
+  position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:50%;
+  border:1px solid rgba(245,201,138,.16);background:rgba(255,255,255,.035);color:#C8BFB2;
+  font:inherit;font-size:18px;line-height:1;cursor:pointer;transition:background .18s ease,color .18s ease;
+}
+.jv-kit-close:hover,.jv-kit-close:focus-visible{background:rgba(245,201,138,.10);color:#FFE0B2;outline:none}
+.jv-kit-head{padding-right:36px}
+.jv-kit-kicker{
+  display:flex;align-items:center;gap:7px;
+  font-family:var(--font-mono,monospace);font-size:9px;font-weight:800;
+  letter-spacing:.17em;color:#C99B60;
+}
+.jv-kit-kicker::before{content:"";width:22px;height:1px;background:linear-gradient(90deg,rgba(245,201,138,.1),rgba(245,201,138,.7))}
+.jv-kit-head h2{
+  margin:12px 0 0;font-size:32px;line-height:1.16;letter-spacing:-.035em;font-weight:850;
+  background:linear-gradient(112deg,#FFF7E8 0%,#FFE1AE 52%,#D6C2FF 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+}
+.jv-kit-head p{
+  max-width:700px;margin:12px 0 0;font-size:13px;line-height:1.9;color:#BFB4A5;
+}
+.jv-kit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:24px 0 14px}
+.jv-kit-card{
+  position:relative;display:block;padding:15px 16px 13px 48px;border-radius:15px;
+  border:1px solid rgba(255,235,205,.08);background:rgba(255,255,255,.032);
+  text-decoration:none;color:inherit;overflow:hidden;
+  transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease;
+}
+.jv-kit-card::after{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:2px;
+  background:linear-gradient(180deg,rgba(245,201,138,.64),rgba(196,181,253,.28));
+  opacity:.45;transition:opacity .18s ease;
+}
+.jv-kit-card:hover,.jv-kit-card:focus-visible{
+  transform:translateY(-2px);border-color:rgba(245,201,138,.28);background:rgba(245,201,138,.055);
+  box-shadow:0 14px 36px rgba(0,0,0,.22);outline:none;
+}
+.jv-kit-card:hover::after,.jv-kit-card:focus-visible::after{opacity:1}
+.jv-kit-no{
+  position:absolute;left:16px;top:16px;font-family:var(--font-mono,monospace);
+  font-size:9px;font-weight:800;letter-spacing:.05em;color:#9C7C55;
+}
+.jv-kit-name{display:block;font-size:15.5px;line-height:1.25;font-weight:820;color:#FFF4DF}
+.jv-kit-tag{display:inline-block;margin-top:5px;padding:2px 6px;border-radius:5px;background:rgba(196,181,253,.07);font-size:8.5px;color:#AE9FCA;letter-spacing:.02em}
+.jv-kit-why{display:block;margin-top:8px;font-size:11px;line-height:1.72;color:#AFA496}
+.jv-kit-go{display:flex;align-items:center;gap:4px;margin-top:8px;font-size:9px;font-weight:750;color:#C99B60}
+.jv-kit-go i{font-style:normal;font-size:10px}
+.jv-kit-card:hover .jv-kit-go{color:#F5C98A}
+.jv-kit-searchnote{
+  padding:13px 15px;border-left:2px solid rgba(245,201,138,.45);border-radius:0 12px 12px 0;
+  background:linear-gradient(90deg,rgba(245,201,138,.065),rgba(245,201,138,.018));
+}
+.jv-kit-searchnote b{display:block;font-size:10px;letter-spacing:.04em;color:#E8C08A;font-weight:800}
+.jv-kit-searchnote span{display:block;margin-top:5px;font-size:11px;line-height:1.7;color:#C9BDAC}
+.jv-kit-searchnote em{display:block;margin-top:4px;font-size:10px;line-height:1.6;color:#8F8273;font-style:normal}
+.jv-kit-foot{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:18px;padding-top:14px;border-top:1px solid rgba(245,201,138,.10)}
+.jv-kit-foot span{font-size:10px;line-height:1.6;color:#9A8E80}
+.jv-kit-foot button{
+  flex:none;min-height:34px;padding:0 14px;border-radius:10px;
+  border:1px solid rgba(245,201,138,.3);background:rgba(245,201,138,.08);
+  color:#F5D6A8;font-family:inherit;font-size:10.5px;font-weight:750;cursor:pointer;
+  transition:background .18s ease,border-color .18s ease,color .18s ease;
+}
+.jv-kit-foot button:hover,.jv-kit-foot button:focus-visible{background:rgba(245,201,138,.15);border-color:rgba(245,201,138,.55);color:#FFF4DF;outline:none}
+
+@media (max-width:640px){
+  .jv-foot-right{gap:4px}
+  /* 触屏没有 hover：锦囊只留一颗低对比星，不抢输入区的注意力。 */
+  .jv-kit-trigger{height:28px;min-width:24px;padding:0 4px;opacity:.46}
+  .jv-kit-trigger .jv-kit-glyph{font-size:11px}
+  .jv-kit-trigger .jv-kit-caption{display:none}
+  .jv-kit-layer{padding:8px;align-items:flex-end}
+  .jv-kit-sheet{
+    width:100%;max-height:92vh;max-height:92dvh;padding:26px 16px 16px;border-radius:22px;
+    transform:translateY(18px) scale(.99);
+  }
+  .jv-kit-close{top:12px;right:12px;width:32px;height:32px}
+  .jv-kit-head{padding-right:26px}
+  .jv-kit-kicker{font-size:8px;letter-spacing:.13em}
+  .jv-kit-head h2{font-size:25px;line-height:1.18}
+  .jv-kit-head p{font-size:12px;line-height:1.8;margin-top:9px}
+  .jv-kit-grid{grid-template-columns:1fr;gap:8px;margin:18px 0 12px}
+  .jv-kit-card{padding:12px 12px 11px 40px}
+  .jv-kit-no{left:13px;top:13px;font-size:8px}
+  .jv-kit-name{font-size:15px}
+  .jv-kit-why{font-size:11.5px;line-height:1.7}
+  .jv-kit-go{font-size:9px}
+  .jv-kit-searchnote{padding:11px 12px}
+  .jv-kit-searchnote span{font-size:11px}
+  .jv-kit-foot{flex-direction:column;align-items:flex-start;gap:9px;margin-top:14px}
+  .jv-kit-foot button{width:100%;min-height:40px;font-size:11px}
+}
+@media (prefers-reduced-motion:reduce){
+  .jv-kit-layer,.jv-kit-sheet,.jv-kit-card,.jv-kit-trigger,.jv-kit-caption{transition:none!important}
+  .jv-kit-sheet,.jv-kit-layer.is-open .jv-kit-sheet{transform:none!important}
+}
