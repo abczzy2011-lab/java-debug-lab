@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
-<title>学科地图 · Java / Python / JavaScript / AI · 全栈开发</title>
+<title>学科地图 · Java / Python / JavaScript / AI · 全栈 · 终端 200 条 · 结业考试</title>
 <link rel="icon" type="image/png" href="./assets/icons/java.png">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -769,7 +769,7 @@ span.apiref:hover{color:var(--accent);border-bottom-color:var(--accent)}
 </style>
 <link rel="stylesheet" href="./_features/local-ai/javis.css?v=20261126z82">
 <link rel="stylesheet" href="./assets/css/liquid-glass.css?v=20261123z47">
-<link rel="stylesheet" href="./assets/css/fullstack-entry.css?v=20261126z85">
+<link rel="stylesheet" href="./assets/css/fullstack-entry.css?v=20261126z86">
 <link rel="stylesheet" href="./assets/css/java-doc.css?v=20261125z57">
 </head>
 <body>
@@ -777,11 +777,10 @@ span.apiref:hover{color:var(--accent);border-bottom-color:var(--accent)}
 <!-- ==================== 学科选择 ==================== -->
 <div id="subject">
   <div class="brand"><div class="brand-dot"></div><div class="brand-name">学科地图</div></div>
-  <div class="landing-sub">4 个语言/领域学科 + 10 个全栈大科目 —— 全栈 10 科已全部上线：从网络、数据库、后端、前端、API 到测试、DevOps、安全架构与项目实战，共 508 课。</div>
+  <div class="landing-sub">4 个语言/领域学科 + 10 个全栈大科目 + 终端 200 条 + 全栈结业考试 —— 全栈 10 科已全部上线：从网络、数据库、后端、前端、API 到测试、DevOps、安全架构与项目实战，共 508 课。</div>
   <div class="subject-actions">
     <button class="btn btn-default btn-lg study-cta" onclick="openStudyHub()"><img class="ui-ico ui-ico-btn" src="./assets/icons/study.png" alt="" loading="lazy" decoding="async">学习中心 · 系统课程</button>
     <button class="btn btn-default btn-lg wrongbook-cta" onclick="openWrongbook()"><img class="ui-ico ui-ico-btn" src="./assets/icons/wrongbook.png" alt="" loading="lazy" decoding="async">错题本 <span id="wb-badge2">0</span></button>
-    <button class="btn btn-default btn-lg terminal-cta" onclick="location.href='subjects/terminal.html?v=20261126z84'"><img class="ui-ico ui-ico-btn" src="./assets/icons/terminal.png" alt="" loading="lazy" decoding="async">终端常用指令 · macOS</button>
   </div>
   <div class="subject-cards">
     <div class="subject-card" style="--card-accent:#8FB8FF" onclick="location.href='subjects/java-hub.html?v=20261126z76'">
@@ -829,6 +828,32 @@ span.apiref:hover{color:var(--accent);border-bottom-color:var(--accent)}
       <div class="subject-cta"><span>进入 JavaScript 分类</span><span aria-hidden="true">→</span></div>
     </div>
   </div>
+  <div class="utility-cards" aria-label="终端与全栈考试入口">
+    <a class="subject-card utility-card" style="--card-accent:#5EEAD4" href="subjects/terminal.html?v=20261126z86">
+      <span class="utility-flag">200 条已上线</span>
+      <div class="subject-icon"><img class="ui-ico ui-ico-subject" src="./assets/icons/terminal.png" alt="" decoding="async"></div>
+      <div class="subject-name">终端常用指令</div>
+      <div class="subject-desc">从 pwd、grep 到 launchctl 和 macOS 系统工具：200 条常用命令，按 8 个真实场景整理；每条都有可复制的常用写法、示例和避坑提示。</div>
+      <div class="subject-meta">
+        <span>macOS 200 条 · 8 分组</span>
+        <span>Linux / Windows 同框架</span>
+        <span>搜索 / 复制 / 掌握进度</span>
+      </div>
+      <div class="subject-cta"><span>打开终端指令库</span><span aria-hidden="true">→</span></div>
+    </a>
+    <a class="subject-card utility-card" style="--card-accent:#C8A976" href="subjects/fullstack-exam.html?v=20261126z85">
+      <span class="utility-flag">20 题 · 自动评分</span>
+      <div class="subject-icon"><img class="ui-ico ui-ico-subject" src="./assets/icons/fullstack.png" alt="" decoding="async"></div>
+      <div class="subject-name">全栈结业考试</div>
+      <div class="subject-desc">覆盖 10 个全栈科目的知识选择题与代码改错题，20 题 100 分；提交后自动给出整体评分、分科成绩和薄弱科目。</div>
+      <div class="subject-meta">
+        <span>10 科 · 20 题 · 100 分</span>
+        <span>选择 4 分 + 改错 6 分</span>
+        <span>S / A / B / C / D 等级</span>
+      </div>
+      <div class="subject-cta"><span>进入全栈考试</span><span aria-hidden="true">→</span></div>
+    </a>
+  </div>
   <section class="fullstack-subjects" aria-labelledby="fsSubjectsTitle">
     <div class="fs-sub-head">
       <div>
@@ -845,7 +870,7 @@ span.apiref:hover{color:var(--accent);border-bottom-color:var(--accent)}
     <div class="fs-sub-note"><b>拆科逻辑：</b>语言课解决“会写代码”；网络、数据库、后端、前端、API、测试、DevOps、安全架构与项目实战解决“能交付产品”。<br><b>结业考试：</b>10 科各 10 分，知识选择 + 代码改错，提交后自动给出整体评分与薄弱科目。</div>
     <noscript><p class="fs-sub-note">全栈大科目：工程基础与 Git、计算机网络与 HTTP、数据库与数据建模、后端工程、前端工程、API 设计与身份认证、测试与质量、DevOps 与云部署、安全性能与架构、全栈项目实战。</p></noscript>
   </section>
-  <div class="landing-footer">4 个现有学科 · 18 个分类入口：Java 6 · Python 4 · JavaScript 5 · AI 3 · 10 个全栈大科目（508 课全部上线）</div>
+  <div class="landing-footer">4 个现有学科 · 18 个分类入口：Java 6 · Python 4 · JavaScript 5 · AI 3 · 10 个全栈大科目（508 课全部上线）· 终端 200 条 · 全栈考试 100 分</div>
 </div>
 
 <!-- ==================== Java 难度选择 ==================== -->
