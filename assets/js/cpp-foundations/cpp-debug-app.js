@@ -1,4 +1,4 @@
-/* C++ 改错实验室：36 题、原地修复、Judge0 GCC 14.1 真实编译、逐用例评分 */
+/* C++ 改错实验室：102 题、原地修复、Judge0 GCC 14.1 真实编译、逐用例评分 */
 (function () {
   'use strict';
 
@@ -13,6 +13,8 @@
   var DRAFT_KEY = 'cppDebug.drafts.v1';
   var state = {
     filter: 'all',
+    status: 'all',
+    query: '',
     current: null,
     best: loadJSON(STORE_KEY, {}),
     drafts: loadJSON(DRAFT_KEY, {}),
@@ -94,35 +96,74 @@
   }
   function round1(n) { return Math.round((Number(n) || 0) * 10) / 10; }
 
+  function matchQuery(task, query) {
+    var q = String(query || '').trim().toLowerCase();
+    if (!q) return true;
+    return [task.id, task.title, task.summary, task.prompt, task.source, task.level, task.order]
+      .join(' ').toLowerCase().indexOf(q) >= 0;
+  }
+  function visibleTasks() {
+    var rank = { basic: 0, medium: 1, hard: 2 };
+    return tasks.filter(function (task) {
+      if (state.filter !== 'all' && task.level !== state.filter) return false;
+      var best = state.best[task.id];
+      var done = !!(best && best.score >= 85);
+      if (state.status === 'todo' && done) return false;
+      if (state.status === 'done' && !done) return false;
+      return matchQuery(task, state.query);
+    }).slice().sort(function (a, b) {
+      return (rank[a.level] - rank[b.level]) || (a.order - b.order);
+    });
+  }
+  function statusCount(status) {
+    if (status === 'done') return solvedCount();
+    if (status === 'todo') return tasks.length - solvedCount();
+    return tasks.length;
+  }
+  function emptyBank() {
+    if (state.query.trim()) return '<div class="empty"><b>没有匹配的题目</b><p>换个关键词，或清空搜索回到全部 ' + tasks.length + ' 题。</p><button class="clear-btn" type="button" data-clear-filters>清空筛选</button></div>';
+    if (state.status === 'done') return '<div class="empty"><b>这一档还没有通过的题</b><p>先运行公开样例，再提交评分。</p></div>';
+    if (state.status === 'todo') return '<div class="empty"><b>这一档已经全部通过</b><p>可以切到「已通过」回看，或挑战另一档难度。</p></div>';
+    return '<div class="empty">这一档暂时没有题目。</div>';
+  }
+
   function renderBank() {
     state.current = null;
     state.lastResults = null;
     stopRun();
-    var rank = { basic: 0, medium: 1, hard: 2 };
-    var visible = tasks.filter(function (task) {
-      return state.filter === 'all' || task.level === state.filter;
-    }).slice().sort(function (a, b) {
-      return (rank[a.level] - rank[b.level]) || (a.order - b.order);
-    });
-    var cards = visible.map(function (task) {
-      var level = levelOf(task);
-      var best = state.best[task.id];
-      var status = best ? (best.score >= 85 ? '已通过 · ' + best.score + ' 分' : '最佳 ' + best.score + ' 分') : '未开始';
-      return '<a class="bug-card" href="#task/' + escapeHTML(task.id) + '">' +
-        '<div class="card-top"><span class="level level-' + escapeHTML(task.level) + '">' + level.label + '</span>' +
-          '<span class="card-no">' + level.short + String(task.order).padStart(2, '0') + '</span></div>' +
-        '<h2>' + escapeHTML(task.title) + '</h2>' +
-        '<p>' + inline(task.summary) + '</p>' +
-        '<div class="card-meta"><span>' + escapeHTML(task.minutes) + ' 分钟</span><span class="' + (best && best.score >= 85 ? 'is-pass' : '') + '">' + escapeHTML(status) + '</span></div>' +
-        '<div class="card-foot"><span>' + task.tests.length + ' 个用例</span><span>开始改错 <b aria-hidden="true">→</b></span></div>' +
-      '</a>';
+    var visible = visibleTasks();
+    var groups = ['basic', 'medium', 'hard'].map(function (levelId) {
+      var level = LEVELS[levelId];
+      var group = visible.filter(function (task) { return task.level === levelId; });
+      if (!group.length) return '';
+      var cards = group.map(function (task) {
+        var best = state.best[task.id];
+        var done = !!(best && best.score >= 85);
+        var status = best ? (done ? '已通过 · ' + best.score + ' 分' : '最佳 ' + best.score + ' 分') : '未开始';
+        return '<a class="bug-card' + (done ? ' is-done' : '') + '" href="#task/' + escapeHTML(task.id) + '">' +
+          '<div class="card-top"><span class="level level-' + escapeHTML(task.level) + '">' + level.label + '</span>' +
+            '<span class="card-no">' + level.short + String(task.order).padStart(2, '0') + '</span></div>' +
+          '<h2>' + escapeHTML(task.title) + '</h2>' +
+          '<p>' + inline(task.summary) + '</p>' +
+          '<div class="card-meta"><span>' + escapeHTML(task.minutes) + ' 分钟</span><span class="' + (done ? 'is-pass' : '') + '">' + escapeHTML(status) + '</span></div>' +
+          '<div class="card-foot"><span>' + task.tests.length + ' 个用例</span><span>' + (done ? '再练一次' : '开始改错') + ' <b aria-hidden="true">→</b></span></div>' +
+        '</a>';
+      }).join('');
+      return '<section class="level-section" aria-labelledby="level-' + levelId + '">' +
+        '<div class="level-head"><div><span class="level-kicker">' + level.short + ' · ' + level.note + '</span><h2 id="level-' + levelId + '">' + level.label + '</h2></div>' +
+          '<span class="level-count">' + group.length + ' 题 · 完成 ' + group.filter(function (task) { var b = state.best[task.id]; return b && b.score >= 85; }).length + '</span></div>' +
+        '<div class="bug-grid">' + cards + '</div></section>';
     }).join('');
+    var done = solvedCount();
+    var pct = tasks.length ? Math.round(done / tasks.length * 100) : 0;
+    var firstUndone = visible.filter(function (task) { var b = state.best[task.id]; return !(b && b.score >= 85); })[0] || visible[0] || tasks.filter(function (task) { var b = state.best[task.id]; return !(b && b.score >= 85); })[0] || tasks[0];
     $('#content').innerHTML = '<div class="bank">' +
       '<section class="hero">' +
         '<div class="hero-inner">' +
-          '<div class="kicker">C++ · DEBUG LAB · 3 LEVELS</div>' +
+          '<div class="kicker">C++ · DEBUG LAB · ' + tasks.length + ' TASKS</div>' +
           '<h1>C++ 改错实验室</h1>' +
           '<p class="sub">不是选择题。每题给你一段带 bug 的 <code>main.cpp</code>，在编辑器里原地修，提交后由 GCC 14.1 按 <strong>C++20</strong> 真实编译运行，按 <strong>公开 + 隐藏用例</strong>逐条比对；正确性 85 分，速度 15 分。</p>' +
+          '<div class="hero-progress"><div class="hero-progress-head"><span>整体进度</span><b>' + done + ' / ' + tasks.length + '</b></div><div class="hero-progress-track"><i style="width:' + pct + '%"></i></div><span class="hero-progress-note">三档各 ' + (tasks.length / 3) + ' 题 · 已通过 ' + pct + '%</span></div>' +
           '<div class="stats">' +
             '<span class="stat"><b>' + tasks.length + '</b> 道题</span>' +
             '<span class="stat"><b>' + (tasks.reduce(function (n, t) { return n + t.tests.length; }, 0)) + '</b> 个用例</span>' +
@@ -130,20 +171,24 @@
             '<span class="stat"><b>85 + 15</b> 评分</span>' +
             '<span class="stat"><b>' + solvedCount() + '</b> 已通过</span>' +
           '</div>' +
+          '<div class="hero-actions"><a class="hero-btn primary" href="#task/' + escapeHTML(firstUndone.id) + '">' + (done < tasks.length ? '继续未完成' : '从第一题开始') + ' <span aria-hidden="true">→</span></a><button class="hero-btn" type="button" data-scroll-rules>评分规则</button></div>' +
           '<div class="hero-note"><span>真实 Judge0 执行</span><span>逐用例比对</span><span>本地保存进度</span><span>可看解析复盘</span></div>' +
         '</div>' +
       '</section>' +
-      '<div class="bank-head">' +
-        '<div class="tabs" role="tablist" aria-label="难度筛选">' +
-          tabButton('all', '全部', tasks.length) +
-          tabButton('basic', '入门', levelCount('basic')) +
-          tabButton('medium', '进阶', levelCount('medium')) +
-          tabButton('hard', '挑战', levelCount('hard')) +
-        '</div>' +
-        '<span class="bank-hint">先运行公开样例，再提交全部用例</span>' +
+      '<div class="bank-toolbar">' +
+        '<div class="bank-search-row"><label class="search-box" for="debugSearch"><span class="search-icon" aria-hidden="true"></span><input id="debugSearch" type="search" autocomplete="off" spellcheck="false" placeholder="搜索故障、题名或题号，例如 边界、b13、字符串" value="' + escapeHTML(state.query) + '" aria-label="搜索改错题"><kbd>/</kbd></label>' +
+          '<div class="status-tabs" role="group" aria-label="按完成状态筛选">' +
+            '<button type="button" class="' + (state.status === 'all' ? 'active' : '') + '" data-status="all">全部 <b>' + statusCount('all') + '</b></button>' +
+            '<button type="button" class="' + (state.status === 'todo' ? 'active' : '') + '" data-status="todo">未完成 <b>' + statusCount('todo') + '</b></button>' +
+            '<button type="button" class="' + (state.status === 'done' ? 'active' : '') + '" data-status="done">已通过 <b>' + statusCount('done') + '</b></button>' +
+          '</div></div>' +
+        '<div class="bank-filter-row"><div class="tabs" role="tablist" aria-label="难度筛选">' +
+          tabButton('all', '全部难度', tasks.length) + tabButton('basic', '入门', levelCount('basic')) + tabButton('medium', '进阶', levelCount('medium')) + tabButton('hard', '挑战', levelCount('hard')) +
+        '</div><span class="bank-hint">当前显示 <b>' + visible.length + '</b> 题 · 先跑公开样例，再提交全部用例</span></div>' +
       '</div>' +
-      '<div class="bug-grid">' + (cards || '<div class="empty">这一档暂时没有题目。</div>') + '</div>' +
-      '<div class="bank-note">题面取材于 8 本 C++ 教材，错误类型包括：循环边界、整数溢出、整数除法、getline、unique 去重、栈顶配对、闰年规则、排序键、最大堆、背包遍历方向等。每题都有可运行的参考修复与解析，提交后解锁。</div>' +
+      (groups || emptyBank()) +
+      '<div class="rules-card" id="debugRules"><div><span class="kicker">SCORING · 100</span><h2>正确性优先，速度只在全过后计算</h2></div><div class="rules-grid"><div><b>85</b><span>公开 + 隐藏用例</span><p>按通过比例给分；编译失败记 0 分，运行异常或超时按未通过处理。</p></div><div><b>15</b><span>速度分</span><p>全部用例通过后，总运行时间越接近该题基准值，速度分越高。</p></div><div><b>3</b><span>组固定用例</span><p>第一组公开，后两组隐藏；提交后逐条显示输入、期望和实际输出。</p></div></div></div>' +
+      '<div class="bank-note">题面取材于 8 本 C++ 教材，错误类型覆盖循环边界、整数除法、getline、unique 去重、栈顶配对、闰年规则、排序键、最大堆、背包遍历方向、图遍历与动态规划。每题都有可运行的参考修复与解析，提交后解锁。</div>' +
     '</div>';
     updateTop();
     document.title = 'C++ 改错实验室 · ' + tasks.length + ' 题';
@@ -177,14 +222,21 @@
     var hintList = (task.hints || []).slice(0, state.hints).map(function (hint) {
       return '<li>' + inline(hint) + '</li>';
     }).join('');
+    var rank = { basic: 0, medium: 1, hard: 2 };
+    var ordered = tasks.slice().sort(function (a, b) { return (rank[a.level] - rank[b.level]) || (a.order - b.order); });
+    var pos = ordered.findIndex(function (item) { return item.id === task.id; });
+    var prev = ordered[(pos - 1 + ordered.length) % ordered.length];
+    var next = ordered[(pos + 1) % ordered.length];
 
-    $('#content').innerHTML = '<div class="task-shell">' +
+    $('#content').innerHTML = '<div class="task-topnav"><a class="back" href="#bank"><span aria-hidden="true">←</span> 返回题库</a>' +
+      '<span class="task-topnav-mid">' + level.short + String(task.order).padStart(2, '0') + ' / ' + tasks.length + ' · ' + level.label + '</span>' +
+      '<div class="task-topnav-links"><a href="#task/' + escapeHTML(prev.id) + '" aria-label="上一题 ' + escapeHTML(prev.title) + '">← 上一题</a><a href="#task/' + escapeHTML(next.id) + '" aria-label="下一题 ' + escapeHTML(next.title) + '">下一题 →</a></div></div>' +
+      '<div class="task-shell">' +
       '<aside class="brief">' +
-        '<a class="back" href="#bank"><span aria-hidden="true">←</span> 返回题库</a>' +
         '<div class="task-eyebrow"><span class="level level-' + escapeHTML(task.level) + '">' + level.label + '</span><span>' + level.short + String(task.order).padStart(2, '0') + '</span><span>' + escapeHTML(task.minutes) + ' 分钟</span></div>' +
         '<h1>' + escapeHTML(task.title) + '</h1>' +
         '<p class="prompt">' + inline(task.prompt) + '</p>' +
-        '<div class="source-line"><b>取材</b>' + escapeHTML(task.source) + '</div>' +
+        '<div class="source-line"><b>取材：</b>' + escapeHTML(task.source) + '</div>' +
         '<div class="bug-note"><b>故障现象</b><p>' + inline(task.summary) + '</p></div>' +
         '<section class="brief-block"><div class="block-head"><h2>公开样例</h2><span>' + cases.length + ' 条可见</span></div>' +
           '<div class="case-list">' + caseList + '</div>' +
@@ -208,7 +260,7 @@
         '<section class="analysis" id="analysis"' + (state.analysisShown ? '' : ' hidden') + '></section>' +
       '</main>' +
     '</div>' +
-    '<div class="task-foot"><a href="#bank">← 题库</a><span>代码只发送到 Judge0 编译运行；草稿与成绩保存在本机。</span></div>';
+    '<div class="task-foot"><div class="task-foot-links"><a href="#task/' + escapeHTML(prev.id) + '">← ' + escapeHTML(prev.title) + '</a><a href="#task/' + escapeHTML(next.id) + '">' + escapeHTML(next.title) + ' →</a></div><span>代码只发送到 Judge0 编译运行；草稿与成绩保存在本机。</span></div>';
 
     var textarea = $('#codeInput');
     textarea.value = code;
@@ -558,9 +610,52 @@
     }
     document.addEventListener('click', function (event) {
       var tab = event.target.closest('[data-filter]');
-      if (!tab) return;
-      state.filter = tab.getAttribute('data-filter');
-      renderBank();
+      if (tab) {
+        state.filter = tab.getAttribute('data-filter');
+        renderBank();
+        return;
+      }
+      var statusBtn = event.target.closest('[data-status]');
+      if (statusBtn) {
+        state.status = statusBtn.getAttribute('data-status');
+        renderBank();
+        return;
+      }
+      if (event.target.closest('[data-clear-filters]')) {
+        state.filter = 'all';
+        state.status = 'all';
+        state.query = '';
+        renderBank();
+        return;
+      }
+      if (event.target.closest('[data-scroll-rules]')) {
+        var rules = $('#debugRules');
+        if (rules) rules.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+    document.addEventListener('input', function (event) {
+      if (!event.target || event.target.id !== 'debugSearch') return;
+      window.clearTimeout(event.target._searchTimer);
+      event.target._searchTimer = window.setTimeout(function () {
+        state.query = event.target.value;
+        renderBank();
+        var input = $('#debugSearch');
+        if (input) { input.focus(); var end = input.value.length; try { input.setSelectionRange(end, end); } catch (err) {} }
+      }, 180);
+    });
+    document.addEventListener('keydown', function (event) {
+      if (event.target && event.target.id === 'debugSearch' && event.key === 'Escape') {
+        event.target.value = '';
+        state.query = '';
+        renderBank();
+        return;
+      }
+      if (event.key === '/' && !event.metaKey && !event.ctrlKey && !event.altKey) {
+        var tag = (event.target && event.target.tagName || '').toLowerCase();
+        if (tag === 'input' || tag === 'textarea' || state.current) return;
+        var input = $('#debugSearch');
+        if (input) { event.preventDefault(); input.focus(); }
+      }
     });
     window.addEventListener('hashchange', route);
     route();

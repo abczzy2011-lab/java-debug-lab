@@ -23,10 +23,10 @@
   };
 
   function loadStore() {
-    const base = { best: {}, bestMs: {}, code: {}, filter: 'all' };
+    const base = { best: {}, bestMs: {}, code: {}, filter: 'all', status: 'all', query: '' };
     try {
       const raw = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
-      const out = { ...base, filter: raw.filter || 'all' };
+      const out = { ...base, filter: raw.filter || 'all', status: raw.status || 'all', query: '' };
       for (const bag of ['best', 'bestMs', 'code']) {
         const src = raw[bag];
         if (!src || typeof src !== 'object') continue;
@@ -36,6 +36,7 @@
         }
       }
       if (!LEVELS.some(l => l.id === out.filter)) out.filter = 'all';
+      if (!['all', 'todo', 'done'].includes(out.status)) out.status = 'all';
       return out;
     } catch (_) {
       return base;
@@ -98,8 +99,28 @@
     return TASKS.filter(isDone).length;
   }
 
+  function matchQuery(task, query) {
+    const q = String(query || '').trim().toLowerCase();
+    if (!q) return true;
+    return [task.id, task.no, task.title, task.subtitle, task.brief, task.goal, (task.concepts || []).join(' '), levelName(task.level)]
+      .join(' ').toLowerCase().includes(q);
+  }
+
+  function visibleTasks() {
+    return TASKS.filter(task => {
+      if (state.store.filter !== 'all' && task.level !== state.store.filter) return false;
+      if (state.store.status === 'todo' && isDone(task)) return false;
+      if (state.store.status === 'done' && !isDone(task)) return false;
+      return matchQuery(task, state.store.query);
+    });
+  }
+
   function updateProgress() {
     if (topProgress) topProgress.textContent = `${doneCount()} / ${TASKS.length}`;
+  }
+
+  function progressPct() {
+    return TASKS.length ? Math.round(doneCount() / TASKS.length * 100) : 0;
   }
 
   function emptyResultHtml() {
@@ -538,25 +559,48 @@
     </button>`;
   }
 
-  function renderBank() {
+  function statusCount(status) {
+    if (status === 'todo') return TASKS.filter(t => !isDone(t)).length;
+    if (status === 'done') return TASKS.filter(isDone).length;
+    return TASKS.length;
+  }
+
+  function emptyBankHtml() {
+    if (state.store.query.trim()) {
+      return `<div class="bank-empty"><b>没有匹配的题目</b><p>换个关键词，或清空搜索回到全部 ${TASKS.length} 题。</p><button class="lab-btn small" type="button" data-action="clear-filters">清空筛选</button></div>`;
+    }
+    if (state.store.status === 'done') return '<div class="bank-empty"><b>这一档还没有通过的题</b><p>先运行公开样例，再提交三组测试。</p></div>';
+    if (state.store.status === 'todo') return '<div class="bank-empty"><b>这一档已经全部通过</b><p>可以切到「已通过」回看，或挑战另一档难度。</p></div>';
+    return '<div class="bank-empty">这个难度下暂时没有题目。</div>';
+  }
+
+  function renderBank(focusSearch) {
     const filter = state.store.filter || 'all';
-    const filtered = filter === 'all' ? TASKS : TASKS.filter(t => t.level === filter);
+    const visible = visibleTasks();
     const groups = LEVELS.map(level => {
-      const tasks = filtered.filter(t => t.level === level.id);
+      const tasks = visible.filter(t => t.level === level.id);
       if (!tasks.length) return '';
       return `<section class="level-section" aria-labelledby="level-${esc(level.id)}">
         <div class="level-head">
           <div><span class="level-kicker">${esc(level.kicker)}</span><h2 id="level-${esc(level.id)}">${esc(level.name)}</h2><p>${esc(level.desc)}</p></div>
-          <span class="level-count">${tasks.length} 题</span>
+          <span class="level-count">${tasks.length} 题 · 完成 ${tasks.filter(isDone).length}</span>
         </div>
         <div class="task-grid">${tasks.map(taskCard).join('')}</div>
       </section>`;
     }).join('');
 
+    const firstUndone = visible.find(t => !isDone(t)) || visible[0] || TASKS.find(t => !isDone(t)) || TASKS[0];
+    const done = doneCount();
+    const pct = progressPct();
     app.innerHTML = `<section class="lab-hero">
-      <span class="kicker">C++ · OUTPUT → CODE · 3 TEST CASES</span>
+      <span class="kicker">C++ · OUTPUT → CODE · ${TASKS.length} TASKS</span>
       <h1>给你输出，<span>从零写出完整程序</span></h1>
       <p class="sub">没有待改的错误代码，也没有可抄的答案。先看目标输出，再从 <b>main.cpp</b> 的空白程序开始写；提交后由真实 GCC 编译运行，按 <b>3 组用例</b>比对 stdout，并把 <b>运行毫秒</b>计入评分。</p>
+      <div class="hero-progress" aria-label="题库完成进度">
+        <div class="hero-progress-head"><span>整体进度</span><b>${done} / ${TASKS.length}</b></div>
+        <div class="hero-progress-track"><i style="width:${pct}%"></i></div>
+        <span class="hero-progress-note">三档各 ${TASKS.length / LEVELS.length} 题 · 已通过 ${pct}%</span>
+      </div>
       <div class="hero-stats">
         <span><b>${LEVELS.length}</b> 档难度</span>
         <span><b>${TASKS.length}</b> 道题</span>
@@ -565,19 +609,33 @@
         <span>C++20 · GCC 14</span>
       </div>
       <div class="hero-actions">
-        <button class="lab-btn primary" type="button" data-action="start-first">开始一题 <span aria-hidden="true">→</span></button>
+        <button class="lab-btn primary" type="button" data-action="start-first">${done < TASKS.length ? '继续未完成' : '从第一题开始'} <span aria-hidden="true">→</span></button>
         <button class="lab-btn" type="button" data-action="scroll-rules">评分规则</button>
       </div>
       <div class="hero-note">判题由公共 <b>Judge0</b> 的 GCC 14.1 执行，需要联网；代码在本机编辑，成绩和草稿只保存在这台设备。</div>
     </section>
     <div class="bank-toolbar">
-      <div class="filter-tabs" role="group" aria-label="按难度筛选">
-        <button type="button" class="${filter === 'all' ? 'active' : ''}" data-action="filter" data-filter="all">全部 <b>${TASKS.length}</b></button>
-        ${LEVELS.map(l => `<button type="button" class="${filter === l.id ? 'active' : ''}" data-action="filter" data-filter="${esc(l.id)}">${esc(l.name)} <b>${TASKS.filter(t => t.level === l.id).length}</b></button>`).join('')}
+      <div class="bank-search-row">
+        <label class="search-box" for="taskSearch">
+          <span class="search-icon" aria-hidden="true"></span>
+          <input id="taskSearch" type="search" inputmode="search" autocomplete="off" spellcheck="false" placeholder="搜索题名、考点或题号，例如 vector、排序、b20" value="${esc(state.store.query)}" aria-label="搜索输出题">
+          <kbd>/</kbd>
+        </label>
+        <div class="status-tabs" role="group" aria-label="按完成状态筛选">
+          <button type="button" class="${state.store.status === 'all' ? 'active' : ''}" data-action="filter-status" data-status="all">全部 <b>${statusCount('all')}</b></button>
+          <button type="button" class="${state.store.status === 'todo' ? 'active' : ''}" data-action="filter-status" data-status="todo">未完成 <b>${statusCount('todo')}</b></button>
+          <button type="button" class="${state.store.status === 'done' ? 'active' : ''}" data-action="filter-status" data-status="done">已通过 <b>${statusCount('done')}</b></button>
+        </div>
       </div>
-      <div class="bank-note">已完成 <b>${doneCount()}</b> / ${TASKS.length} · 最佳成绩保存在本机</div>
+      <div class="bank-filter-row">
+        <div class="filter-tabs" role="group" aria-label="按难度筛选">
+          <button type="button" class="${filter === 'all' ? 'active' : ''}" data-action="filter" data-filter="all">全部难度 <b>${TASKS.length}</b></button>
+          ${LEVELS.map(l => `<button type="button" class="${filter === l.id ? 'active' : ''}" data-action="filter" data-filter="${esc(l.id)}">${esc(l.name)} <b>${TASKS.filter(t => t.level === l.id).length}</b></button>`).join('')}
+        </div>
+        <div class="bank-note">当前显示 <b>${visible.length}</b> 题 · 最佳成绩保存在本机${firstUndone ? ` · <button class="link-btn" type="button" data-action="open-task" data-task="${esc(firstUndone.id)}">继续 ${esc(firstUndone.title)} →</button>` : ''}</div>
+      </div>
     </div>
-    ${groups || '<div class="bank-empty">这个难度下暂时没有题目。</div>'}
+    ${groups || emptyBankHtml()}
     <section class="bank-rules" id="judgingRules">
       <div class="rules-title"><span class="kicker">SCORING · 100</span><h2>分数只看两件可验证的事</h2></div>
       <div class="rules-grid">
@@ -587,6 +645,14 @@
       </div>
     </section>`;
     updateProgress();
+    if (focusSearch) {
+      const input = document.getElementById('taskSearch');
+      if (input) {
+        input.focus();
+        const end = input.value.length;
+        try { input.setSelectionRange(end, end); } catch (_) {}
+      }
+    }
   }
 
   function renderLineNumbers(textarea) {
@@ -954,8 +1020,30 @@
     renderBank();
   }
 
+  function setStatus(status) {
+    if (!['all', 'todo', 'done'].includes(status)) return;
+    state.store.status = status;
+    persistStore();
+    renderBank();
+  }
+
+  function setQuery(query) {
+    state.store.query = String(query || '');
+    persistStore();
+    renderBank(true);
+  }
+
+  function clearFilters() {
+    state.store.filter = 'all';
+    state.store.status = 'all';
+    state.store.query = '';
+    persistStore();
+    renderBank();
+  }
+
   function startFirst() {
-    const first = TASKS.find(t => !isDone(t)) || TASKS[0];
+    const visible = visibleTasks();
+    const first = visible.find(t => !isDone(t)) || visible[0] || TASKS.find(t => !isDone(t)) || TASKS[0];
     if (first) openTask(first.id);
   }
 
@@ -972,6 +1060,12 @@
     } else if (action === 'filter') {
       event.preventDefault();
       setFilter(trigger.dataset.filter || 'all');
+    } else if (action === 'filter-status') {
+      event.preventDefault();
+      setStatus(trigger.dataset.status || 'all');
+    } else if (action === 'clear-filters') {
+      event.preventDefault();
+      clearFilters();
     } else if (action === 'start-first') {
       event.preventDefault();
       startFirst();
@@ -991,6 +1085,35 @@
     } else if (action === 'reset') {
       event.preventDefault();
       resetCode();
+    }
+  });
+
+  app.addEventListener('input', event => {
+    if (event.target && event.target.id === 'taskSearch') {
+      clearTimeout(event.target._searchTimer);
+      event.target._searchTimer = setTimeout(() => setQuery(event.target.value), 180);
+    }
+  });
+
+  app.addEventListener('keydown', event => {
+    if (event.target && event.target.id === 'taskSearch' && event.key === 'Escape') {
+      event.preventDefault();
+      event.target.value = '';
+      state.store.query = '';
+      persistStore();
+      renderBank();
+    }
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key !== '/' || event.metaKey || event.ctrlKey || event.altKey) return;
+    const tag = (event.target && event.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || (event.target && event.target.isContentEditable)) return;
+    if (state.taskId) return;
+    const input = document.getElementById('taskSearch');
+    if (input) {
+      event.preventDefault();
+      input.focus();
     }
   });
 
