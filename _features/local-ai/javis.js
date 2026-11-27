@@ -31,38 +31,46 @@ const LS = {
 
 // 最后一条退路：不摆在明面上，也不在 AI 正常时打扰。AI 失败后才会露出「锦囊」，
 // 里面放的不是高级课，而是初学者真的能看懂、能搜到人话的地方。
+const KIT_FILTERS = [
+  { key: 'all', label: '全部' },
+  { key: 'error', label: '查报错' },
+  { key: 'project', label: '看项目' },
+  { key: 'basics', label: '补基础' },
+  { key: 'docs', label: '查文档' },
+];
+
 const KIT_SITES = [
   {
-    name: 'CSDN', url: 'https://www.csdn.net/', tag: '中文社区 · 搜报错',
-    why: '把完整报错原样粘进搜索框，先看别人有没有踩过同一个坑。优先挑带完整代码、能复现、评论里有纠错的那篇。',
+    name: 'CSDN', url: 'https://www.csdn.net/', tag: '中文社区 · 搜报错', kind: 'error',
+    why: '把完整报错原样粘进搜索框。优先看带完整代码、能复现、评论里有纠错的那篇。',
   },
   {
-    name: 'GitHub', url: 'https://github.com/', tag: '真实项目 · 从 README 开始',
-    why: '不会读源码也能用：先看 README 的安装步骤和目录，再翻 issue 里别人怎么描述问题。搜同主题小项目，比只看教程更接近真实工程。',
+    name: 'Stack Overflow', url: 'https://stackoverflow.com/', tag: '英文问答 · 找根因', kind: 'error',
+    why: '搜报错最后一行。英文答案更接近根因；读不动就翻译，代码块不用翻。',
   },
   {
-    name: 'Stack Overflow', url: 'https://stackoverflow.com/', tag: '英文问答 · 找根因',
-    why: '报错最后一行直接搜，英文答案往往更接近根因。读不动就用浏览器翻译，代码块不用翻。',
+    name: 'GitHub', url: 'https://github.com/', tag: '真实项目 · 从 README 开始', kind: 'project',
+    why: '先读 README，再翻 Issue。看别人怎么描述问题，比只看教程更接近真实工程。',
   },
   {
-    name: '博客园', url: 'https://www.cnblogs.com/', tag: '中文长文 · 工程笔记',
-    why: '很多老工程师把完整实现和踩坑过程写在这里。适合耐心啃一篇长文，而不是只看三行结论。',
+    name: '博客园', url: 'https://www.cnblogs.com/', tag: '中文长文 · 工程笔记', kind: 'project',
+    why: '老工程师的完整实现和踩坑记录。适合耐心啃一篇长文，而不是只看三行结论。',
   },
   {
-    name: '菜鸟教程', url: 'https://www.runoob.com/', tag: '从零补基础',
-    why: '例子短、目录直，HTML、Java、Python、SQL 都能先跑一遍。看不懂课时，用它把最小例子跑通。',
+    name: '菜鸟教程', url: 'https://www.runoob.com/', tag: '从零补基础', kind: 'basics',
+    why: '例子短、目录直。看不懂课时，先在这里把最小例子跑通。',
   },
   {
-    name: '廖雪峰', url: 'https://liaoxuefeng.com/', tag: '系统教程 · 中文',
-    why: 'Java、Python、JavaScript 都有完整的中文主线。适合发现自己缺一整块基础时，从头顺一遍。',
+    name: '廖雪峰', url: 'https://liaoxuefeng.com/', tag: '系统教程 · 中文', kind: 'basics',
+    why: '缺一整块基础时，从头顺一遍完整主线，比零散搜十个答案稳。',
   },
   {
-    name: 'MDN Web Docs', url: 'https://developer.mozilla.org/zh-CN/', tag: 'Web 标准 · 最稳',
-    why: 'JavaScript、DOM、HTTP、浏览器行为的第一手说明书。前端概念打架时，以这里为准。',
+    name: 'freeCodeCamp 中文', url: 'https://www.freecodecamp.org/chinese/', tag: '边写边学 · 免费', kind: 'basics',
+    why: '完全不知道下一步做什么时，先做一小节交互练习，让手先动起来。',
   },
   {
-    name: 'freeCodeCamp 中文', url: 'https://www.freecodecamp.org/chinese/', tag: '边写边学 · 免费',
-    why: '完全不知道下一步做什么时，先做一小节交互练习。手先动起来，比继续盯着概念有用。',
+    name: 'MDN Web Docs', url: 'https://developer.mozilla.org/zh-CN/', tag: 'Web 标准 · 最稳', kind: 'docs',
+    why: 'JavaScript、DOM、HTTP 的第一手说明书。前端概念打架时，以这里为准。',
   },
 ];
 
@@ -99,7 +107,7 @@ const state = {
   searchOpen: false, searchQuery: '', searchBusy: false, searchError: '', searchResults: null,
   forceSearch: false, searchOnlyReason: '',
   resolveByMsg: {}, nextId: 1,
-  panelOpen: false, orbMinimized: false, kitOpen: false, initialized: false,
+  panelOpen: false, orbMinimized: false, kitOpen: false, kitFilter: 'all', initialized: false,
 };
 
 let panel, orb, orbMinBtn, orbRestoreBtn, gateBox, chatBox, msgBox, input, sendBtn, statusEl, searchView, searchInput, searchResultsBox;
@@ -174,6 +182,7 @@ function uiMarkup() {
       <div class="jv-foot">
         <span id="jv-foot-left">模型直答 · 不读取站内资料</span>
         <div class="jv-foot-right">
+          <button class="jv-kit-entry" type="button" data-jv-action="kit" title="打不开思路时，打开锦囊" aria-haspopup="dialog"><span aria-hidden="true">✦</span>锦囊</button>
           <div class="jv-source-switch" id="jv-source-switch" role="group" aria-label="回答来源" hidden><button type="button" data-jv-action="source" data-source="cloud">云端</button><button type="button" data-jv-action="source" data-source="local">本地</button></div>
           <button class="jv-local-action" id="jv-local-action" type="button" data-jv-action="unload" title="卸载本地 AI，释放显存；下载的权重仍保留" hidden>卸载本地</button>
           <span>⌘K</span>
@@ -186,17 +195,71 @@ function uiMarkup() {
     <section class="jv-kit-sheet" role="dialog" aria-modal="true" aria-labelledby="jv-kit-title" aria-describedby="jv-kit-copy">
       <button class="jv-kit-close" type="button" data-kit-close aria-label="收起锦囊">×</button>
       <div class="jv-kit-head">
-        <div class="jv-kit-kicker">LAST RESORT · 无路可走时才打开</div>
+        <div class="jv-kit-kicker">LAST RESORT · 先停一下，再换条路</div>
         <h2 id="jv-kit-title">最后一扇门，给还在硬撑的你</h2>
-        <p id="jv-kit-copy">如果你已经试过所有按钮，把同一句报错读到眼睛发酸，还是不懂——先停一下。不是你笨，也不是你不适合学编程，是这条解释线真的走到头了。</p>
-        <p class="jv-kit-only">我不保证门后一定有标准答案；但在你已经无路可走的这一刻，这是本站唯一还亮着的地方，也是你此刻唯一的解。</p>
+        <p id="jv-kit-copy">同一句报错看到第三遍还是不懂，说明这条解释线已经走到头了。不是你笨，也不是你不适合学编程——先停一下，把问题换一种拿出去的方式。</p>
+        <div class="jv-kit-path" aria-label="三步脱困">
+          <span class="jv-kit-step"><b>01</b><span>写清三行</span></span>
+          <span class="jv-kit-step"><b>02</b><span>去对的地方搜</span></span>
+          <span class="jv-kit-step"><b>03</b><span>只带走一个下一步</span></span>
+        </div>
         <div class="jv-kit-oath">这不是认输。是你终于愿意换一条路，把自己带出去。</div>
       </div>
-      <div class="jv-kit-grid" id="jv-kit-grid"></div>
-      <div class="jv-kit-searchnote">
-        <b>推门前，先把问题缩成三行：</b>
-        <span>① 我在做什么　② 我期望发生什么　③ 实际发生了什么（附完整报错最后一行）</span>
-        <em>带着这三行去搜，命中率会比只搜“为什么报错”高很多。</em>
+
+      <section class="jv-kit-builder" aria-labelledby="jv-kit-builder-title">
+        <div class="jv-kit-builder-head">
+          <div>
+            <div class="jv-kit-label">30 秒求助卡</div>
+            <h3 id="jv-kit-builder-title">把混乱的问题，压成一段能搜的话</h3>
+          </div>
+          <span class="jv-kit-builder-badge">三行就够</span>
+        </div>
+        <div class="jv-kit-fields">
+          <label class="jv-kit-field">
+            <span>① 我在做什么</span>
+            <textarea rows="2" data-kit-field="doing" placeholder="例如：在 Java 里读取用户输入"></textarea>
+          </label>
+          <label class="jv-kit-field">
+            <span>② 我期望发生什么</span>
+            <textarea rows="2" data-kit-field="expect" placeholder="例如：输入三个数字后求和"></textarea>
+          </label>
+          <label class="jv-kit-field">
+            <span>③ 实际发生了什么</span>
+            <textarea rows="2" data-kit-field="actual" placeholder="贴完整报错的最后一行，不要只写“报错了”"></textarea>
+          </label>
+        </div>
+        <div class="jv-kit-brief-wrap">
+          <span class="jv-kit-brief-label">将拿去搜索的话</span>
+          <pre class="jv-kit-brief" id="jv-kit-brief"></pre>
+        </div>
+        <div class="jv-kit-builder-actions">
+          <button class="jv-kit-copy" id="jv-kit-copy" type="button" data-kit-copy>复制这三行</button>
+          <span class="jv-kit-engine-label">直接搜：</span>
+          <a class="jv-kit-engine" data-kit-engine="baidu" href="https://www.baidu.com/" target="_blank" rel="noopener noreferrer">百度</a>
+          <a class="jv-kit-engine" data-kit-engine="bing" href="https://cn.bing.com/" target="_blank" rel="noopener noreferrer">必应</a>
+          <a class="jv-kit-engine" data-kit-engine="google" href="https://www.google.com/" target="_blank" rel="noopener noreferrer">Google</a>
+        </div>
+        <div class="jv-kit-builder-meta">
+          <span id="jv-kit-copy-state" role="status" aria-live="polite">复制后去搜，命中率会高很多</span>
+          <span class="jv-kit-privacy">别贴密码、token、学号和本机绝对路径。</span>
+        </div>
+      </section>
+
+      <section class="jv-kit-directory" aria-labelledby="jv-kit-directory-title">
+        <div class="jv-kit-section-head">
+          <div>
+            <div class="jv-kit-label">WHERE TO SEARCH</div>
+            <h3 id="jv-kit-directory-title">去哪儿搜</h3>
+          </div>
+          <p>同一个问题，去错地方会多耗一小时。</p>
+        </div>
+        <div class="jv-kit-filters" id="jv-kit-filters" role="group" aria-label="筛选推荐站点"></div>
+        <div class="jv-kit-grid" id="jv-kit-grid"></div>
+      </section>
+
+      <div class="jv-kit-rule">
+        <b>只带走一个能执行的动作</b>
+        <span>看到三个以上答案时，先选一个今晚能试的；不要同时改五处，否则你不知道是哪一步起了作用。</span>
       </div>
       <div class="jv-kit-foot">
         <span>今晚不用全部学会，先找到一句能让你继续走下去的话。</span>
@@ -295,9 +358,17 @@ function bindUi() {
   $('#jv-search-close').addEventListener('click', closeSearch);
   $('#jv-search-form').addEventListener('submit', e => { e.preventDefault(); runSearch(); });
   const kitLayer = $('#jv-kit-layer');
-  if (kitLayer) kitLayer.addEventListener('click', e => {
-    if (e.target === kitLayer || e.target.closest('[data-kit-close]')) closeKit();
-  });
+  if (kitLayer) {
+    kitLayer.addEventListener('click', e => {
+      if (e.target === kitLayer || e.target.closest('[data-kit-close]')) { closeKit(); return; }
+      const filter = e.target.closest('[data-kit-filter]');
+      if (filter) { filterKit(filter.dataset.kitFilter); return; }
+      if (e.target.closest('[data-kit-copy]')) copyKitBrief();
+    });
+    kitLayer.addEventListener('input', e => {
+      if (e.target.matches('[data-kit-field]')) syncKitBrief();
+    });
+  }
   $('#jv-form').addEventListener('submit', e => { e.preventDefault(); submit(); });
   input.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); }
@@ -313,6 +384,7 @@ function bindUi() {
   });
   document.addEventListener('keydown', e => {
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); state.panelOpen ? closePanel() : openPanel(); }
+    if (e.key === 'Tab' && state.kitOpen) { trapKitFocus(e); return; }
     if (e.key === 'Escape' && state.kitOpen) { closeKit(); return; }
     if (e.key === 'Escape' && state.searchOpen) { closeSearch(); return; }
     if (e.key === 'Escape' && state.panelOpen) closePanel();
@@ -395,17 +467,120 @@ function applyOrbGlass() {
   } catch (e) {}
 }
 
+const KIT_KIND_LABEL = { error: '查报错', project: '看项目', basics: '补基础', docs: '查文档' };
+const KIT_FIELD_SELECTORS = {
+  doing: '[data-kit-field="doing"]',
+  expect: '[data-kit-field="expect"]',
+  actual: '[data-kit-field="actual"]',
+};
 let kitCloseTimer = 0;
+let kitCopyTimer = 0;
+let kitReturnFocus = null;
+
+function kitValues() {
+  return Object.fromEntries(Object.entries(KIT_FIELD_SELECTORS).map(([key, sel]) => [key, String($(sel)?.value || '').trim()]));
+}
+
+function kitBriefText() {
+  const v = kitValues();
+  return [
+    `我在做什么：${v.doing || '________'}`,
+    `我期望发生：${v.expect || '________'}`,
+    `实际发生：${v.actual || '________'}`,
+  ].join('\n');
+}
+
+function syncKitBrief() {
+  const v = kitValues();
+  const brief = kitBriefText();
+  const briefBox = $('#jv-kit-brief');
+  if (briefBox) briefBox.textContent = brief;
+  const ready = Object.values(v).some(Boolean);
+  const copy = $('#jv-kit-copy');
+  if (copy) copy.disabled = !ready;
+  const query = brief.replace(/\s+/g, ' ').trim();
+  const engines = {
+    baidu: `https://www.baidu.com/s?wd=${encodeURIComponent(query)}`,
+    bing: `https://cn.bing.com/search?q=${encodeURIComponent(query)}`,
+    google: `https://www.google.com/search?q=${encodeURIComponent(query)}`,
+  };
+  document.querySelectorAll('[data-kit-engine]').forEach(link => {
+    const key = link.dataset.kitEngine;
+    link.href = engines[key] || link.href;
+    link.classList.toggle('is-disabled', !ready);
+    link.setAttribute('aria-disabled', String(!ready));
+    if (!ready) link.setAttribute('tabindex', '-1');
+    else link.removeAttribute('tabindex');
+  });
+}
+
+function setKitCopyState(text, isError = false) {
+  const el = $('#jv-kit-copy-state');
+  if (!el) return;
+  el.textContent = text;
+  el.classList.toggle('is-error', isError);
+  clearTimeout(kitCopyTimer);
+  kitCopyTimer = setTimeout(() => {
+    if (!state.kitOpen) return;
+    el.textContent = '复制后去搜，命中率会高很多';
+    el.classList.remove('is-error');
+  }, 2600);
+}
+
+function fallbackCopyText(text) {
+  const area = document.createElement('textarea');
+  area.value = text;
+  area.setAttribute('readonly', '');
+  area.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
+  document.body.appendChild(area);
+  area.select();
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch {}
+  area.remove();
+  return ok;
+}
+
+async function copyKitBrief() {
+  const text = kitBriefText();
+  try {
+    if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
+    else if (!fallbackCopyText(text)) throw new Error('copy unavailable');
+    setKitCopyState('已复制。去百度、必应或 Google 搜一下。');
+  } catch {
+    if (fallbackCopyText(text)) setKitCopyState('已复制。去百度、必应或 Google 搜一下。');
+    else setKitCopyState('复制没成功，可以手动选中上面的三行。', true);
+  }
+}
+
+function filterKit(key) {
+  state.kitFilter = KIT_FILTERS.some(f => f.key === key) ? key : 'all';
+  document.querySelectorAll('#jv-kit-grid .jv-kit-card').forEach(card => {
+    card.hidden = state.kitFilter !== 'all' && card.dataset.kind !== state.kitFilter;
+  });
+  document.querySelectorAll('#jv-kit-filters [data-kit-filter]').forEach(btn => {
+    const on = btn.dataset.kitFilter === state.kitFilter;
+    btn.classList.toggle('is-on', on);
+    btn.setAttribute('aria-pressed', String(on));
+  });
+}
+
 function renderKit() {
   const grid = $('#jv-kit-grid');
-  if (!grid) return;
-  grid.innerHTML = KIT_SITES.map((site, i) => `<a class="jv-kit-card" href="${esc(site.url)}" target="_blank" rel="noopener noreferrer" aria-label="在新窗口打开 ${esc(site.name)}">
+  const filters = $('#jv-kit-filters');
+  if (!grid || !filters) return;
+  filters.innerHTML = KIT_FILTERS.map(item => {
+    const count = item.key === 'all' ? KIT_SITES.length : KIT_SITES.filter(site => site.kind === item.key).length;
+    return `<button type="button" data-kit-filter="${item.key}" aria-pressed="false">${item.label}<em>${count}</em></button>`;
+  }).join('');
+  grid.innerHTML = KIT_SITES.map((site, i) => `<a class="jv-kit-card" data-kind="${site.kind}" href="${esc(site.url)}" target="_blank" rel="noopener noreferrer" aria-label="在新窗口打开 ${esc(site.name)}">
     <span class="jv-kit-no">${String(i + 1).padStart(2, '0')}</span>
     <span class="jv-kit-name">${esc(site.name)}</span>
     <span class="jv-kit-tag">${esc(site.tag)}</span>
     <span class="jv-kit-why">${esc(site.why)}</span>
     <span class="jv-kit-go">去看看 <i aria-hidden="true">↗</i></span>
   </a>`).join('');
+  filterKit(state.kitFilter);
+  syncKitBrief();
 }
 
 function openKit() {
@@ -413,6 +588,8 @@ function openKit() {
   if (!layer || state.kitOpen) return;
   clearTimeout(kitCloseTimer);
   state.kitOpen = true;
+  state.kitFilter = 'all';
+  kitReturnFocus = document.activeElement;
   renderKit();
   layer.hidden = false;
   document.body.classList.add('jv-kit-lock');
@@ -428,8 +605,31 @@ function closeKit() {
   layer.classList.remove('is-open');
   document.body.classList.remove('jv-kit-lock');
   clearTimeout(kitCloseTimer);
+  clearTimeout(kitCopyTimer);
   kitCloseTimer = setTimeout(() => { if (!state.kitOpen) layer.hidden = true; }, 180);
-  try { if (state.panelOpen) input?.focus({ preventScroll: true }); } catch {}
+  const returnTarget = kitReturnFocus;
+  kitReturnFocus = null;
+  try {
+    if (returnTarget && returnTarget.isConnected) returnTarget.focus({ preventScroll: true });
+    else if (state.panelOpen) input?.focus({ preventScroll: true });
+  } catch {}
+}
+
+function trapKitFocus(e) {
+  const layer = $('#jv-kit-layer');
+  if (!layer) return;
+  const focusables = Array.from(layer.querySelectorAll('a[href],button:not([disabled]),textarea,input,[tabindex]:not([tabindex="-1"])'))
+    .filter(el => !el.hidden && el.getAttribute('aria-disabled') !== 'true' && el.offsetParent !== null);
+  if (!focusables.length) return;
+  const first = focusables[0];
+  const last = focusables[focusables.length - 1];
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault();
+    first.focus();
+  }
 }
 
 function openPanel() {
@@ -1834,6 +2034,7 @@ function renderChat() {
     <div class="jv-welcome-title">晚上好，我是 Javis。</div>
     <div class="jv-welcome-copy">我先判断你问的是站内课程还是通用问题：全站地图、第几课、练习会直接查本站目录；Java 概念、代码、对比和学习建议再用云端或本地模型回答。对话会记住上文，追问“它/这个/那”也能接上。</div>
     <div class="jv-welcome-tags"><span>站内目录</span><span>对话记忆</span><span>云端 / 本地</span></div>
+    <button class="jv-welcome-kit" type="button" data-jv-action="kit">卡住了？打开锦囊 <span aria-hidden="true">→</span></button>
   </div>`;
   const html = state.messages.map(m => {
     const resolve = state.resolveByMsg[m.id] || {};
