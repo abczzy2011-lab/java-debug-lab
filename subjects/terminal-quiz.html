@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050b12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>终端指令题库 · 45 道三平台单选题</title>
+<meta name="description" content="macOS、Linux、Windows 三平台终端指令题库：45 道场景单选题，覆盖基础导航、文件、文本、权限、进程、网络、开发、包管理、磁盘、安全、容器、多媒体、平台专属和别名。答完自动评分、按平台统计并支持只练错题。">
+<link rel="icon" type="image/png" href="../assets/icons/terminal.png?v=20261127z88n">
+<link rel="stylesheet" href="../assets/css/terminal.css?v=20261127z88n">
+<link rel="stylesheet" href="../assets/css/terminal-quiz.css?v=20261127z88n">
+</head>
+<body class="term-page quiz-page">
+<header class="term-topbar">
+  <a class="term-back" href="terminal.html?v=20261127z88n" aria-label="返回终端指令全集"><span aria-hidden="true">←</span>指令全集</a>
+  <div class="term-brand"><span class="term-mark" aria-hidden="true">?</span><b>终端指令题库</b></div>
+  <div class="term-topmeta">
+    <span class="online">● 45 道题 · 三平台</span>
+    <span class="dot" aria-hidden="true"></span>
+    <span>即时判分 / 解析 / 错题重练</span>
+  </div>
+</header>
+
+<main class="term-wrap quiz-wrap">
+  <section class="quiz-hero" aria-labelledby="quizHeroTitle">
+    <div class="quiz-hero-copy">
+      <div class="term-kicker">TERMINAL COMMAND QUIZ · 45 QUESTIONS</div>
+      <h1 id="quizHeroTitle">把命令<br><em>用对场景</em></h1>
+      <p>背下 <strong>pwd</strong> 不等于会用终端。这 45 道单选题从真实排障场景出发，覆盖 macOS、Linux、Windows 三平台，每题只有一个最佳答案；答完会按平台和分组给出结果，并支持只练错题。</p>
+      <div class="quiz-hero-stats" aria-label="题库规模">
+        <div><b>45</b><span>道场景题</span></div>
+        <div><b>3</b><span>个平台</span></div>
+        <div><b>15</b><span>个命令分组</span></div>
+      </div>
+    </div>
+    <div class="quiz-window" aria-hidden="true">
+      <div class="quiz-window-bar"><i></i><i></i><i></i><span>terminal-quiz — session</span></div>
+      <pre><span class="dim"># 题目会问“该用哪条”，而不是“这条是什么”</span>
+<span class="q">?</span> 想从最后一行往上查看完整日志，用哪条？
+<span class="dim">A</span> tail -f app.log
+<span class="dim">B</span> tac app.log
+<span class="dim">C</span> head -n 5 app.log
+<span class="dim">D</span> less +F app.log
+<span class="ok">✓ B · tac 按行倒序输出</span>
+<span class="dim">下一题：按 1–4 选择，Enter 继续</span></pre>
+    </div>
+  </section>
+
+  <section class="term-panel quiz-panel" aria-labelledby="quizPanelTitle">
+    <div class="term-panel-head">
+      <div>
+        <div class="term-kicker">QUIZ SESSION · IMMEDIATE FEEDBACK</div>
+        <h2 id="quizPanelTitle">开始答题</h2>
+        <p class="term-panel-sub">选择平台后开始；每题作答立即显示正确答案和解析。做到最后一题自动结算，也可随时只练本轮错题。</p>
+      </div>
+      <div class="quiz-progress" id="quizProgress" aria-live="polite"><b>0</b><i>/</i><span>45</span><em>已答</em></div>
+    </div>
+
+    <div class="quiz-os-tabs" id="quizTabs" role="tablist" aria-label="选择题库平台"></div>
+
+    <div class="quiz-meta-bar">
+      <span id="quizMeta">终端题库 · 第 1 / 45 题</span>
+      <span class="quiz-score" id="quizScore">已答 <b>0</b> / 45 · 答对 <b>0</b></span>
+    </div>
+
+    <div id="quizStage"></div>
+    <div class="quiz-nav" id="quizNav">
+      <span class="quiz-nav-note">快捷操作：数字键 1–4 选择，Enter 下一题</span>
+      <div class="quiz-nav-right">
+        <button class="quiz-btn" id="quizPrev" type="button" disabled>上一题</button>
+        <button class="quiz-btn primary" id="quizNext" type="button" disabled>下一题</button>
+      </div>
+    </div>
+    <div id="quizResult" hidden></div>
+    <noscript><div class="quiz-empty"><b>需要 JavaScript</b>这个页面用 JavaScript 判分和显示解析，请开启后刷新。</div></noscript>
+  </section>
+
+  <footer class="term-foot">
+    <span><b>说明：</b>题目按 macOS zsh、Linux Bash 与 Windows PowerShell 的真实行为设计；同一功能可能有多种命令，这里选最符合题干场景的一条。命令细节可回到指令全集搜索。</span>
+    <span><b>入口：</b><a class="quiz-progress-link" href="terminal.html?v=20261127z88n">← 返回 2,527 条终端指令全集</a></span>
+  </footer>
+</main>
+
+<script src="../assets/js/terminal-quiz-data.js?v=20261127z88n"></script>
+<script src="../assets/js/terminal-quiz-app.js?v=20261127z88n"></script>
+</body>
+</html>

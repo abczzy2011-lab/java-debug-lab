@@ -328,3 +328,25 @@ button{cursor:pointer}
 .term-load-more:hover,.term-show-all:hover{transform:translateY(-1px);border-color:rgba(94,234,212,.44);background:rgba(94,234,212,.14)}
 .term-load-more:focus-visible,.term-show-all:focus-visible{outline:2px solid var(--term-mint);outline-offset:3px}
 @media (max-width:720px){.term-more{flex-wrap:wrap}.term-load-more,.term-show-all{flex:1;min-width:120px}}
+
+/* 题库入口 */
+.term-head-actions{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.term-quiz-cta{
+  display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 13px;border-radius:9px;
+  color:#fff3dc;font-size:11px;font-weight:800;white-space:nowrap;
+  border:1px solid rgba(245,201,138,.35);background:linear-gradient(135deg,rgba(245,201,138,.14),rgba(245,201,138,.04));
+  transition:border-color .18s,background .18s,transform .18s;
+}
+.term-quiz-cta:hover{border-color:rgba(245,201,138,.62);background:rgba(245,201,138,.18);transform:translateY(-1px)}
+.term-quiz-cta:focus-visible{outline:2px solid var(--term-amber);outline-offset:3px}
+.term-quiz-cta span{color:var(--term-amber);font-family:var(--term-mono)}
+.term-quiz-cta-small{height:28px;font-size:10px;padding:0 10px;color:#e8d7b9}
+.term-hero-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:16px}
+.term-hero-secondary{font-size:11px;color:#8ca3b7;border-bottom:1px dashed rgba(148,197,235,.22);padding-bottom:1px}
+.term-hero-secondary:hover{color:#d9ebf8;border-color:rgba(245,201,138,.4)}
+@media (max-width:640px){
+  .term-head-actions{align-items:flex-start;margin-top:10px}
+  .term-quiz-cta{height:32px}
+  .term-quiz-cta-small{height:28px}
+  .term-hero-actions{gap:10px;margin-top:14px}
+}
