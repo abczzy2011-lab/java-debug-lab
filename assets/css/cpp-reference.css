@@ -58,7 +58,7 @@ body{
 .ref-group-count{flex:none;padding:3px 8px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.03);font-family:var(--mono);font-size:8.5px;font-weight:800;color:var(--dim)}
 .api-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .api-card{
-  display:flex;flex-direction:column;min-height:165px;padding:14px 15px 12px;text-align:left;border-radius:12px;
+  display:flex;flex-direction:column;min-width:0;min-height:165px;padding:14px 15px 12px;text-align:left;border-radius:12px;
   border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.032),rgba(255,255,255,.012));
   transition:transform .17s var(--ease),border-color .17s,background .17s;
 }
@@ -67,7 +67,7 @@ body{
 .api-name{min-width:0;font-family:var(--mono);font-size:13px;line-height:1.4;font-weight:800;color:#F6F9FF;letter-spacing:-.02em;word-break:break-word}
 .api-short{flex:none;font-family:var(--mono);font-size:8.5px;font-weight:800;color:#A9C6FF;padding:2px 5px;border-radius:5px;border:1px solid rgba(126,166,255,.18);background:rgba(126,166,255,.055)}
 .api-sum{margin-top:7px;font-size:10.5px;line-height:1.7;color:var(--dim);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.api-syntax{display:block;margin-top:auto;padding-top:10px;font-family:var(--mono);font-size:9.5px;line-height:1.6;color:#AFC7E8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.api-syntax{display:block;max-width:100%;min-width:0;margin-top:auto;padding-top:10px;font-family:var(--mono);font-size:9.5px;line-height:1.6;color:#AFC7E8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .api-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(244,239,230,.07)}
 .api-group{font-size:8.5px;font-weight:700;color:var(--dim)}
 .api-badge{font-size:8px;font-weight:800;color:#9EE6D9;padding:2px 6px;border-radius:999px;border:1px solid rgba(94,234,212,.18);background:rgba(94,234,212,.05);white-space:nowrap}
