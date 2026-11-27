@@ -2,8 +2,8 @@
  * 教程只讲“先做什么、看到什么、怎么验收”，命令细节回到 terminal.html 命令库。
  */
 window.TERMINAL_GUIDE = {
-  version: "20261127z89n",
-  libraryCount: 2915,
+  version: "20261127z90n",
+  libraryCount: 3095,
   tracks: [
     {
       id: "macos", label: "macOS", short: "Mac", shell: "zsh", glyph: "⌘",

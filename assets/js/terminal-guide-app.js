@@ -235,7 +235,7 @@
   const go = (index) => {
     const total = lessons().length;
     if (index >= total) {
-      location.href = 'terminal.html?v=20261127z89n';
+      location.href = 'terminal.html?v=20261127z90n';
       return;
     }
     state.lesson = Math.max(0, Math.min(total - 1, index));

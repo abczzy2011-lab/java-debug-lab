@@ -4,7 +4,7 @@
  * 由 scripts/merge_terminal_platforms.py 从 agent-output/{macos,linux,windows}.json 合并生成，勿手改。
  */
 window.TERMINAL_DATA = {
- "version": "20261127z89n",
+ "version": "20261127z90n",
  "title": "终端指令全集",
  "license": "Command descriptions/examples adapted from tldr-pages zh (CC BY 4.0).",
  "groups": [
@@ -104,8 +104,8 @@ window.TERMINAL_DATA = {
    "label": "macOS",
    "short": "Mac",
    "status": "ready",
-   "badge": "923 条全量",
-   "summary": "macOS 自带命令、zsh 内置、常用开发工具与 tldr 中文命令页全量收录；按真实使用场景分组，每条命令都给出可直接粘贴的示例与参数提示。",
+   "badge": "1,103 条全量",
+   "summary": "macOS 自带命令、zsh 内置、Apple 系统工具、Xcode 工具链、Homebrew 与 tldr 中文命令页全量收录；覆盖 launchd、APFS、Time Machine、Keychain、网络诊断、Xcode 构建与媒体处理。",
    "groupOverrides": {
     "os": {
      "name": "macOS 专属",
@@ -871,6 +871,172 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "z90-nav-launchctl-print",
+      "syntax": "launchctl print gui/$(id -u)",
+      "copy": "launchctl print gui/$(id -u)",
+      "title": "查看当前用户的 launchd 域",
+      "desc": "列出当前登录用户命名空间里的服务、端点与环境变量，排查开机自启和后台任务时先看这里。",
+      "example": "launchctl print gui/$(id -u)",
+      "note": "输出很长，可配合 `grep` 过滤；`gui/$(id -u)` 表示当前用户的 Aqua 会话域。",
+      "keywords": [
+       "launchd",
+       "服务",
+       "自启"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-nav-launchctl-bootstrap",
+      "syntax": "launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.example.plist",
+      "copy": "launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.example.plist",
+      "title": "加载一个 LaunchAgent",
+      "desc": "把 plist 注册进当前用户的 launchd 域，相当于旧版 `launchctl load`。",
+      "example": "launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.example.plist",
+      "note": "plist 必须有 `Label`；重复加载会报 `Bootstrap failed: 5: Input/output error`。",
+      "keywords": [
+       "launchd",
+       "plist",
+       "自启"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-nav-launchctl-bootout",
+      "syntax": "launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.example.plist",
+      "copy": "launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.example.plist",
+      "title": "卸载一个 LaunchAgent",
+      "desc": "把已注册的 plist 从 launchd 域中移除，相当于旧版 `launchctl unload`。",
+      "example": "launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.example.plist",
+      "note": "先 `launchctl print` 确认服务存在；卸载不会删除 plist 文件。",
+      "keywords": [
+       "launchd",
+       "卸载",
+       "plist"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-nav-launchctl-kickstart",
+      "syntax": "sudo launchctl kickstart -k system/com.apple.mDNSResponder",
+      "copy": "sudo launchctl kickstart -k system/com.apple.mDNSResponder",
+      "title": "重启一个 launchd 服务",
+      "desc": "`-k` 先杀掉再拉起，用来重启卡住的系统守护进程，例如 mDNSResponder。",
+      "example": "sudo launchctl kickstart -k system/com.apple.mDNSResponder",
+      "note": "会短暂中断对应系统服务；不要把 `system/` 换成用户域。",
+      "keywords": [
+       "launchd",
+       "重启",
+       "dns"
+      ],
+      "src": "manual",
+      "danger": true
+     },
+     {
+      "id": "z90-nav-launchctl-disabled",
+      "syntax": "launchctl print-disabled gui/$(id -u)",
+      "copy": "launchctl print-disabled gui/$(id -u)",
+      "title": "查看被禁用的服务",
+      "desc": "列出当前用户域里被 `disable` 掉的服务及其状态，排查“为什么开机不启动”。",
+      "example": "launchctl print-disabled gui/$(id -u)",
+      "note": "只读命令；启用用 `launchctl enable gui/$(id -u)/标签`。",
+      "keywords": [
+       "launchd",
+       "禁用",
+       "排查"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-nav-log-show",
+      "syntax": "log show --last 5m --predicate 'process == \"Safari\"'",
+      "copy": "log show --last 5m --predicate 'process == \"Safari\"'",
+      "title": "检索最近 5 分钟的统一日志",
+      "desc": "从系统日志库读取历史记录，按进程、子系统或消息内容过滤，比翻 Console 更快。",
+      "example": "log show --last 5m --predicate 'process == \"Safari\"'",
+      "note": "日志量很大，务必加 `--last` 和 `--predicate`；时间格式支持 `5m`、`2h`。",
+      "keywords": [
+       "日志",
+       "log",
+       "排障"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-nav-log-stream",
+      "syntax": "log stream --level debug --predicate 'subsystem == \"com.apple.network\"'",
+      "copy": "log stream --level debug --predicate 'subsystem == \"com.apple.network\"'",
+      "title": "实时跟踪某个子系统的日志",
+      "desc": "持续输出新日志，适合一边复现问题一边观察网络、蓝牙或应用行为。",
+      "example": "log stream --level debug --predicate 'subsystem == \"com.apple.network\"'",
+      "note": "Ctrl-C 结束；`--level debug` 只在需要时开启，否则输出会非常吵。",
+      "keywords": [
+       "日志",
+       "实时",
+       "网络"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-nav-log-collect",
+      "syntax": "sudo log collect --last 1h --output ~/Desktop/sysdiagnose.logarchive",
+      "copy": "sudo log collect --last 1h --output ~/Desktop/sysdiagnose.logarchive",
+      "title": "打包最近一小时的系统日志",
+      "desc": "生成 `.logarchive`，可以直接拖给支持统一日志的工具分析，适合收集故障现场。",
+      "example": "sudo log collect --last 1h --output ~/Desktop/sysdiagnose.logarchive",
+      "note": "需要管理员权限；输出文件可能上百 MB，别直接塞进 Git。",
+      "keywords": [
+       "日志",
+       "归档",
+       "诊断"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-nav-defaults-read",
+      "syntax": "defaults read com.apple.dock",
+      "copy": "defaults read com.apple.dock",
+      "title": "读取某个 App 的偏好设置",
+      "desc": "把 `~/Library/Preferences` 里的 plist 以可读形式打印出来，排查 Dock、Finder 等设置。",
+      "example": "defaults read com.apple.dock",
+      "note": "域名为反向域名，例如 `com.apple.finder`；写入前先备份当前值。",
+      "keywords": [
+       "defaults",
+       "偏好",
+       "plist"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-nav-defaults-write",
+      "syntax": "defaults write com.apple.dock autohide -bool true",
+      "copy": "defaults write com.apple.dock autohide -bool true",
+      "title": "修改 App 偏好设置",
+      "desc": "写入一个键值，例如让 Dock 自动隐藏；改完通常要 `killall Dock` 才会生效。",
+      "example": "defaults write com.apple.dock autohide -bool true",
+      "note": "`-bool`、`-int`、`-string` 要按类型使用；系统级设置可能需要重新登录。",
+      "keywords": [
+       "defaults",
+       "设置",
+       "dock"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-nav-scutil-proxy",
+      "syntax": "scutil --proxy",
+      "copy": "scutil --proxy",
+      "title": "查看系统代理配置",
+      "desc": "打印当前网络代理、例外域名和 SOCKS 配置，排查“浏览器能上网但终端不能”。",
+      "example": "scutil --proxy",
+      "note": "只读命令；修改代理优先用 `networksetup`，别直接改 plist。",
+      "keywords": [
+       "网络",
+       "代理",
+       "scutil"
+      ],
+      "src": "manual"
      }
     ],
     "file": [
@@ -1432,6 +1598,217 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "z90-file-ditto-bom",
+      "syntax": "ditto --bom src backup",
+      "copy": "ditto --bom src backup",
+      "title": "复制目录并保留 BOM",
+      "desc": "使用 macOS 原生 `ditto` 复制目录，保留资源分支、ACL 和 BOM 清单，比 `cp -R` 更完整。",
+      "example": "ditto --bom src backup",
+      "note": "目标目录已存在时会合并；要完全镜像可加 `--nocache`。",
+      "keywords": [
+       "复制",
+       "ditto",
+       "bom"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-file-ditto-arch",
+      "syntax": "ditto -arch arm64 MyApp.app MyApp-arm64.app",
+      "copy": "ditto -arch arm64 MyApp.app MyApp-arm64.app",
+      "title": "从通用二进制提取指定架构",
+      "desc": "把通用 App 或二进制里的 arm64 / x86_64 切片单独复制出来，检查架构或缩小体积。",
+      "example": "ditto -arch arm64 MyApp.app MyApp-arm64.app",
+      "note": "只对 Mach-O 通用二进制有意义；普通目录不要用 `-arch`。",
+      "keywords": [
+       "二进制",
+       "架构",
+       "apple"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-file-rsync-dry",
+      "syntax": "rsync -avn src/ backup/",
+      "copy": "rsync -avn src/ backup/",
+      "title": "先演练同步，不真正写入",
+      "desc": "`-n` 只打印将要复制和删除的文件，适合在执行危险同步前确认范围。",
+      "example": "rsync -avn src/ backup/",
+      "note": "注意源路径末尾的 `/`：带斜杠复制目录内容，不带则复制目录本身。",
+      "keywords": [
+       "同步",
+       "备份",
+       "演练"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-file-rsync-delete",
+      "syntax": "rsync -av --delete src/ backup/",
+      "copy": "rsync -av --delete src/ backup/",
+      "title": "镜像同步并删除目标多余文件",
+      "desc": "让 `backup/` 与 `src/` 完全一致，目标里多出来的文件会被删除。",
+      "example": "rsync -av --delete src/ backup/",
+      "note": "先跑 `rsync -avn --delete` 确认；源路径写错可能清空目标。",
+      "keywords": [
+       "同步",
+       "删除",
+       "镜像"
+      ],
+      "src": "manual",
+      "danger": true
+     },
+     {
+      "id": "z90-file-tar-list",
+      "syntax": "tar -tzf backup.tgz | head",
+      "copy": "tar -tzf backup.tgz | head",
+      "title": "不解压查看 tar.gz 内容",
+      "desc": "列出归档中的路径，确认备份里有没有需要的文件，再决定是否解压。",
+      "example": "tar -tzf backup.tgz | head",
+      "note": "`-t` 列表、`-z` gzip、`-f` 文件；大归档配合 `head` 或 `grep`。",
+      "keywords": [
+       "tar",
+       "归档",
+       "查看"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-file-tar-extract",
+      "syntax": "tar -xzf backup.tgz -C restore/",
+      "copy": "tar -xzf backup.tgz -C restore/",
+      "title": "解压 tar.gz 到指定目录",
+      "desc": "把归档解到 `restore/`，避免在当前目录炸出一堆文件。",
+      "example": "tar -xzf backup.tgz -C restore/",
+      "note": "目标目录必须已存在；解压前先 `tar -tzf` 检查路径。",
+      "keywords": [
+       "tar",
+       "解压",
+       "目录"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-file-zip-list",
+      "syntax": "unzip -l archive.zip",
+      "copy": "unzip -l archive.zip",
+      "title": "查看 zip 里有什么",
+      "desc": "只列目录和文件大小，不解压，适合确认下载包内容。",
+      "example": "unzip -l archive.zip",
+      "note": "`unzip -l` 不会覆盖任何文件；配合 `grep` 找特定路径。",
+      "keywords": [
+       "zip",
+       "查看",
+       "归档"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-file-zip-test",
+      "syntax": "unzip -t archive.zip",
+      "copy": "unzip -t archive.zip",
+      "title": "校验 zip 是否完整",
+      "desc": "逐条测试压缩数据 CRC，下载中断或文件损坏时会报错。",
+      "example": "unzip -t archive.zip",
+      "note": "只校验不落盘；损坏的包重新下载，不要强行解压。",
+      "keywords": [
+       "zip",
+       "校验",
+       "crc"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-file-xattr-write",
+      "syntax": "xattr -w com.example.tag value file.txt",
+      "copy": "xattr -w com.example.tag value file.txt",
+      "title": "写入扩展属性",
+      "desc": "给文件加自定义元数据，Finder 标签、下载来源和隔离标记都存放在扩展属性里。",
+      "example": "xattr -w com.example.tag value file.txt",
+      "note": "键名用反向域名；写入前先 `xattr -l` 看已有属性。",
+      "keywords": [
+       "xattr",
+       "元数据",
+       "标签"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-file-xattr-delete",
+      "syntax": "xattr -d com.example.tag file.txt",
+      "copy": "xattr -d com.example.tag file.txt",
+      "title": "删除单个扩展属性",
+      "desc": "移除指定的 xattr 键，不碰文件内容；处理“下载文件被隔离”时常用来删 `com.apple.quarantine`。",
+      "example": "xattr -d com.example.tag file.txt",
+      "note": "删除系统属性可能影响 Gatekeeper 行为；先确认键名。",
+      "keywords": [
+       "xattr",
+       "删除",
+       "quarantine"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-file-chflags-nouchg",
+      "syntax": "sudo chflags nouchg file.txt",
+      "copy": "sudo chflags nouchg file.txt",
+      "title": "解除文件锁定标志",
+      "desc": "清除 `uchg` 不可变标志，让文件重新可编辑；Finder 的“锁定”也会设置这个标志。",
+      "example": "sudo chflags nouchg file.txt",
+      "note": "需要管理员权限；加锁用 `chflags uchg`，别对系统文件乱用。",
+      "keywords": [
+       "chflags",
+       "锁定",
+       "权限"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-file-stat-birth",
+      "syntax": "stat -f \"%SB %N\" file.txt",
+      "copy": "stat -f \"%SB %N\" file.txt",
+      "title": "查看文件创建时间",
+      "desc": "macOS `stat` 的 `%SB` 是创建时间（birth），`%Sm` 才是修改时间。",
+      "example": "stat -f \"%SB %N\" file.txt",
+      "note": "格式化字符串要用双引号包住；`%N` 输出文件名。",
+      "keywords": [
+       "stat",
+       "创建时间",
+       "元数据"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-file-df-inode",
+      "syntax": "df -i /",
+      "copy": "df -i /",
+      "title": "查看文件系统 inode 使用率",
+      "desc": "文件很多但空间没满时，可能是 inode 耗尽；APFS 用 `df -i` 看已用节点。",
+      "example": "df -i /",
+      "note": "APFS 共享容器空间，inode 数字和传统 ext4 含义不同。",
+      "keywords": [
+       "磁盘",
+       "inode",
+       "df"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-file-du-depth",
+      "syntax": "du -d 1 -h ~/Projects",
+      "copy": "du -d 1 -h ~/Projects",
+      "title": "只看一层目录占用",
+      "desc": "限制递归深度为 1，快速找出哪个项目目录最占空间，避免扫描整棵大树。",
+      "example": "du -d 1 -h ~/Projects",
+      "note": "`-d` 是 macOS du 的深度参数；再配合 `sort -h` 排序。",
+      "keywords": [
+       "磁盘",
+       "目录",
+       "du"
+      ],
+      "src": "manual"
      }
     ],
     "view": [
@@ -2341,6 +2718,216 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "z90-view-rg-hidden",
+      "syntax": "rg --hidden --glob '!.git' \"TODO\" .",
+      "copy": "rg --hidden --glob '!.git' \"TODO\" .",
+      "title": "搜索隐藏文件但跳过 .git",
+      "desc": "默认 rg 会忽略隐藏文件；`--hidden` 打开，再用 glob 排除 `.git`，避免扫描对象库。",
+      "example": "rg --hidden --glob '!.git' \"TODO\" .",
+      "note": "`--glob` 可多次使用；搜索二进制要加 `-a`。",
+      "keywords": [
+       "ripgrep",
+       "隐藏文件",
+       "搜索"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-view-rg-type",
+      "syntax": "rg -t js \"use strict\" src",
+      "copy": "rg -t js \"use strict\" src",
+      "title": "按文件类型搜索",
+      "desc": "`-t js` 只搜 JavaScript，跳过 node_modules 和构建产物，结果更干净。",
+      "example": "rg -t js \"use strict\" src",
+      "note": "`rg --type-list` 可查看所有类型名；自定义类型用 `--type-add`。",
+      "keywords": [
+       "ripgrep",
+       "类型",
+       "代码"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-view-rg-count",
+      "syntax": "rg -c \"error\" app.log",
+      "copy": "rg -c \"error\" app.log",
+      "title": "统计每个文件的命中数",
+      "desc": "只输出文件名和次数，不打印每一行，适合快速估算日志里错误分布。",
+      "example": "rg -c \"error\" app.log",
+      "note": "`-c` 按文件计数；要总数用 `rg --count-matches` 或管道 `wc -l`。",
+      "keywords": [
+       "ripgrep",
+       "统计",
+       "日志"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-view-fd-ext",
+      "syntax": "fd -e md -e txt . ~/Documents",
+      "copy": "fd -e md -e txt . ~/Documents",
+      "title": "按多个扩展名找文件",
+      "desc": "`fd` 默认递归、忽略隐藏和 Git 目录，按扩展名过滤比 `find` 好写。",
+      "example": "fd -e md -e txt . ~/Documents",
+      "note": "`. ` 是匹配所有名称；`-e` 可以重复。",
+      "keywords": [
+       "fd",
+       "扩展名",
+       "查找"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-view-fd-exec",
+      "syntax": "fd -e png -x sips -g pixelWidth {}",
+      "copy": "fd -e png -x sips -g pixelWidth {}",
+      "title": "对找到的每个文件执行命令",
+      "desc": "`-x` 并行执行，`{}` 是占位路径；这里批量读取 PNG 宽度。",
+      "example": "fd -e png -x sips -g pixelWidth {}",
+      "note": "先加 `--dry-run` 查看会执行什么；`-X` 是串行执行。",
+      "keywords": [
+       "fd",
+       "批量",
+       "sips"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-view-jq-keys",
+      "syntax": "jq 'keys' package.json",
+      "copy": "jq 'keys' package.json",
+      "title": "列出 JSON 顶层键",
+      "desc": "快速看清配置文件有哪些字段，避免直接打开长 JSON 瞎找。",
+      "example": "jq 'keys' package.json",
+      "note": "`keys` 只对对象有效；数组用 `length` 或 `.[]`。",
+      "keywords": [
+       "jq",
+       "json",
+       "键"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-view-jq-select",
+      "syntax": "jq '.dependencies | to_entries[] | select(.value | startswith(\"^\"))' package.json",
+      "copy": "jq '.dependencies | to_entries[] | select(.value | startswith(\"^\"))' package.json",
+      "title": "筛选满足条件的 JSON 条目",
+      "desc": "把依赖对象转成键值对，再筛选以 `^` 开头的版本，适合审计依赖范围。",
+      "example": "jq '.dependencies | to_entries[] | select(.value | startswith(\"^\"))' package.json",
+      "note": "`select` 里的表达式要用括号；输出可再接 `jq -r` 去掉引号。",
+      "keywords": [
+       "jq",
+       "筛选",
+       "依赖"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-view-yq-merge",
+      "syntax": "yq '.services.web.image = \"nginx:alpine\"' compose.yml",
+      "copy": "yq '.services.web.image = \"nginx:alpine\"' compose.yml",
+      "title": "用 yq 修改 YAML 字段",
+      "desc": "在命令行安全地改嵌套 YAML，不必手工处理缩进；默认输出到 stdout。",
+      "example": "yq '.services.web.image = \"nginx:alpine\"' compose.yml",
+      "note": "写回文件用 `-i`；先重定向到临时文件检查差异。",
+      "keywords": [
+       "yq",
+       "yaml",
+       "编辑"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-view-xmllint",
+      "syntax": "xmllint --format Info.plist",
+      "copy": "xmllint --format Info.plist",
+      "title": "格式化 XML / plist",
+      "desc": "把压缩成一行的 XML 重新缩进，检查标签闭合和层级，适合看 plist 和配置文件。",
+      "example": "xmllint --format Info.plist",
+      "note": "`--format` 只排版；校验用 `--noout`，XPath 用 `--xpath`。",
+      "keywords": [
+       "xml",
+       "plist",
+       "格式化"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-view-plutil-json",
+      "syntax": "plutil -convert json -o - Info.plist",
+      "copy": "plutil -convert json -o - Info.plist",
+      "title": "把 plist 转成 JSON 查看",
+      "desc": "`-o -` 输出到终端，不修改原文件；用 jq 进一步筛选字段。",
+      "example": "plutil -convert json -o - Info.plist",
+      "note": "二进制 plist 也能转；要写回文件把 `-o -` 换成目标路径。",
+      "keywords": [
+       "plist",
+       "json",
+       "转换"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-view-mdls",
+      "syntax": "mdls -name kMDItemFSName -name kMDItemContentType file.pdf",
+      "copy": "mdls -name kMDItemFSName -name kMDItemContentType file.pdf",
+      "title": "读取 Spotlight 元数据",
+      "desc": "查看文件被 Spotlight 索引到的属性，例如内容类型、作者、下载来源。",
+      "example": "mdls -name kMDItemFSName -name kMDItemContentType file.pdf",
+      "note": "刚创建的文件可能还没索引；`mdimport` 可以强制导入。",
+      "keywords": [
+       "spotlight",
+       "元数据",
+       "文件"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-view-bat-range",
+      "syntax": "bat -r 20:40 src/app.js",
+      "copy": "bat -r 20:40 src/app.js",
+      "title": "只高亮查看文件的一段",
+      "desc": "`bat` 带行号和语法高亮，`-r` 指定行范围，适合快速看大文件的关键片段。",
+      "example": "bat -r 20:40 src/app.js",
+      "note": "`-r` 从 1 开始计数；输出经过管道时会自动关闭颜色。",
+      "keywords": [
+       "bat",
+       "高亮",
+       "范围"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-view-sed-inplace",
+      "syntax": "sed -i '' 's/localhost/127.0.0.1/g' config.js",
+      "copy": "sed -i '' 's/localhost/127.0.0.1/g' config.js",
+      "title": "BSD sed 原地替换",
+      "desc": "macOS 的 `sed -i` 必须带一个空参数，否则会把下一个参数当成备份后缀。",
+      "example": "sed -i '' 's/localhost/127.0.0.1/g' config.js",
+      "note": "先不加 `-i` 预览结果；`-i ''` 才是原地修改。",
+      "keywords": [
+       "sed",
+       "替换",
+       "bsd"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-view-awk-sum",
+      "syntax": "awk '{sum += $3} END {print sum}' data.txt",
+      "copy": "awk '{sum += $3} END {print sum}' data.txt",
+      "title": "按列求和",
+      "desc": "读取第三列数字并累加，适合快速统计日志里的字节数、耗时或金额。",
+      "example": "awk '{sum += $3} END {print sum}' data.txt",
+      "note": "字段默认按空白分割；CSV 用 `-F,` 指定分隔符。",
+      "keywords": [
+       "awk",
+       "求和",
+       "文本"
+      ],
+      "src": "manual"
      }
     ],
     "perm": [
@@ -2766,6 +3353,112 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "z90-perm-acl-add",
+      "syntax": "chmod +a \"staff allow read,write\" shared/",
+      "copy": "chmod +a \"staff allow read,write\" shared/",
+      "title": "给目录追加 ACL",
+      "desc": "在传统权限位之外，单独允许 staff 组读写；ACL 按条目叠加，不会覆盖原有权限。",
+      "example": "chmod +a \"staff allow read,write\" shared/",
+      "note": "`ls -le` 查看 ACL；`chmod -N` 可清空。写 ACL 前先确认目录归属。",
+      "keywords": [
+       "acl",
+       "权限",
+       "目录"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-perm-acl-remove",
+      "syntax": "chmod -N shared/",
+      "copy": "chmod -N shared/",
+      "title": "清空目录的 ACL",
+      "desc": "删除该路径上的所有访问控制条目，只保留 POSIX 权限位。",
+      "example": "chmod -N shared/",
+      "note": "会移除所有 ACL，不只是刚加的那条；生产目录先 `ls -le` 备份。",
+      "keywords": [
+       "acl",
+       "清除",
+       "权限"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-perm-ls-acl",
+      "syntax": "ls -le@ shared/",
+      "copy": "ls -le@ shared/",
+      "title": "同时查看 ACL 和扩展属性",
+      "desc": "`-e` 显示 ACL，`-@` 显示 xattr 键名，一条命令看清目录的附加权限和元数据。",
+      "example": "ls -le@ shared/",
+      "note": "`-@` 只列键名，值要用 `xattr -l`。",
+      "keywords": [
+       "acl",
+       "xattr",
+       "查看"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-perm-security-list",
+      "syntax": "security list-keychains",
+      "copy": "security list-keychains",
+      "title": "列出钥匙串搜索路径",
+      "desc": "查看系统会按什么顺序查找钥匙串，排查证书或密码找不到的问题。",
+      "example": "security list-keychains",
+      "note": "只读；新增钥匙串用 `security list-keychains -s`。",
+      "keywords": [
+       "keychain",
+       "证书",
+       "钥匙串"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-perm-security-unlock",
+      "syntax": "security unlock-keychain ~/Library/Keychains/login.keychain-db",
+      "copy": "security unlock-keychain ~/Library/Keychains/login.keychain-db",
+      "title": "解锁登录钥匙串",
+      "desc": "在自动化脚本里先解锁钥匙串，后续 `security find-identity` 才能访问私钥。",
+      "example": "security unlock-keychain ~/Library/Keychains/login.keychain-db",
+      "note": "会提示输入密码；不要把密码写进命令历史。",
+      "keywords": [
+       "keychain",
+       "解锁",
+       "证书"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-perm-tccutil-reset",
+      "syntax": "tccutil reset ScreenCapture com.example.app",
+      "copy": "tccutil reset ScreenCapture com.example.app",
+      "title": "重置某个 App 的隐私权限",
+      "desc": "把屏幕录制权限恢复为“未决定”，下次启动会重新弹窗，适合调试权限拒绝。",
+      "example": "tccutil reset ScreenCapture com.example.app",
+      "note": "只重置指定 bundle id；`All` 会重置所有 App，慎用。",
+      "keywords": [
+       "tcc",
+       "隐私",
+       "权限"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-perm-sysadminctl",
+      "syntax": "sudo sysadminctl -addUser devuser -password \"ChangeMe123\" -home /Users/devuser",
+      "copy": "sudo sysadminctl -addUser devuser -password \"ChangeMe123\" -home /Users/devuser",
+      "title": "创建本地用户并指定家目录",
+      "desc": "`sysadminctl` 是 macOS 上比 `dscl` 更安全的建用户方式，会处理 Secure Token 等细节。",
+      "example": "sudo sysadminctl -addUser devuser -password \"ChangeMe123\" -home /Users/devuser",
+      "note": "会真实创建账户；密码不要留在 shell 历史，生产环境用交互式输入。",
+      "keywords": [
+       "用户",
+       "账户",
+       "sysadminctl"
+      ],
+      "src": "manual",
+      "danger": true
      }
     ],
     "proc": [
@@ -3918,6 +4611,262 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "z90-proc-ps-forest",
+      "syntax": "ps axjf | head -40",
+      "copy": "ps axjf | head -40",
+      "title": "用树形查看进程关系",
+      "desc": "`axjf` 显示所有进程、PID/PPID 和缩进层级，能看出谁启动了谁。",
+      "example": "ps axjf | head -40",
+      "note": "输出很长，配合 `head` 或 `grep`；`-o` 可自定义列。",
+      "keywords": [
+       "进程",
+       "树形",
+       "ps"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-proc-ps-mem",
+      "syntax": "ps aux | sort -k4 -nr | head",
+      "copy": "ps aux | sort -k4 -nr | head",
+      "title": "按内存占用排序进程",
+      "desc": "第 4 列是内存百分比，`sort -nr` 倒序，快速找吃内存的进程。",
+      "example": "ps aux | sort -k4 -nr | head",
+      "note": "`sort` 的列号从 1 开始；`-k4` 只按内存列。",
+      "keywords": [
+       "内存",
+       "进程",
+       "排序"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-proc-top-pid",
+      "syntax": "top -pid 1234",
+      "copy": "top -pid 1234",
+      "title": "只盯一个进程的资源",
+      "desc": "持续观察指定 PID 的 CPU、内存和线程数，避免全屏进程列表干扰。",
+      "example": "top -pid 1234",
+      "note": "按 `q` 退出；PID 变了要重新查。",
+      "keywords": [
+       "top",
+       "进程",
+       "监控"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-proc-spindump",
+      "syntax": "sudo spindump -o /tmp/spindump.txt 1234",
+      "copy": "sudo spindump -o /tmp/spindump.txt 1234",
+      "title": "采样进程调用栈",
+      "desc": "对卡死或无响应的进程做系统级采样，生成可分析的 stackshot 文本。",
+      "example": "sudo spindump -o /tmp/spindump.txt 1234",
+      "note": "需要管理员权限；采样期间进程会更慢。",
+      "keywords": [
+       "采样",
+       "卡顿",
+       "调用栈"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-proc-dtrace",
+      "syntax": "sudo dtrace -n 'syscall:::entry { @[probefunc] = count(); }'",
+      "copy": "sudo dtrace -n 'syscall:::entry { @[probefunc] = count(); }'",
+      "title": "统计系统调用次数",
+      "desc": "用 DTrace 聚合所有 syscall 的调用次数，快速看哪个系统调用最频繁。",
+      "example": "sudo dtrace -n 'syscall:::entry { @[probefunc] = count(); }'",
+      "note": "SIP 开启时部分探针不可用；Ctrl-C 结束并打印聚合结果。",
+      "keywords": [
+       "dtrace",
+       "系统调用",
+       "性能"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-proc-dtruss",
+      "syntax": "sudo dtruss -f -t open ls",
+      "copy": "sudo dtruss -f -t open ls",
+      "title": "跟踪进程的系统调用",
+      "desc": "`dtruss` 包装命令并打印每次 syscall，适合看程序到底打开了哪些文件。",
+      "example": "sudo dtruss -f -t open ls",
+      "note": "需要关闭部分 SIP 限制；输出量很大，先限定 `-t` 调用名。",
+      "keywords": [
+       "dtruss",
+       "syscall",
+       "调试"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-proc-fs-usage",
+      "syntax": "sudo fs_usage -w -f filesys | head",
+      "copy": "sudo fs_usage -w -f filesys | head",
+      "title": "实时查看文件系统活动",
+      "desc": "按文件系统事件显示哪些进程在读写、打开或删除文件，排查磁盘抖动。",
+      "example": "sudo fs_usage -w -f filesys | head",
+      "note": "输出非常密集；加 `-f filesys` 只看文件系统，Ctrl-C 结束。",
+      "keywords": [
+       "文件系统",
+       "io",
+       "监控"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-proc-execsnoop",
+      "syntax": "sudo execsnoop -l 1 | head",
+      "copy": "sudo execsnoop -l 1 | head",
+      "title": "跟踪新进程的 exec",
+      "desc": "显示谁在启动什么程序、完整参数是什么，排查弹窗和后台脚本。",
+      "example": "sudo execsnoop -l 1 | head",
+      "note": "会打印命令行参数，可能包含敏感信息；采集完及时删除。",
+      "keywords": [
+       "进程",
+       "exec",
+       "监控"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-proc-iosnoop",
+      "syntax": "sudo iosnoop | head",
+      "copy": "sudo iosnoop | head",
+      "title": "跟踪磁盘 I/O 请求",
+      "desc": "显示每个 I/O 的进程、设备、偏移和延迟，定位“哪个进程在狂读盘”。",
+      "example": "sudo iosnoop | head",
+      "note": "需要管理员权限；SSD 上输出很快，先 `head` 采样。",
+      "keywords": [
+       "磁盘",
+       "io",
+       "监控"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-proc-powermetrics",
+      "syntax": "sudo powermetrics --samplers cpu_power,gpu_power -i 1000 -n 5",
+      "copy": "sudo powermetrics --samplers cpu_power,gpu_power -i 1000 -n 5",
+      "title": "查看 CPU / GPU 功耗",
+      "desc": "按 1 秒间隔采样 5 次，输出 Apple Silicon 的功耗和频率，排查发热与降频。",
+      "example": "sudo powermetrics --samplers cpu_power,gpu_power -i 1000 -n 5",
+      "note": "需要 sudo；不同芯片支持的 sampler 名称不同。",
+      "keywords": [
+       "功耗",
+       "cpu",
+       "gpu"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-proc-pmset-sleep",
+      "syntax": "sudo pmset -a sleep 15",
+      "copy": "sudo pmset -a sleep 15",
+      "title": "修改系统休眠时间",
+      "desc": "把所有电源模式下的空闲休眠设为 15 分钟；调试长任务时可临时调大。",
+      "example": "sudo pmset -a sleep 15",
+      "note": "会改变电源策略；用 `pmset -g` 先记录原值。",
+      "keywords": [
+       "电源",
+       "休眠",
+       "pmset"
+      ],
+      "src": "manual",
+      "danger": true
+     },
+     {
+      "id": "z90-proc-taskpolicy",
+      "syntax": "taskpolicy -b -p 1234",
+      "copy": "taskpolicy -b -p 1234",
+      "title": "把进程降到后台 QoS",
+      "desc": "给指定进程设置后台服务质量，降低它和前台任务抢 CPU 的优先级。",
+      "example": "taskpolicy -b -p 1234",
+      "note": "只影响调度策略，不改变 nice 值；恢复用 `taskpolicy -r -p PID`。",
+      "keywords": [
+       "qos",
+       "调度",
+       "进程"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-proc-vmmap",
+      "syntax": "vmmap 1234 | head -40",
+      "copy": "vmmap 1234 | head -40",
+      "title": "查看进程虚拟内存布局",
+      "desc": "按区域列出堆、栈、Mapped File 和 dirty 内存，定位内存上涨来源。",
+      "example": "vmmap 1234 | head -40",
+      "note": "进程需有权限；`-summary` 只看汇总。",
+      "keywords": [
+       "内存",
+       "vmmap",
+       "调试"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-proc-heap",
+      "syntax": "heap 1234 | head -40",
+      "copy": "heap 1234 | head -40",
+      "title": "统计进程堆上的对象",
+      "desc": "按类名汇总 malloc 块数量和大小，找出谁在制造大量小对象。",
+      "example": "heap 1234 | head -40",
+      "note": "需要开发者工具；只对 malloc 堆有效。",
+      "keywords": [
+       "堆",
+       "内存",
+       "对象"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-proc-leaks",
+      "syntax": "leaks 1234 | head -40",
+      "copy": "leaks 1234 | head -40",
+      "title": "检查进程内存泄漏",
+      "desc": "扫描进程堆中不再可达的块，输出泄漏对象的调用栈。",
+      "example": "leaks 1234 | head -40",
+      "note": "会暂停目标进程一小会儿；SIP 可能限制系统进程。",
+      "keywords": [
+       "泄漏",
+       "内存",
+       "调试"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-proc-footprint",
+      "syntax": "footprint 1234",
+      "copy": "footprint 1234",
+      "title": "查看进程内存足迹",
+      "desc": "按 dirty、swapped、compressed 等维度展示真实内存占用，比 `ps` 的 RSS 更准。",
+      "example": "footprint 1234",
+      "note": "Apple Silicon 上很有用；需要开发者工具支持。",
+      "keywords": [
+       "内存",
+       "footprint",
+       "监控"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-proc-xctrace",
+      "syntax": "xcrun xctrace list devices",
+      "copy": "xcrun xctrace list devices",
+      "title": "列出可用的 Instruments 设备",
+      "desc": "查看本机、模拟器和已连接设备，准备用 xctrace 做性能录制。",
+      "example": "xcrun xctrace list devices",
+      "note": "需要安装 Xcode；设备需解锁并信任电脑。",
+      "keywords": [
+       "xctrace",
+       "instruments",
+       "设备"
+      ],
+      "src": "manual"
      }
     ],
     "net": [
@@ -5050,6 +5999,263 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "z90-net-networksetup-wifi",
+      "syntax": "networksetup -setairportnetwork en0 \"MyWiFi\" \"password\"",
+      "copy": "networksetup -setairportnetwork en0 \"MyWiFi\" \"password\"",
+      "title": "命令行连接 Wi-Fi",
+      "desc": "指定网卡、SSID 和密码加入无线网络，适合远程或自动化环境。",
+      "example": "networksetup -setairportnetwork en0 \"MyWiFi\" \"password\"",
+      "note": "SSID 或密码含空格要加引号；网卡名先用 `networksetup -listallhardwareports` 确认。",
+      "keywords": [
+       "wifi",
+       "networksetup",
+       "连接"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-net-networksetup-dns",
+      "syntax": "networksetup -setdnsservers Wi-Fi 1.1.1.1 8.8.8.8",
+      "copy": "networksetup -setdnsservers Wi-Fi 1.1.1.1 8.8.8.8",
+      "title": "修改当前网络的 DNS",
+      "desc": "把 Wi-Fi 服务的 DNS 设为 Cloudflare 和 Google，排查本地 DNS 污染或缓存问题。",
+      "example": "networksetup -setdnsservers Wi-Fi 1.1.1.1 8.8.8.8",
+      "note": "服务名是 `Wi-Fi` 或 `Ethernet`；恢复自动用 `-setdnsservers Wi-Fi empty`。",
+      "keywords": [
+       "dns",
+       "networksetup",
+       "网络"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-net-networksetup-proxy",
+      "syntax": "networksetup -setwebproxy Wi-Fi 127.0.0.1 8080",
+      "copy": "networksetup -setwebproxy Wi-Fi 127.0.0.1 8080",
+      "title": "给当前网络设置 HTTP 代理",
+      "desc": "把 Wi-Fi 的 Web 代理指向本机 8080，配合 Charles、mitmproxy 抓包。",
+      "example": "networksetup -setwebproxy Wi-Fi 127.0.0.1 8080",
+      "note": "只设 HTTP；HTTPS 用 `-setsecurewebproxy`，关代理用 `-setwebproxystate Wi-Fi off`。",
+      "keywords": [
+       "代理",
+       "http",
+       "抓包"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-net-airport-scan",
+      "syntax": "airport -s",
+      "copy": "airport -s",
+      "title": "扫描周围 Wi-Fi",
+      "desc": "列出附近 SSID、信道、信号强度和加密方式，排查信道拥堵。",
+      "example": "airport -s",
+      "note": "旧版 macOS 自带 `airport`；新系统可能要用 `sudo wdutil scan`。",
+      "keywords": [
+       "wifi",
+       "扫描",
+       "信道"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-net-airport-disassoc",
+      "syntax": "sudo airport -z",
+      "copy": "sudo airport -z",
+      "title": "断开当前 Wi-Fi",
+      "desc": "强制解除当前无线关联，用于切换网络或复现重连问题。",
+      "example": "sudo airport -z",
+      "note": "会立即断网；远程操作前确保有其它接入方式。",
+      "keywords": [
+       "wifi",
+       "断开",
+       "airport"
+      ],
+      "src": "manual",
+      "danger": true
+     },
+     {
+      "id": "z90-net-wdutil",
+      "syntax": "sudo wdutil info",
+      "copy": "sudo wdutil info",
+      "title": "查看无线网络详细状态",
+      "desc": "输出当前 SSID、BSSID、信道、速率、安全类型和信号质量，比 `airport -I` 更完整。",
+      "example": "sudo wdutil info",
+      "note": "需要 sudo；不同 macOS 版本输出字段略有差异。",
+      "keywords": [
+       "wifi",
+       "wdutil",
+       "诊断"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-net-networkquality",
+      "syntax": "networkQuality -v",
+      "copy": "networkQuality -v",
+      "title": "测试网络质量",
+      "desc": "Apple 自带的网络质量工具，测上下行吞吐、往返延迟和回程路由。",
+      "example": "networkQuality -v",
+      "note": "需要几秒到十几秒；`-v` 输出详细指标。",
+      "keywords": [
+       "网速",
+       "延迟",
+       "networkquality"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-net-scutil-reach",
+      "syntax": "scutil -r github.com",
+      "copy": "scutil -r github.com",
+      "title": "检查目标是否可达",
+      "desc": "用系统配置探测域名或 IP 是否有路由，不依赖 ping 是否被防火墙拦截。",
+      "example": "scutil -r github.com",
+      "note": "返回 `Reachable` 或 `Not Reachable`；只测可达性，不测端口。",
+      "keywords": [
+       "网络",
+       "可达性",
+       "scutil"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-net-pfctl",
+      "syntax": "sudo pfctl -s info",
+      "copy": "sudo pfctl -s info",
+      "title": "查看 PF 防火墙状态",
+      "desc": "显示 packet filter 是否启用、规则计数和状态表，排查端口被拦。",
+      "example": "sudo pfctl -s info",
+      "note": "只读；修改规则要写 `/etc/pf.conf` 并用 `pfctl -f` 加载。",
+      "keywords": [
+       "防火墙",
+       "pf",
+       "网络"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-net-socketfilterfw",
+      "syntax": "sudo /usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate",
+      "copy": "sudo /usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate",
+      "title": "查看应用防火墙开关",
+      "desc": "确认 macOS 应用防火墙是否开启，排查 App 无法被局域网访问。",
+      "example": "sudo /usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate",
+      "note": "只读；`--setglobalstate on` 会改设置，需管理员权限。",
+      "keywords": [
+       "防火墙",
+       "应用",
+       "安全"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-net-ndp",
+      "syntax": "ndp -an",
+      "copy": "ndp -an",
+      "title": "查看 IPv6 邻居表",
+      "desc": "列出 IPv6 邻居、链路层地址和状态，排查局域网 IPv6 解析问题。",
+      "example": "ndp -an",
+      "note": "只读；清缓存用 `ndp -c`（会影响网络）。",
+      "keywords": [
+       "ipv6",
+       "邻居",
+       "网络"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-net-route-add",
+      "syntax": "sudo route add default 192.168.1.1",
+      "copy": "sudo route add default 192.168.1.1",
+      "title": "临时修改默认路由",
+      "desc": "把默认网关指向 192.168.1.1，用于多网卡或测试环境切换出口。",
+      "example": "sudo route add default 192.168.1.1",
+      "note": "会改变全局路由；重启或网络切换后可能失效。",
+      "keywords": [
+       "路由",
+       "网关",
+       "网络"
+      ],
+      "src": "manual",
+      "danger": true
+     },
+     {
+      "id": "z90-net-netstat-route",
+      "syntax": "netstat -rn",
+      "copy": "netstat -rn",
+      "title": "查看路由表",
+      "desc": "以数字形式显示 IPv4/IPv6 路由，不反解主机名，排查流量走哪张网卡。",
+      "example": "netstat -rn",
+      "note": "只读；`-r` 路由表，`-n` 不解析名字。",
+      "keywords": [
+       "路由",
+       "netstat",
+       "网络"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-net-lsof-port",
+      "syntax": "sudo lsof -nP -iTCP:8080 -sTCP:LISTEN",
+      "copy": "sudo lsof -nP -iTCP:8080 -sTCP:LISTEN",
+      "title": "查谁在监听 8080",
+      "desc": "列出占用 TCP 8080 的进程和 PID，端口冲突时第一时间用。",
+      "example": "sudo lsof -nP -iTCP:8080 -sTCP:LISTEN",
+      "note": "需要 sudo 才能看到其他用户的进程；`-P` 不解析端口名。",
+      "keywords": [
+       "端口",
+       "lsof",
+       "进程"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-net-nc-listen",
+      "syntax": "nc -l 8080",
+      "copy": "nc -l 8080",
+      "title": "临时监听一个 TCP 端口",
+      "desc": "启动一个最简 TCP 服务，接收一行文本或测试防火墙是否放行。",
+      "example": "nc -l 8080",
+      "note": "只适合调试；Ctrl-C 结束，别暴露在公网。",
+      "keywords": [
+       "tcp",
+       "监听",
+       "调试"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-net-curl-json",
+      "syntax": "curl -sS -H \"Content-Type: application/json\" -d '{\"q\":\"test\"}' https://httpbin.org/post",
+      "copy": "curl -sS -H \"Content-Type: application/json\" -d '{\"q\":\"test\"}' https://httpbin.org/post",
+      "title": "发送 JSON POST 请求",
+      "desc": "带 Content-Type 和 JSON body 调接口，`-sS` 静默但保留错误。",
+      "example": "curl -sS -H \"Content-Type: application/json\" -d '{\"q\":\"test\"}' https://httpbin.org/post",
+      "note": "body 里的引号要正确转义；调试加 `-v` 看请求头。",
+      "keywords": [
+       "curl",
+       "json",
+       "http"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-net-dig-mx",
+      "syntax": "dig example.com MX +short",
+      "copy": "dig example.com MX +short",
+      "title": "查询 MX 记录",
+      "desc": "只输出邮件交换记录，排查域名收信和邮件路由。",
+      "example": "dig example.com MX +short",
+      "note": "`+short` 精简输出；指定 DNS 用 `@8.8.8.8`。",
+      "keywords": [
+       "dns",
+       "mx",
+       "dig"
+      ],
+      "src": "manual"
      }
     ],
     "dev": [
@@ -8118,6 +9324,366 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "z90-dev-simctl-list",
+      "syntax": "xcrun simctl list devices available",
+      "copy": "xcrun simctl list devices available",
+      "title": "列出可用模拟器",
+      "desc": "只显示当前 runtime 下可启动的 iPhone / iPad，避免列出已删除的旧设备。",
+      "example": "xcrun simctl list devices available",
+      "note": "需要 Xcode；设备名可用于 `boot` 和 `-destination`。",
+      "keywords": [
+       "ios",
+       "模拟器",
+       "simctl"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-dev-simctl-boot",
+      "syntax": "xcrun simctl boot \"iPhone 16 Pro\"",
+      "copy": "xcrun simctl boot \"iPhone 16 Pro\"",
+      "title": "启动指定模拟器",
+      "desc": "按设备名启动模拟器；已启动会报 `Unable to boot device in current state: Booted`。",
+      "example": "xcrun simctl boot \"iPhone 16 Pro\"",
+      "note": "先 `simctl list devices available` 确认名称；`open -a Simulator` 显示界面。",
+      "keywords": [
+       "ios",
+       "模拟器",
+       "启动"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-dev-simctl-install",
+      "syntax": "xcrun simctl install booted MyApp.app",
+      "copy": "xcrun simctl install booted MyApp.app",
+      "title": "把 App 装进已启动模拟器",
+      "desc": "`booted` 代表当前启动的设备，安装后可用 bundle id 启动。",
+      "example": "xcrun simctl install booted MyApp.app",
+      "note": "App 必须已签名；路径是 `.app` 目录。",
+      "keywords": [
+       "ios",
+       "安装",
+       "simctl"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-dev-simctl-launch",
+      "syntax": "xcrun simctl launch --console booted com.example.app",
+      "copy": "xcrun simctl launch --console booted com.example.app",
+      "title": "启动 App 并看控制台",
+      "desc": "`--console` 把 App 的 stdout/stderr 接到终端，调试启动崩溃很方便。",
+      "example": "xcrun simctl launch --console booted com.example.app",
+      "note": "用 bundle id，不是 App 名称；Ctrl-C 只断开控制台，不一定杀 App。",
+      "keywords": [
+       "ios",
+       "启动",
+       "日志"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-dev-simctl-screenshot",
+      "syntax": "xcrun simctl io booted screenshot ~/Desktop/sim.png",
+      "copy": "xcrun simctl io booted screenshot ~/Desktop/sim.png",
+      "title": "截取模拟器屏幕",
+      "desc": "把当前模拟器画面保存为 PNG，写验收记录或提 Bug 时用。",
+      "example": "xcrun simctl io booted screenshot ~/Desktop/sim.png",
+      "note": "设备必须 booted；`--type=png` 可显式指定格式。",
+      "keywords": [
+       "ios",
+       "截图",
+       "simctl"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-dev-simctl-shutdown",
+      "syntax": "xcrun simctl shutdown all",
+      "copy": "xcrun simctl shutdown all",
+      "title": "关闭所有模拟器",
+      "desc": "批量释放模拟器占用的 CPU 和内存，比一个个点关闭快。",
+      "example": "xcrun simctl shutdown all",
+      "note": "会关闭所有已启动设备；只想关一个用设备名替换 `all`。",
+      "keywords": [
+       "ios",
+       "模拟器",
+       "关闭"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-dev-xcodebuild-list",
+      "syntax": "xcodebuild -list -project MyApp.xcodeproj",
+      "copy": "xcodebuild -list -project MyApp.xcodeproj",
+      "title": "列出工程里的 target 和 scheme",
+      "desc": "构建前先确认 scheme 名称，避免 `-scheme` 拼错。",
+      "example": "xcodebuild -list -project MyApp.xcodeproj",
+      "note": "Workspace 用 `-workspace MyApp.xcworkspace`；SPM 包用 `-list`。",
+      "keywords": [
+       "xcode",
+       "scheme",
+       "构建"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-dev-xcodebuild-build",
+      "syntax": "xcodebuild -scheme MyApp -destination 'platform=iOS Simulator,name=iPhone 16' build",
+      "copy": "xcodebuild -scheme MyApp -destination 'platform=iOS Simulator,name=iPhone 16' build",
+      "title": "命令行构建 iOS App",
+      "desc": "指定 scheme 和模拟器 destination，适合 CI 或脚本化验证。",
+      "example": "xcodebuild -scheme MyApp -destination 'platform=iOS Simulator,name=iPhone 16' build",
+      "note": "destination 名称要和 `simctl list` 一致；输出很长可接 `xcbeautify`。",
+      "keywords": [
+       "xcode",
+       "构建",
+       "ios"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-dev-xcodebuild-test",
+      "syntax": "xcodebuild test -scheme MyApp -destination 'platform=iOS Simulator,name=iPhone 16'",
+      "copy": "xcodebuild test -scheme MyApp -destination 'platform=iOS Simulator,name=iPhone 16'",
+      "title": "命令行跑单元测试",
+      "desc": "在指定模拟器上执行 XCTest / Swift Testing，CI 里常用。",
+      "example": "xcodebuild test -scheme MyApp -destination 'platform=iOS Simulator,name=iPhone 16'",
+      "note": "需要可测试的 scheme；测试结果可加 `-resultBundlePath` 存档。",
+      "keywords": [
+       "xcode",
+       "测试",
+       "ios"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-dev-xcodebuild-archive",
+      "syntax": "xcodebuild archive -scheme MyApp -archivePath build/MyApp.xcarchive",
+      "copy": "xcodebuild archive -scheme MyApp -archivePath build/MyApp.xcarchive",
+      "title": "打包成 xcarchive",
+      "desc": "生成可分发的归档，后续用 `-exportArchive` 导出 ipa。",
+      "example": "xcodebuild archive -scheme MyApp -archivePath build/MyApp.xcarchive",
+      "note": "签名配置必须完整；archive 前先清理 DerivedData。",
+      "keywords": [
+       "xcode",
+       "归档",
+       "发布"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-dev-xcodebuild-export",
+      "syntax": "xcodebuild -exportArchive -archivePath build/MyApp.xcarchive -exportPath build/export -exportOptionsPlist ExportOptions.plist",
+      "copy": "xcodebuild -exportArchive -archivePath build/MyApp.xcarchive -exportPath build/export -exportOptionsPlist ExportOptions.plist",
+      "title": "从归档导出 ipa",
+      "desc": "按 ExportOptions 里的证书、描述文件和分发方式导出安装包。",
+      "example": "xcodebuild -exportArchive -archivePath build/MyApp.xcarchive -exportPath build/export -exportOptionsPlist ExportOptions.plist",
+      "note": "ExportOptions.plist 的 method 要与证书匹配；导出目录必须不存在或为空。",
+      "keywords": [
+       "xcode",
+       "ipa",
+       "发布"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-dev-notarytool-submit",
+      "syntax": "xcrun notarytool submit MyApp.zip --keychain-profile notary --wait",
+      "copy": "xcrun notarytool submit MyApp.zip --keychain-profile notary --wait",
+      "title": "提交 Apple 公证",
+      "desc": "把 zip 上传到 Apple 公证服务并等待结果，分发前必须做。",
+      "example": "xcrun notarytool submit MyApp.zip --keychain-profile notary --wait",
+      "note": "先 `notarytool store-credentials` 保存凭据；`--wait` 会阻塞到出结果。",
+      "keywords": [
+       "公证",
+       "notary",
+       "发布"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-dev-stapler-staple",
+      "syntax": "xcrun stapler staple MyApp.app",
+      "copy": "xcrun stapler staple MyApp.app",
+      "title": "给 App 附加公证票据",
+      "desc": "把公证结果钉到 App 上，离线环境也能通过 Gatekeeper 验证。",
+      "example": "xcrun stapler staple MyApp.app",
+      "note": "必须先公证成功；`stapler validate` 可检查票据。",
+      "keywords": [
+       "公证",
+       "stapler",
+       "gatekeeper"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-dev-swift-package",
+      "syntax": "swift package init --type executable",
+      "copy": "swift package init --type executable",
+      "title": "初始化 Swift Package",
+      "desc": "生成 Package.swift、Sources 和 Tests 目录，快速起一个命令行项目。",
+      "example": "swift package init --type executable",
+      "note": "`--type library` 建库；包名默认取当前目录名。",
+      "keywords": [
+       "swift",
+       "spm",
+       "项目"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-dev-swift-build",
+      "syntax": "swift build -c release",
+      "copy": "swift build -c release",
+      "title": "编译 Swift Package",
+      "desc": "用 release 配置构建，产物在 `.build/release/`。",
+      "example": "swift build -c release",
+      "note": "首次构建会拉依赖；清理用 `swift package clean`。",
+      "keywords": [
+       "swift",
+       "构建",
+       "spm"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-dev-swift-test",
+      "syntax": "swift test --parallel",
+      "copy": "swift test --parallel",
+      "title": "并行跑 Swift 测试",
+      "desc": "使用 XCTest 并行执行测试用例，缩短 CI 时间。",
+      "example": "swift test --parallel",
+      "note": "部分测试共享状态时不要并行；`--filter` 可只跑一个用例。",
+      "keywords": [
+       "swift",
+       "测试",
+       "ci"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-dev-xcodegen",
+      "syntax": "xcodegen generate",
+      "copy": "xcodegen generate",
+      "title": "从 project.yml 生成 Xcode 工程",
+      "desc": "用 YAML 管理工程结构，避免 `.xcodeproj` 合并冲突。",
+      "example": "xcodegen generate",
+      "note": "需要先安装 `brew install xcodegen`；生成前备份自定义配置。",
+      "keywords": [
+       "xcode",
+       "xcodegen",
+       "工程"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-dev-xcbeautify",
+      "syntax": "xcodebuild build | xcbeautify",
+      "copy": "xcodebuild build | xcbeautify",
+      "title": "美化 xcodebuild 输出",
+      "desc": "把冗长的构建日志变成带颜色和分组的可读输出，CI 日志也更好扫。",
+      "example": "xcodebuild build | xcbeautify",
+      "note": "需要 `brew install xcbeautify`；加 `--quiet` 只显示警告和错误。",
+      "keywords": [
+       "xcode",
+       "日志",
+       "构建"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-dev-tuist",
+      "syntax": "tuist generate",
+      "copy": "tuist generate",
+      "title": "用 Tuist 生成工程",
+      "desc": "按 Project.swift 定义生成 Xcode workspace，适合模块化大项目。",
+      "example": "tuist generate",
+      "note": "需要安装 Tuist；生成会覆盖已有 `.xcodeproj`，先提交或备份。",
+      "keywords": [
+       "xcode",
+       "tuist",
+       "工程"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-dev-fastlane",
+      "syntax": "fastlane ios beta",
+      "copy": "fastlane ios beta",
+      "title": "用 fastlane 发测试版",
+      "desc": "按 Fastfile 里的 lane 自动签名、打包并上传 TestFlight。",
+      "example": "fastlane ios beta",
+      "note": "凭据用环境变量或 keychain，不要写进 Fastfile；先本地跑 `fastlane ios beta --dry-run`。",
+      "keywords": [
+       "ios",
+       "fastlane",
+       "发布"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-dev-brew-search",
+      "syntax": "brew search --cask font",
+      "copy": "brew search --cask font",
+      "title": "搜索 Homebrew Cask",
+      "desc": "只搜图形化 App 的 cask，找字体、编辑器或工具时比网页快。",
+      "example": "brew search --cask font",
+      "note": "`--cask` 只搜 cask；公式用 `--formula`。",
+      "keywords": [
+       "homebrew",
+       "cask",
+       "搜索"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-dev-brew-info",
+      "syntax": "brew info node@22",
+      "copy": "brew info node@22",
+      "title": "查看软件包详情",
+      "desc": "显示版本、依赖、安装路径和 caveats，装前先确认会改什么。",
+      "example": "brew info node@22",
+      "note": "`--json` 可给脚本解析；`--cask` 查图形 App。",
+      "keywords": [
+       "homebrew",
+       "包信息",
+       "依赖"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-dev-brew-cask",
+      "syntax": "brew install --cask visual-studio-code",
+      "copy": "brew install --cask visual-studio-code",
+      "title": "安装图形化 App",
+      "desc": "用 Homebrew 管理 `.app`，升级和卸载都能走 `brew`。",
+      "example": "brew install --cask visual-studio-code",
+      "note": "首次安装 cask 可能需要输入密码；企业环境注意许可。",
+      "keywords": [
+       "homebrew",
+       "cask",
+       "安装"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-dev-swift-format",
+      "syntax": "xcrun swift-format format --in-place Sources/*.swift",
+      "copy": "xcrun swift-format format --in-place Sources/*.swift",
+      "title": "格式化 Swift 源码",
+      "desc": "用 Apple 官方 swift-format 统一缩进、换行和空格，减少 review 噪音。",
+      "example": "xcrun swift-format format --in-place Sources/*.swift",
+      "note": "先不加 `--in-place` 看 diff；团队要统一配置文件。",
+      "keywords": [
+       "swift",
+       "格式化",
+       "xcode"
+      ],
+      "src": "manual"
      }
     ],
     "pkg": [
@@ -9942,6 +11508,247 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "z90-pkg-installer",
+      "syntax": "sudo installer -pkg MyApp.pkg -target /",
+      "copy": "sudo installer -pkg MyApp.pkg -target /",
+      "title": "安装 pkg 包",
+      "desc": "命令行安装 `.pkg`，适合远程或批量部署；`-target /` 表示系统卷。",
+      "example": "sudo installer -pkg MyApp.pkg -target /",
+      "note": "pkg 可能带脚本和重启要求；装前用 `pkgutil --payload-files` 看内容。",
+      "keywords": [
+       "pkg",
+       "安装",
+       "部署"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-pkg-pkgutil-list",
+      "syntax": "pkgutil --pkgs | sort",
+      "copy": "pkgutil --pkgs | sort",
+      "title": "列出已安装的 pkg",
+      "desc": "输出所有 receipt 的包标识，排查某个组件是否装过。",
+      "example": "pkgutil --pkgs | sort",
+      "note": "只列 receipt，不代表文件还在；`--pkg-info` 看版本。",
+      "keywords": [
+       "pkgutil",
+       "安装包",
+       "receipt"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-pkg-pkgutil-info",
+      "syntax": "pkgutil --pkg-info com.example.pkg",
+      "copy": "pkgutil --pkg-info com.example.pkg",
+      "title": "查看 pkg 安装信息",
+      "desc": "显示版本、安装位置、安装时间和 receipt 路径。",
+      "example": "pkgutil --pkg-info com.example.pkg",
+      "note": "包 id 来自 `pkgutil --pkgs`；卷参数用 `--volume /`。",
+      "keywords": [
+       "pkgutil",
+       "版本",
+       "receipt"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-pkg-pkgutil-payload",
+      "syntax": "pkgutil --payload-files MyApp.pkg",
+      "copy": "pkgutil --payload-files MyApp.pkg",
+      "title": "列出 pkg 会安装哪些文件",
+      "desc": "安装前预览 payload 路径，确认不会覆盖系统文件。",
+      "example": "pkgutil --payload-files MyApp.pkg",
+      "note": "只列路径，不展开内容；需要解包用 `pkgutil --expand`。",
+      "keywords": [
+       "pkg",
+       "文件",
+       "预览"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-pkg-xip-expand",
+      "syntax": "xip --expand Xcode.xip",
+      "copy": "xip --expand Xcode.xip",
+      "title": "解压 Apple 的 xip 包",
+      "desc": "Xcode 等大包用 xip 分发，解压时会校验签名，不能改用普通 unzip。",
+      "example": "xip --expand Xcode.xip",
+      "note": "需要足够磁盘空间；解压后记得校验 `codesign`。",
+      "keywords": [
+       "xip",
+       "xcode",
+       "解压"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-pkg-softwareupdate-list",
+      "syntax": "softwareupdate --list",
+      "copy": "softwareupdate --list",
+      "title": "列出可用系统更新",
+      "desc": "不打开系统设置，直接看有哪些 macOS 更新和安全响应。",
+      "example": "softwareupdate --list",
+      "note": "只读；安装前先看兼容性和剩余空间。",
+      "keywords": [
+       "更新",
+       "macos",
+       "softwareupdate"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-pkg-softwareupdate-install",
+      "syntax": "sudo softwareupdate --install --all --restart",
+      "copy": "sudo softwareupdate --install --all --restart",
+      "title": "安装所有系统更新并重启",
+      "desc": "批量安装可用更新，完成后自动重启，适合维护窗口。",
+      "example": "sudo softwareupdate --install --all --restart",
+      "note": "会重启机器并可能中断任务；先保存工作，远程机器慎用。",
+      "keywords": [
+       "更新",
+       "重启",
+       "维护"
+      ],
+      "src": "manual",
+      "danger": true
+     },
+     {
+      "id": "z90-pkg-softwareupdate-history",
+      "syntax": "softwareupdate --history",
+      "copy": "softwareupdate --history",
+      "title": "查看更新安装历史",
+      "desc": "显示每台机器装过哪些更新、时间和版本，排查“为什么系统行为变了”。",
+      "example": "softwareupdate --history",
+      "note": "只读；`--history --product` 可过滤单个产品。",
+      "keywords": [
+       "更新",
+       "历史",
+       "排查"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-pkg-mas-list",
+      "syntax": "mas list",
+      "copy": "mas list",
+      "title": "列出 App Store 已安装 App",
+      "desc": "显示 App 名称、版本和 Apple ID，补装或审计授权时用。",
+      "example": "mas list",
+      "note": "需要 `brew install mas`；首次使用要登录 App Store。",
+      "keywords": [
+       "appstore",
+       "mas",
+       "应用"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-pkg-mas-install",
+      "syntax": "mas install 497799835",
+      "copy": "mas install 497799835",
+      "title": "用 mas 安装 App Store 应用",
+      "desc": "按 App Store 数字 id 安装，适合脚本化装机。",
+      "example": "mas install 497799835",
+      "note": "497799835 是 Xcode 的 id；安装前需已登录并同意条款。",
+      "keywords": [
+       "appstore",
+       "mas",
+       "xcode"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-pkg-port-search",
+      "syntax": "port search python",
+      "copy": "port search python",
+      "title": "搜索 MacPorts 包",
+      "desc": "按名称或描述搜索 MacPorts 仓库，找与 Homebrew 不同版本的软件。",
+      "example": "port search python",
+      "note": "需要先装 MacPorts；`port info` 看版本和依赖。",
+      "keywords": [
+       "macports",
+       "搜索",
+       "包"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-pkg-port-install",
+      "syntax": "sudo port install wget",
+      "copy": "sudo port install wget",
+      "title": "安装 MacPorts 包",
+      "desc": "从 MacPorts 源编译或下载安装，和 Homebrew 的 `/opt/local` 前缀隔离。",
+      "example": "sudo port install wget",
+      "note": "不要和 Homebrew 混装同一工具；注意 PATH 顺序。",
+      "keywords": [
+       "macports",
+       "安装",
+       "wget"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-pkg-brew-upgrade",
+      "syntax": "brew upgrade",
+      "copy": "brew upgrade",
+      "title": "升级所有 Homebrew 包",
+      "desc": "更新 formulae 和 cask 到最新版，升级前先 `brew outdated` 看清单。",
+      "example": "brew upgrade",
+      "note": "可能引入不兼容版本；生产工具建议固定版本。",
+      "keywords": [
+       "homebrew",
+       "升级",
+       "维护"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-pkg-brew-cleanup",
+      "syntax": "brew cleanup --prune=all",
+      "copy": "brew cleanup --prune=all",
+      "title": "清理旧版本和缓存",
+      "desc": "删除旧 cellar、下载缓存和失效链接，释放磁盘空间。",
+      "example": "brew cleanup --prune=all",
+      "note": "`--prune=all` 会删所有旧版本，回滚前先确认。",
+      "keywords": [
+       "homebrew",
+       "清理",
+       "磁盘"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-pkg-brew-doctor",
+      "syntax": "brew doctor",
+      "copy": "brew doctor",
+      "title": "诊断 Homebrew 环境",
+      "desc": "检查 PATH、权限、链接和 Xcode 工具链问题，装包失败时先跑它。",
+      "example": "brew doctor",
+      "note": "输出是建议不是命令，逐条确认后再执行。",
+      "keywords": [
+       "homebrew",
+       "诊断",
+       "环境"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-pkg-brew-deps",
+      "syntax": "brew deps --tree node",
+      "copy": "brew deps --tree node",
+      "title": "查看依赖树",
+      "desc": "以树形展示一个 formula 的依赖，评估升级影响和安装体积。",
+      "example": "brew deps --tree node",
+      "note": "`--installed` 只看已安装依赖；cask 不支持依赖树。",
+      "keywords": [
+       "homebrew",
+       "依赖",
+       "树"
+      ],
+      "src": "manual"
      }
     ],
     "disk": [
@@ -10605,6 +12412,157 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "z90-disk-diskutil-info",
+      "syntax": "diskutil info /",
+      "copy": "diskutil info /",
+      "title": "查看卷的详细信息",
+      "desc": "显示文件系统、挂载点、容量、APFS 容器和加密状态。",
+      "example": "diskutil info /",
+      "note": "只读；指定卷用 `/Volumes/Name` 或 `disk3s1`。",
+      "keywords": [
+       "diskutil",
+       "卷",
+       "apfs"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-disk-diskutil-verify",
+      "syntax": "diskutil verifyVolume /",
+      "copy": "diskutil verifyVolume /",
+      "title": "校验卷的文件系统",
+      "desc": "只检查不修复，评估磁盘是否需要修复；APFS 快照也会被检查。",
+      "example": "diskutil verifyVolume /",
+      "note": "卷在使用中可能有限制；修复前先备份。",
+      "keywords": [
+       "diskutil",
+       "校验",
+       "磁盘"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-disk-diskutil-repair",
+      "syntax": "diskutil repairVolume /",
+      "copy": "diskutil repairVolume /",
+      "title": "修复卷的文件系统",
+      "desc": "尝试修复目录结构或元数据错误，可能需要卸载卷。",
+      "example": "diskutil repairVolume /",
+      "note": "有数据风险，先备份；SSD 硬件故障不能靠它解决。",
+      "keywords": [
+       "diskutil",
+       "修复",
+       "磁盘"
+      ],
+      "src": "manual",
+      "danger": true
+     },
+     {
+      "id": "z90-disk-diskutil-eject",
+      "syntax": "diskutil eject /Volumes/USB",
+      "copy": "diskutil eject /Volumes/USB",
+      "title": "弹出外置卷",
+      "desc": "先卸载再断电，避免 U 盘或移动硬盘写入缓存丢失。",
+      "example": "diskutil eject /Volumes/USB",
+      "note": "卷被占用时会失败；先 `lsof` 找占用进程。",
+      "keywords": [
+       "u盘",
+       "弹出",
+       "卷"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-disk-diskutil-apfs",
+      "syntax": "diskutil apfs list",
+      "copy": "diskutil apfs list",
+      "title": "查看 APFS 容器和卷",
+      "desc": "显示容器、卷、角色、快照和加密状态，排查 APFS 空间共享。",
+      "example": "diskutil apfs list",
+      "note": "只读；删除快照等操作在 `diskutil apfs deleteSnapshot`。",
+      "keywords": [
+       "apfs",
+       "容器",
+       "磁盘"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-disk-hdiutil-attach",
+      "syntax": "hdiutil attach MyApp.dmg",
+      "copy": "hdiutil attach MyApp.dmg",
+      "title": "挂载 dmg 镜像",
+      "desc": "把磁盘映像挂到 `/Volumes`，查看内容或安装 App。",
+      "example": "hdiutil attach MyApp.dmg",
+      "note": "下载的 dmg 先确认来源；卸载用 `hdiutil detach`。",
+      "keywords": [
+       "dmg",
+       "挂载",
+       "hdiutil"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-disk-hdiutil-create",
+      "syntax": "hdiutil create -volname Backup -srcfolder ~/Projects -ov -format UDZO ~/Desktop/backup.dmg",
+      "copy": "hdiutil create -volname Backup -srcfolder ~/Projects -ov -format UDZO ~/Desktop/backup.dmg",
+      "title": "把目录打成压缩 dmg",
+      "desc": "生成只读压缩磁盘映像，适合归档项目或分发离线包。",
+      "example": "hdiutil create -volname Backup -srcfolder ~/Projects -ov -format UDZO ~/Desktop/backup.dmg",
+      "note": "`-ov` 覆盖已有文件；大目录耗时且占用额外空间。",
+      "keywords": [
+       "dmg",
+       "打包",
+       "归档"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-disk-hdiutil-convert",
+      "syntax": "hdiutil convert old.dmg -format UDZO -o new.dmg",
+      "copy": "hdiutil convert old.dmg -format UDZO -o new.dmg",
+      "title": "转换 dmg 压缩格式",
+      "desc": "把未压缩或旧格式映像转成 UDZO，减小体积。",
+      "example": "hdiutil convert old.dmg -format UDZO -o new.dmg",
+      "note": "输出名不要带 `.dmg` 后缀，工具会自动加。",
+      "keywords": [
+       "dmg",
+       "压缩",
+       "转换"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-disk-hdiutil-detach",
+      "syntax": "hdiutil detach /Volumes/MyApp",
+      "copy": "hdiutil detach /Volumes/MyApp",
+      "title": "卸载 dmg 卷",
+      "desc": "安全卸载映像；被占用时加 `-force` 有风险。",
+      "example": "hdiutil detach /Volumes/MyApp",
+      "note": "先退出卷里的 App；`diskutil unmount` 也可。",
+      "keywords": [
+       "dmg",
+       "卸载",
+       "hdiutil"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-disk-fsck-apfs",
+      "syntax": "sudo fsck_apfs -n /dev/disk3s1",
+      "copy": "sudo fsck_apfs -n /dev/disk3s1",
+      "title": "只读检查 APFS 卷",
+      "desc": "`-n` 只检查不修复，确认文件系统是否一致；修复要去掉 `-n`。",
+      "example": "sudo fsck_apfs -n /dev/disk3s1",
+      "note": "设备号用 `diskutil list` 查；运行前尽量卸载卷。",
+      "keywords": [
+       "apfs",
+       "fsck",
+       "检查"
+      ],
+      "src": "manual"
      }
     ],
     "sec": [
@@ -11001,6 +12959,173 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "z90-sec-fdesetup-status",
+      "syntax": "fdesetup status",
+      "copy": "fdesetup status",
+      "title": "查看 FileVault 状态",
+      "desc": "确认启动盘是否加密、是否正在加密或解密。",
+      "example": "fdesetup status",
+      "note": "只读；`fdesetup list` 看已授权用户。",
+      "keywords": [
+       "filevault",
+       "加密",
+       "磁盘"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-sec-fdesetup-enable",
+      "syntax": "sudo fdesetup enable",
+      "copy": "sudo fdesetup enable",
+      "title": "开启 FileVault",
+      "desc": "为启动卷启用全盘加密，命令会生成恢复密钥，务必妥善保存。",
+      "example": "sudo fdesetup enable",
+      "note": "会要求输入用户密码；忘记恢复密钥可能导致数据无法恢复。",
+      "keywords": [
+       "filevault",
+       "加密",
+       "安全"
+      ],
+      "src": "manual",
+      "danger": true
+     },
+     {
+      "id": "z90-sec-fdesetup-list",
+      "syntax": "sudo fdesetup list",
+      "copy": "sudo fdesetup list",
+      "title": "列出 FileVault 授权用户",
+      "desc": "显示哪些账户可以在开机时解锁磁盘。",
+      "example": "sudo fdesetup list",
+      "note": "需要 sudo；移除用户用 `fdesetup remove -user`。",
+      "keywords": [
+       "filevault",
+       "用户",
+       "解锁"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-sec-security-find-identity",
+      "syntax": "security find-identity -v -p codesigning",
+      "copy": "security find-identity -v -p codesigning",
+      "title": "查找代码签名身份",
+      "desc": "列出钥匙串里有效的 Developer ID / Apple Development 证书。",
+      "example": "security find-identity -v -p codesigning",
+      "note": "`-v` 只显示有效身份；证书过期会从列表消失。",
+      "keywords": [
+       "证书",
+       "签名",
+       "keychain"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-sec-security-add-generic",
+      "syntax": "security add-generic-password -a user -s myservice -w",
+      "copy": "security add-generic-password -a user -s myservice -w",
+      "title": "把密码写入钥匙串",
+      "desc": "给服务名和账户保存密码，`-w` 不跟值时会交互式询问，避免明文进历史。",
+      "example": "security add-generic-password -a user -s myservice -w",
+      "note": "`-U` 更新已有条目；读取用 `find-generic-password -w`。",
+      "keywords": [
+       "keychain",
+       "密码",
+       "凭据"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-sec-security-dump",
+      "syntax": "security dump-keychain -d login.keychain-db",
+      "copy": "security dump-keychain -d login.keychain-db",
+      "title": "导出钥匙串条目",
+      "desc": "`-d` 会输出密码明文，仅在本地排障时临时使用。",
+      "example": "security dump-keychain -d login.keychain-db",
+      "note": "输出含敏感凭据，别重定向到共享目录；用完删除。",
+      "keywords": [
+       "keychain",
+       "导出",
+       "安全"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-sec-csrutil-status",
+      "syntax": "csrutil status",
+      "copy": "csrutil status",
+      "title": "查看 SIP 状态",
+      "desc": "确认系统完整性保护是否开启；很多调试工具需要它关闭才能工作。",
+      "example": "csrutil status",
+      "note": "只读；关闭要进恢复模式，日常不要关。",
+      "keywords": [
+       "sip",
+       "安全",
+       "系统"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-sec-spctl-list",
+      "syntax": "spctl --list",
+      "copy": "spctl --list",
+      "title": "查看 Gatekeeper 规则",
+      "desc": "列出当前评估策略和已放行的来源，排查 App 被拦截。",
+      "example": "spctl --list",
+      "note": "只读；`--master-disable` 会降低安全性，别长期使用。",
+      "keywords": [
+       "gatekeeper",
+       "spctl",
+       "安全"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-sec-tccutil-reset-all",
+      "syntax": "tccutil reset All",
+      "copy": "tccutil reset All",
+      "title": "重置所有隐私权限",
+      "desc": "把所有 App 的相机、麦克风、屏幕录制等授权清空，下次访问会重新弹窗。",
+      "example": "tccutil reset All",
+      "note": "会影响所有 App，逐个重新授权；只排障时用。",
+      "keywords": [
+       "tcc",
+       "隐私",
+       "权限"
+      ],
+      "src": "manual",
+      "danger": true
+     },
+     {
+      "id": "z90-sec-profiles-list",
+      "syntax": "sudo profiles -P",
+      "copy": "sudo profiles -P",
+      "title": "列出已安装配置描述文件",
+      "desc": "查看 MDM 或手动安装的配置描述文件，排查设备管理策略。",
+      "example": "sudo profiles -P",
+      "note": "需要 sudo；删除用 `profiles -R -p 标识`。",
+      "keywords": [
+       "mdm",
+       "描述文件",
+       "设备"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-sec-openssl-fingerprint",
+      "syntax": "openssl x509 -in cert.pem -noout -fingerprint -sha256",
+      "copy": "openssl x509 -in cert.pem -noout -fingerprint -sha256",
+      "title": "计算证书 SHA-256 指纹",
+      "desc": "比对证书是否一致，部署 HTTPS 或校验固定证书时用。",
+      "example": "openssl x509 -in cert.pem -noout -fingerprint -sha256",
+      "note": "PEM 证书直接读；DER 格式加 `-inform der`。",
+      "keywords": [
+       "证书",
+       "指纹",
+       "openssl"
+      ],
+      "src": "manual"
      }
     ],
     "container": [
@@ -11537,6 +13662,66 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "z90-container-colima-start",
+      "syntax": "colima start --cpu 4 --memory 8",
+      "copy": "colima start --cpu 4 --memory 8",
+      "title": "启动 Colima 虚拟机",
+      "desc": "在 macOS 上跑 Docker 兼容运行时，指定 CPU 和内存，避免默认资源太小。",
+      "example": "colima start --cpu 4 --memory 8",
+      "note": "首次启动会下载镜像；需要 `brew install colima docker`。",
+      "keywords": [
+       "docker",
+       "colima",
+       "虚拟机"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-container-colima-stop",
+      "syntax": "colima stop",
+      "copy": "colima stop",
+      "title": "停止 Colima",
+      "desc": "释放虚拟机占用的 CPU、内存和磁盘锁，升级前先停。",
+      "example": "colima stop",
+      "note": "停止后容器不运行；`colima delete` 才会删数据。",
+      "keywords": [
+       "docker",
+       "colima",
+       "停止"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-container-limactl-start",
+      "syntax": "limactl start template://docker",
+      "copy": "limactl start template://docker",
+      "title": "用 Lima 启动 Docker 虚拟机",
+      "desc": "Lima 提供 Linux VM，模板直接装 Docker，适合 Apple Silicon。",
+      "example": "limactl start template://docker",
+      "note": "需要 `brew install lima`；模板首次启动较慢。",
+      "keywords": [
+       "lima",
+       "docker",
+       "虚拟机"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-container-podman-run",
+      "syntax": "podman run --rm -it alpine sh",
+      "copy": "podman run --rm -it alpine sh",
+      "title": "用 Podman 跑一次性容器",
+      "desc": "无守护进程的 Docker 替代品，`--rm` 退出即删，适合临时环境。",
+      "example": "podman run --rm -it alpine sh",
+      "note": "需要 `brew install podman` 并初始化 machine；镜像需先拉取。",
+      "keywords": [
+       "podman",
+       "容器",
+       "alpine"
+      ],
+      "src": "manual"
      }
     ],
     "media": [
@@ -12535,6 +14720,201 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "z90-media-sips-resize",
+      "syntax": "sips -Z 1600 image.jpg --out resized.jpg",
+      "copy": "sips -Z 1600 image.jpg --out resized.jpg",
+      "title": "按最长边缩放图片",
+      "desc": "`-Z` 保持比例，把最长边限制到 1600 像素，适合网页配图。",
+      "example": "sips -Z 1600 image.jpg --out resized.jpg",
+      "note": "只读原图，输出到新文件；`-z` 才是强制宽高。",
+      "keywords": [
+       "图片",
+       "缩放",
+       "sips"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-media-sips-rotate",
+      "syntax": "sips -r 90 image.jpg --out rotated.jpg",
+      "copy": "sips -r 90 image.jpg --out rotated.jpg",
+      "title": "旋转图片",
+      "desc": "按角度顺时针旋转，修正手机照片方向。",
+      "example": "sips -r 90 image.jpg --out rotated.jpg",
+      "note": "`-r` 会改像素方向；只改 EXIF 方向用其它工具。",
+      "keywords": [
+       "图片",
+       "旋转",
+       "sips"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-media-sips-convert",
+      "syntax": "sips -s format png image.jpg --out image.png",
+      "copy": "sips -s format png image.jpg --out image.png",
+      "title": "转换图片格式",
+      "desc": "把 JPEG 转 PNG，保留原图不变。",
+      "example": "sips -s format png image.jpg --out image.png",
+      "note": "`-s format` 支持 jpeg、png、tiff 等；透明背景要看源图。",
+      "keywords": [
+       "图片",
+       "格式",
+       "png"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-media-sips-crop",
+      "syntax": "sips -c 800 800 image.jpg --out square.jpg",
+      "copy": "sips -c 800 800 image.jpg --out square.jpg",
+      "title": "居中裁剪为正方形",
+      "desc": "`-c 高 宽` 从中心裁剪，做头像或社媒方图很快。",
+      "example": "sips -c 800 800 image.jpg --out square.jpg",
+      "note": "裁剪会丢边缘内容；先复制原图。",
+      "keywords": [
+       "图片",
+       "裁剪",
+       "sips"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-media-qlmanage-thumb",
+      "syntax": "qlmanage -t -s 512 -o /tmp image.png",
+      "copy": "qlmanage -t -s 512 -o /tmp image.png",
+      "title": "生成 Quick Look 缩略图",
+      "desc": "用系统预览引擎生成 512px 缩略图，支持 PDF、视频和 Office 文档。",
+      "example": "qlmanage -t -s 512 -o /tmp image.png",
+      "note": "`-t` 缩略图，`-p` 预览；输出目录必须存在。",
+      "keywords": [
+       "缩略图",
+       "quicklook",
+       "预览"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-media-iconutil-extract",
+      "syntax": "iconutil -c iconset MyIcon.icns -o MyIcon.iconset",
+      "copy": "iconutil -c iconset MyIcon.icns -o MyIcon.iconset",
+      "title": "把 icns 拆成 iconset",
+      "desc": "导出各尺寸 PNG，方便修改 App 图标后重新打包。",
+      "example": "iconutil -c iconset MyIcon.icns -o MyIcon.iconset",
+      "note": "反向打包用 `iconutil -c icns MyIcon.iconset`。",
+      "keywords": [
+       "图标",
+       "icns",
+       "iconutil"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-media-textutil-html",
+      "syntax": "textutil -convert html notes.txt -output notes.html",
+      "copy": "textutil -convert html notes.txt -output notes.html",
+      "title": "把纯文本转成 HTML",
+      "desc": "生成带基本排版的 HTML，适合快速整理笔记或邮件正文。",
+      "example": "textutil -convert html notes.txt -output notes.html",
+      "note": "`-convert rtf` 可转富文本；编码用 `-encoding UTF-8`。",
+      "keywords": [
+       "文本",
+       "html",
+       "转换"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-media-afconvert-m4a",
+      "syntax": "afconvert -f m4af -d aac input.wav output.m4a",
+      "copy": "afconvert -f m4af -d aac input.wav output.m4a",
+      "title": "把音频转成 AAC",
+      "desc": "用系统音频工具把 WAV 压成 m4a，不依赖 ffmpeg。",
+      "example": "afconvert -f m4af -d aac input.wav output.m4a",
+      "note": "`-f m4af` 是容器，`-d aac` 是编码；码率可加 `-b`。",
+      "keywords": [
+       "音频",
+       "aac",
+       "afconvert"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-media-afinfo",
+      "syntax": "afinfo audio.m4a",
+      "copy": "afinfo audio.m4a",
+      "title": "查看音频文件信息",
+      "desc": "显示时长、采样率、声道、编码和比特率，排查播放兼容性。",
+      "example": "afinfo audio.m4a",
+      "note": "支持 m4a、wav、aiff；不解析视频容器。",
+      "keywords": [
+       "音频",
+       "信息",
+       "afinfo"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-media-say-voice",
+      "syntax": "say -v Ting-Ting \"你好，世界\"",
+      "copy": "say -v Ting-Ting \"你好，世界\"",
+      "title": "用指定语音朗读",
+      "desc": "`-v` 选择中文语音 Ting-Ting，做提示音或无障碍播报。",
+      "example": "say -v Ting-Ting \"你好，世界\"",
+      "note": "`say -v ?` 列出所有语音；语速用 `-r`。",
+      "keywords": [
+       "语音",
+       "朗读",
+       "say"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-media-screencapture-window",
+      "syntax": "screencapture -w window.png",
+      "copy": "screencapture -w window.png",
+      "title": "交互式截取窗口",
+      "desc": "运行后点击某个窗口，只截该窗口并带阴影，适合写文档。",
+      "example": "screencapture -w window.png",
+      "note": "`-w` 需要屏幕录制权限；按空格可切换窗口/区域模式。",
+      "keywords": [
+       "截图",
+       "窗口",
+       "screencapture"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-media-screencapture-clipboard",
+      "syntax": "screencapture -c",
+      "copy": "screencapture -c",
+      "title": "截图直接进剪贴板",
+      "desc": "不落地文件，截完直接粘贴到聊天或文档。",
+      "example": "screencapture -c",
+      "note": "默认截全屏；加 `-i` 交互选择区域。",
+      "keywords": [
+       "截图",
+       "剪贴板",
+       "screencapture"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-media-exiftool",
+      "syntax": "exiftool -DateTimeOriginal image.jpg",
+      "copy": "exiftool -DateTimeOriginal image.jpg",
+      "title": "读取照片拍摄时间",
+      "desc": "查看 EXIF 里的原始拍摄时间、相机和 GPS，整理照片时用。",
+      "example": "exiftool -DateTimeOriginal image.jpg",
+      "note": "需 `brew install exiftool`；写入 EXIF 用 `-DateTimeOriginal=`。",
+      "keywords": [
+       "exif",
+       "照片",
+       "元数据"
+      ],
+      "src": "manual"
      }
     ],
     "os": [
@@ -13058,6 +15438,277 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "z90-os-pmset-battery",
+      "syntax": "pmset -g batt",
+      "copy": "pmset -g batt",
+      "title": "查看电池状态",
+      "desc": "显示当前电量、电源来源和剩余时间，脚本里也能解析。",
+      "example": "pmset -g batt",
+      "note": "只读；`pmset -g` 看全部电源设置。",
+      "keywords": [
+       "电池",
+       "电源",
+       "pmset"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-os-pmset-assertions",
+      "syntax": "pmset -g assertions",
+      "copy": "pmset -g assertions",
+      "title": "查看谁在阻止休眠",
+      "desc": "列出持有电源断言的应用，排查合盖后不休眠、耗电快。",
+      "example": "pmset -g assertions",
+      "note": "只读；`pmset -g assertionslog` 可实时跟踪。",
+      "keywords": [
+       "休眠",
+       "断言",
+       "电源"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-os-caffeinate-display",
+      "syntax": "caffeinate -d -t 3600",
+      "copy": "caffeinate -d -t 3600",
+      "title": "一小时内不让显示器休眠",
+      "desc": "`-d` 阻止显示器休眠，`-t` 指定秒数，演示或下载时用。",
+      "example": "caffeinate -d -t 3600",
+      "note": "只防休眠，不防锁屏；Ctrl-C 可提前结束。",
+      "keywords": [
+       "caffeinate",
+       "休眠",
+       "演示"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-os-open-url",
+      "syntax": "open https://developer.apple.com",
+      "copy": "open https://developer.apple.com",
+      "title": "用默认浏览器打开网址",
+      "desc": "从终端直接打开文档、后台或本地服务器地址，省去复制。",
+      "example": "open https://developer.apple.com",
+      "note": "`open -a Safari` 可指定浏览器；URL 含 `&` 要加引号。",
+      "keywords": [
+       "open",
+       "浏览器",
+       "url"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-os-open-wait",
+      "syntax": "open -W MyApp.app",
+      "copy": "open -W MyApp.app",
+      "title": "打开 App 并等待退出",
+      "desc": "`-W` 阻塞到 App 关闭，适合脚本里串行启动和清理。",
+      "example": "open -W MyApp.app",
+      "note": "GUI App 可能一直不退出；加超时控制。",
+      "keywords": [
+       "open",
+       "等待",
+       "app"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-os-mdimport",
+      "syntax": "mdimport ~/Documents",
+      "copy": "mdimport ~/Documents",
+      "title": "强制重建 Spotlight 索引",
+      "desc": "让新文件立刻可被 `mdfind` 搜到，排查“搜不到刚下载的文件”。",
+      "example": "mdimport ~/Documents",
+      "note": "目录大时耗时；`mdutil -E /` 会重建整卷索引，慎用。",
+      "keywords": [
+       "spotlight",
+       "索引",
+       "mdfind"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-os-mdutil-status",
+      "syntax": "mdutil -s /",
+      "copy": "mdutil -s /",
+      "title": "查看 Spotlight 索引状态",
+      "desc": "确认某个卷是否开启索引、索引是否正常。",
+      "example": "mdutil -s /",
+      "note": "只读；`-i on/off` 切换索引。",
+      "keywords": [
+       "spotlight",
+       "索引",
+       "mdutil"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-os-mdfind-kind",
+      "syntax": "mdfind 'kMDItemContentType == \"public.jpeg\"'",
+      "copy": "mdfind 'kMDItemContentType == \"public.jpeg\"'",
+      "title": "按内容类型搜索文件",
+      "desc": "用 Spotlight 查询语法找所有 JPEG，不受扩展名伪装影响。",
+      "example": "mdfind 'kMDItemContentType == \"public.jpeg\"'",
+      "note": "`mdls` 可查看可用属性名；查询要加引号。",
+      "keywords": [
+       "spotlight",
+       "文件",
+       "查询"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-os-shortcuts-run",
+      "syntax": "shortcuts run \"Resize Image\"",
+      "copy": "shortcuts run \"Resize Image\"",
+      "title": "运行一个快捷指令",
+      "desc": "从终端触发“快捷指令”App 里的自动化，把 GUI 流程接进脚本。",
+      "example": "shortcuts run \"Resize Image\"",
+      "note": "需要先创建同名快捷指令；`shortcuts list` 查看全部。",
+      "keywords": [
+       "快捷指令",
+       "自动化",
+       "shortcuts"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-os-osacompile",
+      "syntax": "osacompile -e 'display dialog \"Hi\"' -o hello.app",
+      "copy": "osacompile -e 'display dialog \"Hi\"' -o hello.app",
+      "title": "把 AppleScript 编译成 App",
+      "desc": "生成可双击运行的 `.app`，适合做小工具或给非技术用户。",
+      "example": "osacompile -e 'display dialog \"Hi\"' -o hello.app",
+      "note": "脚本里有引号要转义；运行前先用 `osascript` 测试。",
+      "keywords": [
+       "applescript",
+       "app",
+       "自动化"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-os-automator",
+      "syntax": "automator -i ~/Desktop/input.txt MyWorkflow.workflow",
+      "copy": "automator -i ~/Desktop/input.txt MyWorkflow.workflow",
+      "title": "运行 Automator 工作流",
+      "desc": "把输入文件传给工作流并执行，适合批量处理图片、PDF。",
+      "example": "automator -i ~/Desktop/input.txt MyWorkflow.workflow",
+      "note": "工作流需先保存；`-D` 可传变量。",
+      "keywords": [
+       "automator",
+       "工作流",
+       "自动化"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-os-plutil-lint",
+      "syntax": "plutil -lint Info.plist",
+      "copy": "plutil -lint Info.plist",
+      "title": "校验 plist 语法",
+      "desc": "检查括号、分号和类型是否正确，改配置后先跑它。",
+      "example": "plutil -lint Info.plist",
+      "note": "只校验不转换；转 JSON 用 `-convert json`。",
+      "keywords": [
+       "plist",
+       "校验",
+       "语法"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-os-plistbuddy",
+      "syntax": "/usr/libexec/PlistBuddy -c \"Print :CFBundleIdentifier\" Info.plist",
+      "copy": "/usr/libexec/PlistBuddy -c \"Print :CFBundleIdentifier\" Info.plist",
+      "title": "读取 plist 里的单个键",
+      "desc": "按冒号路径读取嵌套键，脚本里比 `defaults read` 更精确。",
+      "example": "/usr/libexec/PlistBuddy -c \"Print :CFBundleIdentifier\" Info.plist",
+      "note": "写值用 `-c \"Set :Key value\"`；路径大小写敏感。",
+      "keywords": [
+       "plist",
+       "plistbuddy",
+       "配置"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-os-kextstat",
+      "syntax": "kextstat | head -20",
+      "copy": "kextstat | head -20",
+      "title": "列出已加载的内核扩展",
+      "desc": "查看第三方 kext、驱动和虚拟化组件是否加载。",
+      "example": "kextstat | head -20",
+      "note": "Apple Silicon 上很多 kext 已改为 system extension；`kmutil` 更现代。",
+      "keywords": [
+       "kext",
+       "内核",
+       "驱动"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-os-kmutil",
+      "syntax": "kmutil showloaded --list-only",
+      "copy": "kmutil showloaded --list-only",
+      "title": "列出已加载的 kmutil 组件",
+      "desc": "查看内核扩展和系统扩展的加载状态，排查驱动冲突。",
+      "example": "kmutil showloaded --list-only",
+      "note": "需要 sudo；`kmutil showloaded` 不加 `--list-only` 输出更详细。",
+      "keywords": [
+       "kmutil",
+       "内核",
+       "驱动"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-os-ioreg",
+      "syntax": "ioreg -l -w 0 | head",
+      "copy": "ioreg -l -w 0 | head",
+      "title": "查看 I/O Registry",
+      "desc": "导出硬件树，排查 USB、电池、显示器和蓝牙设备识别问题。",
+      "example": "ioreg -l -w 0 | head",
+      "note": "输出巨大；先加 `-c` 类名或 `grep` 过滤。",
+      "keywords": [
+       "硬件",
+       "ioreg",
+       "设备"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-os-nvram",
+      "syntax": "nvram -p",
+      "copy": "nvram -p",
+      "title": "读取 NVRAM 变量",
+      "desc": "查看启动参数、音量、亮度等持久变量，排查启动行为。",
+      "example": "nvram -p",
+      "note": "只读；写 NVRAM 有风险，先备份输出。",
+      "keywords": [
+       "nvram",
+       "启动",
+       "硬件"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-os-systemsetup-timezone",
+      "syntax": "sudo systemsetup -settimezone Asia/Shanghai",
+      "copy": "sudo systemsetup -settimezone Asia/Shanghai",
+      "title": "设置系统时区",
+      "desc": "把机器时区改为上海，适合远程机器或 CI runner 时间对齐。",
+      "example": "sudo systemsetup -settimezone Asia/Shanghai",
+      "note": "会改变系统时间显示；用 `-gettimezone` 先记录原值。",
+      "keywords": [
+       "时区",
+       "系统",
+       "设置"
+      ],
+      "src": "manual",
+      "danger": true
      }
     ],
     "alias": [
@@ -13212,6 +15863,36 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "z90-alias-brace",
+      "syntax": "cp report.{txt,bak}",
+      "copy": "cp report.{txt,bak}",
+      "title": "用花括号展开批量复制",
+      "desc": "zsh 会把 `report.{txt,bak}` 展开成两个路径，快速给文件做备份。",
+      "example": "cp report.{txt,bak}",
+      "note": "花括号里不能有空格；不匹配时 zsh 可能报 `nomatch`。",
+      "keywords": [
+       "zsh",
+       "花括号",
+       "复制"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-alias-process-sub",
+      "syntax": "diff <(sort a.txt) <(sort b.txt)",
+      "copy": "diff <(sort a.txt) <(sort b.txt)",
+      "title": "用进程替换比较两个排序结果",
+      "desc": "把两个命令的输出当临时文件传给 `diff`，不落地临时文件。",
+      "example": "diff <(sort a.txt) <(sort b.txt)",
+      "note": "需要 zsh/bash；`<(...)` 是进程替换，不是重定向。",
+      "keywords": [
+       "zsh",
+       "进程替换",
+       "diff"
+      ],
+      "src": "manual"
      }
     ],
     "other": [
@@ -13300,6 +15981,36 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "z90-other-xar-list",
+      "syntax": "xar -tf MyApp.pkg",
+      "copy": "xar -tf MyApp.pkg",
+      "title": "列出 pkg 的 xar 内容",
+      "desc": "查看安装包归档里的文件路径和顺序，排查 pkg 结构。",
+      "example": "xar -tf MyApp.pkg",
+      "note": "只读；解包用 `xar -xf`，但会破坏签名上下文。",
+      "keywords": [
+       "xar",
+       "pkg",
+       "归档"
+      ],
+      "src": "manual"
+     },
+     {
+      "id": "z90-other-sdef",
+      "syntax": "sdef /Applications/Safari.app",
+      "copy": "sdef /Applications/Safari.app",
+      "title": "导出 App 的 AppleScript 字典",
+      "desc": "查看一个 App 支持哪些脚本命令和对象，写自动化前先读它。",
+      "example": "sdef /Applications/Safari.app",
+      "note": "输出是 XML；`sdef -h` 查看选项。",
+      "keywords": [
+       "applescript",
+       "sdef",
+       "自动化"
+      ],
+      "src": "manual"
      }
     ]
    }
