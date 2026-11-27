@@ -1,5 +1,5 @@
 /* ============================================================
-   全栈开发路线 · z77
+   全栈开发路线 · z94 · 动画与交互
    与 Java/Python/JavaScript 学科页共用深色液态玻璃语言
    ============================================================ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -115,7 +115,7 @@ h1 {
   box-shadow: 0 18px 46px rgba(0, 0, 0, .24), inset 0 1px 0 rgba(255, 255, 255, .06);
 }
 .stat { padding: 18px 18px 16px; background: linear-gradient(180deg, rgba(24, 24, 23, .66), rgba(9, 12, 16, .84)); }
-.stat b { display: block; font-family: var(--fs-mono); font-size: 25px; line-height: 1.15; color: #F8F6EF; }
+.stat b { display: block; font-family: var(--fs-mono); font-size: 25px; line-height: 1.15; color: #F8F6EF; font-variant-numeric: tabular-nums; }
 .stat span { display: block; margin-top: 5px; font-size: 10.5px; color: var(--fs-dim); font-weight: 750; letter-spacing: .02em; }
 .stat.partial b { color: var(--fs-gold); }
 .stat.ready b { color: #5EEAD4; }
@@ -132,9 +132,9 @@ h1 {
   position: relative; display: flex; flex-direction: column; gap: 2px; padding: 13px 14px 12px;
   border: 1px solid var(--fs-line); border-radius: 13px;
   background: linear-gradient(180deg, rgba(255, 255, 255, .045), rgba(255, 255, 255, .018));
-  transition: transform .18s var(--fs-ease), border-color .18s, background .18s;
+  transition: transform .24s var(--fs-ease), border-color .24s ease, background .24s ease;
 }
-.fs-base:hover { transform: translateY(-2px); border-color: rgba(94, 234, 212, .38); background: rgba(94, 234, 212, .055); }
+.fs-base:hover { transform: translate3d(0, -3px, 0); border-color: rgba(94, 234, 212, .42); background: rgba(94, 234, 212, .06); }
 .fs-base b { font-size: 12px; color: #F5F2EA; font-weight: 800; }
 .fs-base span { font-size: 9.5px; color: var(--fs-dim); }
 .fs-base i { position: absolute; right: 12px; top: 12px; font-style: normal; font-size: 13px; color: var(--fs-mint); }
@@ -177,9 +177,9 @@ h1 {
   border: 1px solid var(--fs-line);
   background: linear-gradient(180deg, rgba(24, 24, 23, .62), rgba(9, 12, 16, .80));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .055), 0 18px 42px rgba(0, 0, 0, .18);
-  transition: transform .2s var(--fs-ease), border-color .2s, box-shadow .2s;
+  transition: transform .26s var(--fs-ease), border-color .26s ease, box-shadow .26s ease;
 }
-.fs-module:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--mod-color) 48%, transparent); box-shadow: 0 26px 56px rgba(0, 0, 0, .30); }
+.fs-module:hover { transform: translate3d(0, -4px, 0); border-color: color-mix(in srgb, var(--mod-color) 52%, transparent); box-shadow: 0 28px 62px rgba(0, 0, 0, .33), 0 0 0 1px color-mix(in srgb, var(--mod-color) 10%, transparent); }
 .fs-module.partial { --mod-color: var(--fs-gold); }
 .fs-module.ready { --mod-color: #5EEAD4; }
 .fs-module.missing { --mod-color: var(--fs-accent); }
@@ -278,6 +278,63 @@ h1 {
   .checklist { grid-template-columns: 1fr; }
   .fs-foot { font-size: 9.5px; }
 }
+/* 动画层：入场、滚动揭示、卡片光效与阶段导航 */
+.fs-module { isolation: isolate; }
+.fs-module > :not(.fs-spot) { position: relative; z-index: 1; }
+.fs-spot {
+  position: absolute; inset: -1px; border-radius: inherit; pointer-events: none;
+  z-index: 0; opacity: 0;
+  background: radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%),
+              color-mix(in srgb, var(--mod-color) 14%, transparent), transparent 66%);
+  transition: opacity .28s ease;
+}
+.fs-module:hover .fs-spot { opacity: .92; }
+
+.fs-stage-tab.is-active {
+  color: #F8FAFF;
+  background: linear-gradient(115deg, rgba(143, 184, 255, .17), rgba(94, 234, 212, .07));
+  box-shadow: inset 0 -2px 0 rgba(143, 184, 255, .62);
+}
+.fs-stage-tab.is-active span { color: #A7F0E3; }
+.fs-stage-tab.is-active em { color: var(--fs-accent); }
+
+.fs-motion .fs-reveal {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+}
+.fs-motion .fs-reveal.is-visible {
+  animation: fs-reveal-in .62s var(--fs-ease) both;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+@keyframes fs-reveal-in {
+  from { opacity: 0; transform: translate3d(0, 18px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+.fs-motion .fs-module.fs-reveal.is-visible:hover { transform: translate3d(0, -4px, 0); }
+.fs-motion .fs-base.fs-reveal.is-visible:hover { transform: translate3d(0, -3px, 0); }
+
+@keyframes fs-status-pulse {
+  0%, 100% { opacity: .72; transform: scale(.88); }
+  50% { opacity: 1; transform: scale(1.14); }
+}
+@keyframes fs-hero-rise {
+  from { opacity: 0; transform: translate3d(0, 18px, 0) scale(.985); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+  .fs-motion .hero .fs-mark { animation: fs-hero-rise .72s var(--fs-ease) .02s both; }
+  .fs-motion .hero .kicker { animation: fs-hero-rise .58s var(--fs-ease) .10s both; }
+  .fs-motion .hero h1 { animation: fs-hero-rise .62s var(--fs-ease) .14s both; }
+  .fs-motion .hero p { animation: fs-hero-rise .58s var(--fs-ease) .20s both; }
+  .fs-motion .hero-actions { animation: fs-hero-rise .58s var(--fs-ease) .26s both; }
+  .fs-motion .fs-status i { animation: fs-status-pulse 3.4s ease-in-out infinite; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * { transition-duration: .01ms !important; animation-duration: .01ms !important; scroll-behavior: auto !important; }
+  .fs-motion .fs-reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .fs-spot { display: none !important; }
+  .fs-motion .fs-status i { animation: none !important; }
 }
