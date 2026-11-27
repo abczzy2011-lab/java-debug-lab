@@ -1,0 +1,102 @@
+/* ============================================================
+   z95 · 全站光影与滚动节奏
+   统一首页、学科入口、课程目录、终端与考试页的入场、揭示、
+   指针微倾与阅读进度条。只动 transform / opacity；减少动画时
+   自动退回静态页面。
+   ============================================================ */
+:root{
+  --fx-ease:cubic-bezier(.22,1,.36,1);
+  --fx-line:rgba(244,239,230,.12);
+}
+
+/* 入场与滚动揭示的初始态只由 html.fx-motion 开启：
+   JS 未运行、出错或被禁用时内容保持原样可见。 */
+html.fx-motion .fx-intro{
+  opacity:0;
+  transform:translate3d(0,18px,0);
+}
+html.fx-motion .fx-intro.fx-in{
+  animation:fx-rise .72s var(--fx-ease) var(--fx-delay,0s) both;
+}
+@keyframes fx-rise{
+  from{opacity:0;transform:translate3d(0,18px,0)}
+  to{opacity:1;transform:translate3d(0,0,0)}
+}
+
+html.fx-motion .fx-reveal{
+  opacity:0;
+  transform:translate3d(0,16px,0) scale(.996);
+}
+html.fx-motion .fx-reveal.fx-in{
+  animation:fx-reveal .66s var(--fx-ease) var(--fx-delay,0s) both;
+}
+@keyframes fx-reveal{
+  from{opacity:0;transform:translate3d(0,16px,0) scale(.996)}
+  to{opacity:1;transform:none}
+}
+
+/* 桌面精细指针下的卡片微倾：最大约 3°，不改变卡片布局，
+   也不接管原有 hover 阴影与边框。触屏与窄屏不挂载。 */
+.fx-tilt{
+  transform-style:preserve-3d;
+  backface-visibility:hidden;
+}
+html.fx-motion .fx-tilt:hover{
+  transform:perspective(1000px) rotateX(var(--fx-rx,0deg)) rotateY(var(--fx-ry,0deg)) translate3d(0,-3px,0);
+}
+html.fx-motion .fx-tilt:active{
+  transform:perspective(1000px) rotateX(var(--fx-rx,0deg)) rotateY(var(--fx-ry,0deg)) translate3d(0,-1px,0) scale(.986);
+  transition-duration:.08s;
+}
+
+
+/* 卡片指针光斑：补上入口卡 / 章卡 / 首页全栈卡的光照跟随，
+   光层位于内容下方，不挡文字与点击。 */
+.fx-glint-host{isolation:isolate}
+.fx-glint{
+  position:absolute;inset:0;z-index:-1;
+  border-radius:inherit;
+  pointer-events:none;
+  opacity:0;
+  background:
+    radial-gradient(260px circle at var(--fx-gx,50%) var(--fx-gy,0),
+      rgba(255,255,255,.13), rgba(200,169,118,.055) 34%, transparent 68%);
+  mix-blend-mode:screen;
+  transition:opacity .22s ease;
+}
+html.fx-motion .fx-tilt:hover .fx-glint{opacity:.9}
+
+/* 顶部细进度条：长页面阅读位置，不占布局。 */
+.fx-progress{
+  position:fixed;left:0;top:0;z-index:980;
+  width:100%;height:2px;
+  pointer-events:none;
+  opacity:0;
+  background:linear-gradient(90deg,#C8A976,#9CC9B8 48%,#8FB8FF 100%);
+  box-shadow:0 0 18px rgba(200,169,118,.18);
+  transform:scaleX(0);
+  transform-origin:0 50%;
+  transition:opacity .22s ease;
+  will-change:transform;
+}
+.fx-progress.fx-on{opacity:.92}
+
+@media (max-width:760px){
+  .fx-tilt:hover,.fx-tilt:active{transform:none!important}
+}
+@media (hover:none){
+  .fx-tilt:hover,.fx-tilt:active{transform:none!important}
+}
+@media (prefers-reduced-motion:reduce){
+  .fx-glint{display:none!important}
+  html.fx-motion .fx-intro,
+  html.fx-motion .fx-intro.fx-in,
+  html.fx-motion .fx-reveal,
+  html.fx-motion .fx-reveal.fx-in{
+    opacity:1!important;
+    transform:none!important;
+    animation:none!important;
+  }
+  .fx-tilt:hover,.fx-tilt:active{transform:none!important}
+  .fx-progress{transition:none}
+}

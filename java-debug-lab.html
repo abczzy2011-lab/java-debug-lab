@@ -771,6 +771,7 @@ span.apiref:hover{color:var(--accent);border-bottom-color:var(--accent)}
 <link rel="stylesheet" href="./assets/css/liquid-glass.css?v=20261123z47">
 <link rel="stylesheet" href="./assets/css/fullstack-entry.css?v=20261126z86">
 <link rel="stylesheet" href="./assets/css/java-doc.css?v=20261125z57">
+<link rel="stylesheet" href="./assets/css/site-fx.css?v=20261127z95">
 </head>
 <body>
 
@@ -1493,6 +1494,7 @@ window.__JAVA_DOC_LINKS__=function(){
 <script>
 /* z37 · 液态玻璃指针光斑 + 按压高光定位 + 全屏点击光效 */
 (function(){
+  window.__JGL_POINTER__=1;document.documentElement.dataset.jglPointer='1';
   var GLASS='.subject-card,.card,.study-card,.lesson-item,.sec-card,.wb-card,.wb-stat .box,.dict-item,.hw-qcard,.logic-qcard,.review,.to-box,.panel-card,.panel-card.elevated,.score-card,.trial-card,.bug-card,.know-card,.lq-rcard,.term-card,.api-cn-item,.study-wrap,.hw-opt,.logic-choice,.subject-icon';
   var PRESS='button:not([class*="jv-"]):not(:disabled),.btn:not(:disabled),.home,.back-link,.study-cta,.wrongbook-cta,.tab,.api-type-chip,.subject-card,.card,.study-card,.lesson-item,.wb-card,.dict-item,.hw-opt,.logic-choice';
   var raf=0,pending=null;
@@ -1553,5 +1555,6 @@ window.__JAVA_DOC_LINKS__=function(){
 </script>
 <script defer src="./assets/js/fullstack/fullstack-data.js?v=20261127z93n"></script>
 <script defer src="./assets/js/fullstack/fullstack-entry.js?v=20261127z93n"></script>
+<script defer src="./assets/js/site-fx.js?v=20261127z95"></script>
 </body>
 </html>
