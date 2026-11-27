@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
-<title>C++ 学科 · 学习资料 / 改错 / 输出实现场</title>
-<meta name="description" content="C++ 学科入口：五篇 18 章 96 课系统学习资料、102 题改错实验室、102 题输出实现场；课程取材于 8 本 C++ 教材，判题使用 GCC 14.1 与 C++20。">
+<title>C++ 学科 · 学习资料 / 改错 / 输出 / API 速查</title>
+<meta name="description" content="C++ 学科入口：五篇 18 章 96 课系统学习资料、102 题改错实验室、102 题输出实现场、站内 C++ API 速查；课程取材于 8 本 C++ 教材，判题使用 GCC 14.1 与 C++20。">
 <link rel="icon" type="image/svg+xml" href="../assets/icons/cpp.svg">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -120,6 +120,34 @@ h1{font-size:clamp(38px,6vw,64px);line-height:1.04;letter-spacing:-.045em;font-w
   .entry h2{font-size:22px}
   .entry p{font-size:12px}
 }
+.api-strip{
+  display:flex;align-items:center;justify-content:space-between;gap:22px;margin-top:16px;padding:19px 22px 18px;
+  border:1px solid rgba(126,166,255,.26);border-radius:18px;
+  background:radial-gradient(48% 140% at 8% 0%,rgba(126,166,255,.17),transparent 68%),linear-gradient(145deg,rgba(20,27,37,.75),rgba(7,11,18,.88));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 16px 36px rgba(0,0,0,.18);
+  transition:transform .2s var(--ease),border-color .2s,box-shadow .2s;
+}
+.api-strip:hover{transform:translateY(-3px);border-color:rgba(126,166,255,.58);box-shadow:0 24px 52px rgba(0,0,0,.28),0 0 0 1px rgba(126,166,255,.08) inset}
+.api-strip:active{transform:translateY(-1px) scale(.997)}
+.api-strip-copy{min-width:0}
+.api-strip-top{display:flex;flex-wrap:wrap;align-items:center;gap:9px}
+.api-strip-top>span:first-child{font-family:var(--mono);font-size:8.5px;font-weight:850;letter-spacing:.16em;color:#A9C6FF}
+.api-strip-badge{padding:3px 7px;border:1px solid rgba(126,166,255,.30);border-radius:999px;background:rgba(126,166,255,.07);font-family:var(--mono);font-size:8px;font-weight:800;color:#C7D8FF}
+.api-strip h2{margin-top:7px;font-size:clamp(23px,3vw,31px);line-height:1.15;letter-spacing:-.04em;font-weight:850;background:linear-gradient(100deg,#FFF 5%,#C9DAFF 72%,#E6D6B8 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.api-strip p{max-width:780px;margin-top:7px;font-size:11px;line-height:1.8;color:var(--muted)}
+.api-strip p b{color:#C7D8FF;font-weight:800}
+.api-strip-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:11px}
+.api-strip-tags span{padding:3px 7px;border:1px solid rgba(244,239,230,.10);border-radius:5px;background:rgba(255,255,255,.026);font-family:var(--mono);font-size:8.5px;font-weight:750;color:#A9C6FF}
+.api-strip-cta{flex:none;display:flex;align-items:center;gap:8px;min-height:42px;padding:0 13px;border:1px solid rgba(126,166,255,.25);border-radius:10px;background:rgba(126,166,255,.075);color:#DDE9FF;font-size:10.5px;font-weight:800;white-space:nowrap}
+.api-strip-cta span:last-child{font-size:19px;color:#A9C6FF;transition:transform .16s}
+.api-strip:hover .api-strip-cta span:last-child{transform:translateX(3px)}
+@media (max-width:760px){
+  .api-strip{align-items:flex-start;gap:10px;padding:17px 16px;border-radius:15px}
+  .api-strip p{font-size:10.5px}
+  .api-strip-cta{min-height:34px;padding:0 9px;font-size:9.5px}
+  .api-strip-cta span:first-child{display:none}
+}
+
 @media (max-width:760px){
   .subbar{gap:9px;padding-left:10px;padding-right:10px}
   .home{min-height:42px;padding:0 11px;font-size:12px}
@@ -148,26 +176,26 @@ h1{font-size:clamp(38px,6vw,64px);line-height:1.04;letter-spacing:-.045em;font-w
 .book-pill b{display:block;margin-bottom:3px;color:#D8C08B;font-size:10px;font-weight:800}
 @media (max-width:760px){.book-strip{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
-<link rel="stylesheet" href="../assets/css/liquid-glass.css?v=20261128z109">
+<link rel="stylesheet" href="../assets/css/liquid-glass.css?v=20261128z114">
 <link rel="stylesheet" href="../assets/css/site-fx.css?v=20261127z102">
-<link rel="stylesheet" href="../assets/css/subject-intro.css?v=20261128z111">
+<link rel="stylesheet" href="../assets/css/subject-intro.css?v=20261128z114">
 </head>
 <body>
 <header class="subbar">
-  <a class="home" href="../java-debug-lab.html?v=20261128z109" aria-label="返回学科入口"><span aria-hidden="true">←</span>返回学科</a>
+  <a class="home" href="../java-debug-lab.html?v=20261128z114" aria-label="返回学科入口"><span aria-hidden="true">←</span>返回学科</a>
   <div class="brand"><img src="../assets/icons/cpp.svg" alt="" width="26" height="26"><b>C++ 学科</b></div>
   <div class="spacer"></div>
-  <div class="tip">3 类入口 · C++20</div>
+  <div class="tip">4 类入口 · C++20</div>
 </header>
 <main class="hub">
   <section class="hero">
     <div class="hero-ico"><img src="../assets/icons/cpp.svg" alt="C++ 学科" width="66" height="66"></div>
-    <div class="kicker">SUBJECT · C++ · 3 CATEGORIES</div>
+    <div class="kicker">SUBJECT · C++ · 4 CATEGORIES</div>
     <h1>C++</h1>
-    <p>从 8 本教材压成一条可执行路线：<strong>学习资料</strong>是五篇 18 章 96 课，<strong>改错实验室</strong>在带 bug 的 main.cpp 里定位逻辑，<strong>输出实现场</strong>只给目标输出，从空白写出完整程序。两套实验室都用 GCC 14.1 按 C++20 真实编译。</p>
+    <p>从 8 本教材压成一条可执行路线：<strong>学习资料</strong>是五篇 18 章 96 课，<strong>改错实验室</strong>在带 bug 的 main.cpp 里定位逻辑，<strong>输出实现场</strong>只给目标输出，从空白写出完整程序，<strong>API 速查</strong>把标准库签名、示例与坑点留在站内。两套实验室都用 GCC 14.1 按 C++20 真实编译。</p>
   </section>
 
-  <a class="output-spotlight" href="./cpp-output.html?v=20261128z109" aria-label="进入 C++ 输出实现场">
+  <a class="output-spotlight" href="./cpp-output.html?v=20261128z114" aria-label="进入 C++ 输出实现场">
     <div class="spotlight-copy">
       <span class="spotlight-kicker">OUTPUT → CODE · C++20 · GCC 14</span>
       <h2>C++ 输出实现场</h2>
@@ -186,7 +214,7 @@ h1{font-size:clamp(38px,6vw,64px);line-height:1.04;letter-spacing:-.045em;font-w
   </a>
 
   <section class="entry-grid">
-    <a class="entry course" href="./cpp-course.html?v=20261128z109">
+    <a class="entry course" href="./cpp-course.html?v=20261128z114">
       <div class="entry-top">
         <div class="entry-ico"><img src="../assets/icons/study.png" alt="" width="38" height="38"></div>
         <span class="badge">五篇 18 章</span>
@@ -196,7 +224,7 @@ h1{font-size:clamp(38px,6vw,64px);line-height:1.04;letter-spacing:-.045em;font-w
       <div class="entry-meta"><span>96 课 / 1,344 小节</span><span>A Tour of C++ · C++ Primer Plus · Effective Modern C++</span><span>同一套 reader 架构</span></div>
       <div class="entry-cta"><span>进入完整课程</span><span aria-hidden="true">→</span></div>
     </a>
-    <a class="entry practice" href="./cpp-debug-lab.html?v=20261128z109">
+    <a class="entry practice" href="./cpp-debug-lab.html?v=20261128z114">
       <div class="entry-top">
         <div class="entry-ico"><img src="../assets/icons/algo.png" alt="" width="38" height="38"></div>
         <span class="badge">3 档 102 题</span>
@@ -207,6 +235,16 @@ h1{font-size:clamp(38px,6vw,64px);line-height:1.04;letter-spacing:-.045em;font-w
       <div class="entry-cta"><span>进入改错</span><span aria-hidden="true">→</span></div>
     </a>
   </section>
+
+  <a class="api-strip" href="./cpp-api.html?v=20261128z114" aria-label="打开 C++ API 速查">
+    <div class="api-strip-copy">
+      <div class="api-strip-top"><span>STANDARD LIBRARY · OFFLINE SEARCH</span><span class="api-strip-badge">12 GROUPS · 164 ENTRIES</span></div>
+      <h2>C++ API 速查</h2>
+      <p>标准库容器、算法、字符串、流、文件系统、并发与智能指针：在站内搜 <b>vector</b> / <b>sort</b> / <b>mutex</b>，直接看头文件、签名、示例、输出和坑点，不再跳 cppreference。</p>
+      <div class="api-strip-tags"><span>vector</span><span>sort</span><span>filesystem</span><span>mutex</span><span>optional</span><span>regex</span></div>
+    </div>
+    <div class="api-strip-cta"><span>站内搜索</span><span aria-hidden="true">→</span></div>
+  </a>
 
   <div class="output-spotlight" style="grid-template-columns:1fr;cursor:default;margin-top:16px" aria-label="C++ 教材路线">
     <div>
@@ -223,13 +261,13 @@ h1{font-size:clamp(38px,6vw,64px);line-height:1.04;letter-spacing:-.045em;font-w
         <div class="book-pill"><b>C++20 - The Complete Guide</b>专题 · concepts / ranges</div>
         <div class="book-pill"><b>C++ Concurrency in Action 2E</b>并发 · 线程与内存序</div>
       </div>
-      <p style="margin:10px 2px 0;font-size:10px;color:var(--dim)">标准签名与边界另查 <a href="https://en.cppreference.com/w/cpp" target="_blank" rel="noopener" style="color:#D8C08B;text-decoration:none">cppreference ↗</a>；它不计入 8 本教材。</p>
+      <p style="margin:10px 2px 0;font-size:10px;color:var(--dim)">标准签名与边界统一在 <a href="./cpp-api.html?v=20261128z114" style="color:#D8C08B;text-decoration:none">站内 C++ API 速查</a> 里查；它不计入 8 本教材。</p>
     </div>
   </div>
 
-  <div class="note"><b>C++ 线只做三件事：系统学、改错、从输出写代码。</b> 课程正文与两套实验室共享同一套视觉与进度本地保存；判题由公共 Judge0 的 GCC 14.1 执行，编译选项固定为 <b>-std=c++20 -O2</b>。</div>
+  <div class="note"><b>C++ 线做四件事：系统学、改错、从输出写代码、在站内查 API。</b> 课程正文与两套实验室共享同一套视觉与进度本地保存；判题由公共 Judge0 的 GCC 14.1 执行，编译选项固定为 <b>-std=c++20 -O2</b>。</div>
 </main>
 <script defer src="../assets/js/site-fx.js?v=20261127z102"></script>
-<script defer src="../assets/js/subject-intro.js?v=20261128z111"></script>
+<script defer src="../assets/js/subject-intro.js?v=20261128z114"></script>
 </body>
 </html>

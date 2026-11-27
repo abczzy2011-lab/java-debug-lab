@@ -711,10 +711,10 @@
           <div class="rules-box"><details><summary>评分与比较规则</summary><div class="rules-copy"><p>${esc(RULES.normalize)}</p><p>${esc(RULES.speedRule)}</p><p>${esc(RULES.msRule)}</p></div></details></div>
           <div class="doc-callout">
             <div class="doc-callout-copy">
-              <span class="doc-callout-kicker">CPPREFERENCE · C++20</span>
-              <p>做题时边写边查：标准库容器、算法、字符串与并发参考。</p>
+              <span class="doc-callout-kicker">C++ API · 站内速查</span>
+              <p>做题时边写边查：容器、算法、字符串、并发与文件系统条目，全部在站内完成。</p>
             </div>
-            <a class="lab-btn" href="https://en.cppreference.com/w/cpp" target="_blank" rel="noopener">打开 cppreference ↗</a>
+            <a class="lab-btn" href="./cpp-api.html?v=20261128z114">打开 C++ API 速查 →</a>
           </div>
         </aside>
         <section class="workspace-main">
@@ -722,7 +722,7 @@
             <div class="editor-head">
               <div class="editor-file">main.cpp <span>C++20 · GCC 14.1</span></div>
               <div class="editor-actions">
-                <a class="lab-btn small" href="https://en.cppreference.com/w/cpp" target="_blank" rel="noopener">CPP Reference ↗</a>
+                <a class="lab-btn small" href="./cpp-api.html?v=20261128z114">API 速查</a>
                 <button class="lab-btn small" type="button" data-action="reset">重置模板</button>
               </div>
             </div>
