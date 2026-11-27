@@ -95,6 +95,23 @@
     return q.split(/\s+/).every(part => haystack.includes(part));
   };
 
+  // 有搜索词时，命令本体命中优先于说明文字命中；避免搜 Get-ChildItem 先看到 ls 的等价说明。
+  const searchScore = (cmd) => {
+    const q = state.query.trim().toLowerCase();
+    if (!q) return 0;
+    const syntax = String(cmd.copy || cmd.syntax || '').toLowerCase();
+    const first = syntax.split(/\s+/)[0];
+    const id = String(cmd.id || '').toLowerCase();
+    const kw = (cmd.keywords || []).map(k => String(k).toLowerCase());
+    if (syntax === q || first === q || id === q || kw[0] === q) return 0;
+    if (syntax.startsWith(q) || id.startsWith(q) || kw.some(k => k.startsWith(q))) return 1;
+    if (syntax.includes(q) || id.includes(q) || kw.some(k => k.includes(q))) return 2;
+    if (String(cmd.title || '').toLowerCase().includes(q)) return 3;
+    if (String(cmd.desc || '').toLowerCase().includes(q)) return 4;
+    if (String(cmd.example || '').toLowerCase().includes(q)) return 5;
+    return 6;
+  };
+
   const renderTabs = () => {
     if (!els.tabs) return;
     els.tabs.innerHTML = Object.entries(DATA.platforms).map(([id, p]) => `
@@ -205,8 +222,14 @@
     if (els.title) els.title.textContent = `${p.label} 指令全集`;
     if (els.subtitle) els.subtitle.textContent = p.summary;
 
-    const rows = allCommands().filter(matches).sort((a, b) =>
-      rank(a.id) - rank(b.id) || a._gi - b._gi || a._ci - b._ci);
+    const q = state.query.trim().toLowerCase();
+    const rows = allCommands().filter(matches).sort((a, b) => {
+      if (q) {
+        const diff = searchScore(a) - searchScore(b);
+        if (diff) return diff;
+      }
+      return rank(a.id) - rank(b.id) || a._gi - b._gi || a._ci - b._ci;
+    });
     const shown = rows.slice(0, state.limit);
     if (els.count) {
       els.count.textContent = rows.length > shown.length

@@ -148,3 +148,6 @@ body.quiz-page{overflow-x:hidden}
   .quiz-card-top{gap:6px}
   .quiz-chip{font-size:9px;padding:0 7px}
 }
+
+/* 题库页脚：指令全集 + 教程双入口 */
+.quiz-progress-link + .quiz-progress-link{margin-left:12px}

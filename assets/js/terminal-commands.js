@@ -4,7 +4,7 @@
  * 由 scripts/merge_terminal_platforms.py 从 agent-output/{macos,linux,windows}.json 合并生成，勿手改。
  */
 window.TERMINAL_DATA = {
- "version": "20261127z88n",
+ "version": "20261127z89n",
  "title": "终端指令全集",
  "license": "Command descriptions/examples adapted from tldr-pages zh (CC BY 4.0).",
  "groups": [
@@ -13308,7 +13308,7 @@ window.TERMINAL_DATA = {
    "label": "Linux",
    "short": "Linux",
    "status": "ready",
-   "badge": "935 条全量",
+   "badge": "1,069 条全量",
    "summary": "覆盖 GNU / util-linux / systemd / 发行版包管理 / 网络 / 磁盘 / 开发与容器工具的 Linux 中文命令库，每条均附可直接粘贴的示例与分组检索。",
    "groupOverrides": {
     "os": {
@@ -13979,6 +13979,214 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "history",
+      "syntax": "history 20",
+      "copy": "history 20",
+      "title": "查看最近命令历史",
+      "desc": "快速找回上一条复杂命令；历史里可能含敏感参数，分享前先检查。",
+      "example": "# 查看最近命令历史\nhistory 20",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "history",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "declare",
+      "syntax": "declare -p PATH",
+      "copy": "declare -p PATH",
+      "title": "查看变量属性和值",
+      "desc": "bash 内建，能区分普通变量、数组和只读变量。",
+      "example": "# 查看变量属性和值\ndeclare -p PATH",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "declare",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "local",
+      "syntax": "local name=\"value\"",
+      "copy": "local name=\"value\"",
+      "title": "声明函数内局部变量",
+      "desc": "只在函数内部有效，避免污染全局环境；必须在函数里使用。",
+      "example": "# 声明函数内局部变量\nlocal name=\"value\"",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "local",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "readonly",
+      "syntax": "readonly PI=3.14",
+      "copy": "readonly PI=3.14",
+      "title": "把变量设为只读",
+      "desc": "设置后当前 shell 不能修改，适合固定配置项。",
+      "example": "# 把变量设为只读\nreadonly PI=3.14",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "readonly",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "mapfile",
+      "syntax": "mapfile -t lines < file.txt",
+      "copy": "mapfile -t lines < file.txt",
+      "title": "把文件按行读入数组",
+      "desc": "-t 去掉换行符，之后可用 ${lines[0]} 逐行处理。",
+      "example": "# 把文件按行读入数组\nmapfile -t lines < file.txt",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "mapfile",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "shopt",
+      "syntax": "shopt -s globstar",
+      "copy": "shopt -s globstar",
+      "title": "打开 bash 可选行为",
+      "desc": "例如 globstar 让 ** 递归匹配；写进 ~/.bashrc 才能长期生效。",
+      "example": "# 打开 bash 可选行为\nshopt -s globstar",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "shopt",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "exec",
+      "syntax": "exec bash",
+      "copy": "exec bash",
+      "title": "用新命令替换当前 shell",
+      "desc": "成功时不会返回；写错命令可能直接退出当前终端。",
+      "example": "# 用新命令替换当前 shell\nexec bash",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "exec",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "getopts",
+      "syntax": "getopts \"hv\" opt",
+      "copy": "getopts \"hv\" opt",
+      "title": "解析脚本短选项",
+      "desc": "在 shell 脚本里循环处理 -h、-v 等参数；长选项需另行处理。",
+      "example": "# 解析脚本短选项\ngetopts \"hv\" opt",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "getopts",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "wait",
+      "syntax": "wait",
+      "copy": "wait",
+      "title": "等待后台任务结束",
+      "desc": "不带参数等待当前 shell 的全部子进程，脚本收尾时常用。",
+      "example": "# 等待后台任务结束\nwait",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "wait",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "shift",
+      "syntax": "shift 2",
+      "copy": "shift 2",
+      "title": "左移脚本参数",
+      "desc": "把 $3 变成 $1，处理完一组参数后继续解析。",
+      "example": "# 左移脚本参数\nshift 2",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "shift",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "time",
+      "syntax": "time ls -la",
+      "copy": "time ls -la",
+      "title": "统计命令耗时",
+      "desc": "输出真实时间、用户 CPU 和系统 CPU，快速比较命令开销。",
+      "example": "# 统计命令耗时\ntime ls -la",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "time",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "builtin",
+      "syntax": "builtin cd /tmp",
+      "copy": "builtin cd /tmp",
+      "title": "强制调用 shell 内建",
+      "desc": "同名函数或别名覆盖了内建命令时，用 builtin 绕过。",
+      "example": "# 强制调用 shell 内建\nbuiltin cd /tmp",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "builtin",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "enable",
+      "syntax": "enable -n cd",
+      "copy": "enable -n cd",
+      "title": "启用或禁用 shell 内建",
+      "desc": "调试别名冲突时临时禁用内建；恢复用 enable cd。",
+      "example": "# 启用或禁用 shell 内建\nenable -n cd",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "enable",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
      }
     ],
     "file": [
@@ -14330,6 +14538,102 @@ window.TERMINAL_DATA = {
        "FIFO",
        "进程通信",
        "管道"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "dirname",
+      "syntax": "dirname /etc/nginx/nginx.conf",
+      "copy": "dirname /etc/nginx/nginx.conf",
+      "title": "取路径的目录部分",
+      "desc": "和 basename 配对，脚本里拆分路径时使用。",
+      "example": "# 取路径的目录部分\ndirname /etc/nginx/nginx.conf",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "dirname",
+       "文件",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "realpath",
+      "syntax": "realpath ./src/main.c",
+      "copy": "realpath ./src/main.c",
+      "title": "解析文件的真实绝对路径",
+      "desc": "会展开符号链接，确认脚本到底读的是哪个文件。",
+      "example": "# 解析文件的真实绝对路径\nrealpath ./src/main.c",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "realpath",
+       "文件",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "stat",
+      "syntax": "stat /etc/hosts",
+      "copy": "stat /etc/hosts",
+      "title": "查看文件详细元数据",
+      "desc": "显示 inode、权限、大小和三个时间戳，比 ls -l 更完整。",
+      "example": "# 查看文件详细元数据\nstat /etc/hosts",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "stat",
+       "文件",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "mktemp",
+      "syntax": "mktemp -d",
+      "copy": "mktemp -d",
+      "title": "创建临时目录",
+      "desc": "-d 建目录，默认在 /tmp 下；脚本结束后记得清理。",
+      "example": "# 创建临时目录\nmktemp -d",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "mktemp",
+       "文件",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "rename-files",
+      "syntax": "rename 's/.bak$//' *.bak",
+      "copy": "rename 's/.bak$//' *.bak",
+      "title": "批量重命名文件",
+      "desc": "不同发行版的 rename 实现不同；执行前先用 -n 或 echo 预览。",
+      "example": "# 批量重命名文件\nrename 's/.bak$//' *.bak",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "rename-files",
+       "文件",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "sync",
+      "syntax": "sync",
+      "copy": "sync",
+      "title": "把缓存刷写到磁盘",
+      "desc": "关机前或拔盘前执行，减少数据丢失风险。",
+      "example": "# 把缓存刷写到磁盘\nsync",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "sync",
+       "文件",
+       "系统内建"
       ],
       "danger": false,
       "src": "builtin"
@@ -15149,6 +15453,262 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "cmp",
+      "syntax": "cmp file1 file2",
+      "copy": "cmp file1 file2",
+      "title": "逐字节比较两个文件",
+      "desc": "只报告第一处差异，适合确认文件是否完全一致。",
+      "example": "# 逐字节比较两个文件\ncmp file1 file2",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "cmp",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "comm",
+      "syntax": "comm -12 a.txt b.txt",
+      "copy": "comm -12 a.txt b.txt",
+      "title": "比较两个已排序文件",
+      "desc": "-12 只显示共同行；输入必须先排序。",
+      "example": "# 比较两个已排序文件\ncomm -12 a.txt b.txt",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "comm",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "csplit",
+      "syntax": "csplit app.log '/ERROR/' '{*}'",
+      "copy": "csplit app.log '/ERROR/' '{*}'",
+      "title": "按模式拆分文件",
+      "desc": "按匹配行切成多段，适合拆分大日志。",
+      "example": "# 按模式拆分文件\ncsplit app.log '/ERROR/' '{*}'",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "csplit",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "expand",
+      "syntax": "expand tabs.txt",
+      "copy": "expand tabs.txt",
+      "title": "把制表符转成空格",
+      "desc": "统一缩进格式，避免不同编辑器显示错位。",
+      "example": "# 把制表符转成空格\nexpand tabs.txt",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "expand",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "fold",
+      "syntax": "fold -w 80 README.md",
+      "copy": "fold -w 80 README.md",
+      "title": "按宽度折行",
+      "desc": "只改变显示，不改变原文件；适合终端阅读长行。",
+      "example": "# 按宽度折行\nfold -w 80 README.md",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "fold",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "look",
+      "syntax": "look prefix words.txt",
+      "copy": "look prefix words.txt",
+      "title": "按前缀查找行",
+      "desc": "只对已排序文本有效，查字典或词表很快。",
+      "example": "# 按前缀查找行\nlook prefix words.txt",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "look",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "nl",
+      "syntax": "nl -ba app.log",
+      "copy": "nl -ba app.log",
+      "title": "给文件加行号",
+      "desc": "比 cat -n 更可控，可指定起始行和格式。",
+      "example": "# 给文件加行号\nnl -ba app.log",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "nl",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "od",
+      "syntax": "od -An -tx1 file.bin",
+      "copy": "od -An -tx1 file.bin",
+      "title": "以八进制或十六进制查看二进制",
+      "desc": "排查文件头、编码和不可见字符时使用。",
+      "example": "# 以八进制或十六进制查看二进制\nod -An -tx1 file.bin",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "od",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "rev",
+      "syntax": "rev words.txt",
+      "copy": "rev words.txt",
+      "title": "逐行反转字符",
+      "desc": "检查回文或从右往左处理文本时有用。",
+      "example": "# 逐行反转字符\nrev words.txt",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "rev",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "shuf",
+      "syntax": "shuf -n 5 names.txt",
+      "copy": "shuf -n 5 names.txt",
+      "title": "随机抽取若干行",
+      "desc": "做抽样或随机分组；不要用于安全随机。",
+      "example": "# 随机抽取若干行\nshuf -n 5 names.txt",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "shuf",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "split",
+      "syntax": "split -l 1000 big.log part_",
+      "copy": "split -l 1000 big.log part_",
+      "title": "把大文件按行拆分",
+      "desc": "生成 part_aa、part_ab 等分片，便于传输和处理。",
+      "example": "# 把大文件按行拆分\nsplit -l 1000 big.log part_",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "split",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "strings",
+      "syntax": "strings binary | grep http",
+      "copy": "strings binary | grep http",
+      "title": "从二进制里提取可打印字符串",
+      "desc": "排查二进制内嵌路径、URL 或错误信息。",
+      "example": "# 从二进制里提取可打印字符串\nstrings binary | grep http",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "strings",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "tr",
+      "syntax": "tr '[:lower:]' '[:upper:]'",
+      "copy": "tr '[:lower:]' '[:upper:]'",
+      "title": "替换或删除字符",
+      "desc": "按字符转换，不是按单词；处理编码时注意 locale。",
+      "example": "# 替换或删除字符\ntr '[:lower:]' '[:upper:]'",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "tr",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "xargs",
+      "syntax": "find . -name '*.log' | xargs rm",
+      "copy": "find . -name '*.log' | xargs rm",
+      "title": "把输入变成命令参数",
+      "desc": "文件名含空格时用 -0 配合 find -print0，删除前先 echo 预览。",
+      "example": "# 把输入变成命令参数\nfind . -name '*.log' | xargs rm",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "xargs",
+       "查看",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "xxd",
+      "syntax": "xxd -l 32 file.bin",
+      "copy": "xxd -l 32 file.bin",
+      "title": "查看文件前 32 字节",
+      "desc": "比 od 更直观，适合看文件头和魔数。",
+      "example": "# 查看文件前 32 字节\nxxd -l 32 file.bin",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "xxd",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "zcat",
+      "syntax": "zcat app.log.gz",
+      "copy": "zcat app.log.gz",
+      "title": "不解压直接查看 gzip 文本",
+      "desc": "大压缩日志先 zcat | grep，不用先解压占磁盘。",
+      "example": "# 不解压直接查看 gzip 文本\nzcat app.log.gz",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "zcat",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
      }
     ],
     "perm": [
@@ -15398,6 +15958,86 @@ window.TERMINAL_DATA = {
        "ACL",
        "权限",
        "用户"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "getfacl",
+      "syntax": "getfacl /etc/hosts",
+      "copy": "getfacl /etc/hosts",
+      "title": "查看 ACL 权限",
+      "desc": "普通 ls 看不到 ACL，排查“为什么他能读我不能”时用。",
+      "example": "# 查看 ACL 权限\ngetfacl /etc/hosts",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "getfacl",
+       "权限",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "visudo",
+      "syntax": "visudo",
+      "copy": "visudo",
+      "title": "安全编辑 sudoers",
+      "desc": "会做语法检查，避免写坏 sudo 配置把管理员锁死。",
+      "example": "# 安全编辑 sudoers\nvisudo",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "visudo",
+       "权限",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "newgrp",
+      "syntax": "newgrp developers",
+      "copy": "newgrp developers",
+      "title": "切换当前用户组",
+      "desc": "只影响当前 shell；退出后恢复原组。",
+      "example": "# 切换当前用户组\nnewgrp developers",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "newgrp",
+       "权限",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "lastb",
+      "syntax": "lastb -n 10",
+      "copy": "lastb -n 10",
+      "title": "查看失败登录记录",
+      "desc": "需要 root 读取；暴力破解排查先看这里。",
+      "example": "# 查看失败登录记录\nlastb -n 10",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "lastb",
+       "权限",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "chsh",
+      "syntax": "chsh -s /bin/bash",
+      "copy": "chsh -s /bin/bash",
+      "title": "修改登录 Shell",
+      "desc": "目标 Shell 必须在 /etc/shells 中；下次登录生效。",
+      "example": "# 修改登录 Shell\nchsh -s /bin/bash",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "chsh",
+       "权限",
+       "系统内建"
       ],
       "danger": false,
       "src": "builtin"
@@ -16804,6 +17444,310 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "free",
+      "syntax": "free -h",
+      "copy": "free -h",
+      "title": "查看内存使用",
+      "desc": "-h 用人类可读单位，重点看 available 而不是 free。",
+      "example": "# 查看内存使用\nfree -h",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "free",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "vmstat",
+      "syntax": "vmstat 1 5",
+      "copy": "vmstat 1 5",
+      "title": "采样系统整体状态",
+      "desc": "每秒一次共五次，观察 CPU、内存、交换和 IO 等待。",
+      "example": "# 采样系统整体状态\nvmstat 1 5",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "vmstat",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "mpstat",
+      "syntax": "mpstat 1 5",
+      "copy": "mpstat 1 5",
+      "title": "按 CPU 核采样",
+      "desc": "多核机器排查单核打满时比 top 更清楚。",
+      "example": "# 按 CPU 核采样\nmpstat 1 5",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "mpstat",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "pidstat",
+      "syntax": "pidstat 1 5",
+      "copy": "pidstat 1 5",
+      "title": "按进程采样资源",
+      "desc": "定位哪个进程在持续吃 CPU、内存或磁盘。",
+      "example": "# 按进程采样资源\npidstat 1 5",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "pidstat",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "sar",
+      "syntax": "sar -u 1 5",
+      "copy": "sar -u 1 5",
+      "title": "查看历史或实时性能",
+      "desc": "sysstat 工具，适合复盘过去某时间段的负载。",
+      "example": "# 查看历史或实时性能\nsar -u 1 5",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "sar",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "systemd-cgtop",
+      "syntax": "systemd-cgtop",
+      "copy": "systemd-cgtop",
+      "title": "按 cgroup 查看资源占用",
+      "desc": "定位是哪个服务或容器在吃资源。",
+      "example": "# 按 cgroup 查看资源占用\nsystemd-cgtop",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "systemd-cgtop",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "systemd-cgls",
+      "syntax": "systemd-cgls",
+      "copy": "systemd-cgls",
+      "title": "查看 cgroup 进程树",
+      "desc": "确认某个服务下挂了哪些进程。",
+      "example": "# 查看 cgroup 进程树\nsystemd-cgls",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "systemd-cgls",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "systemd-detect-virt",
+      "syntax": "systemd-detect-virt",
+      "copy": "systemd-detect-virt",
+      "title": "判断当前虚拟化环境",
+      "desc": "输出 kvm、docker、none 等，排查性能问题先确认环境。",
+      "example": "# 判断当前虚拟化环境\nsystemd-detect-virt",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "systemd-detect-virt",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "systemd-escape",
+      "syntax": "systemd-escape --path /var/lib/app",
+      "copy": "systemd-escape --path /var/lib/app",
+      "title": "把路径转成 unit 名",
+      "desc": "写 systemd unit 或查日志时，路径需要转义。",
+      "example": "# 把路径转成 unit 名\nsystemd-escape --path /var/lib/app",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "systemd-escape",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "systemd-tmpfiles",
+      "syntax": "systemd-tmpfiles --clean",
+      "copy": "systemd-tmpfiles --clean",
+      "title": "按规则清理临时文件",
+      "desc": "按 tmpfiles.d 配置清理，不要手工 rm 系统临时目录。",
+      "example": "# 按规则清理临时文件\nsystemd-tmpfiles --clean",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "systemd-tmpfiles",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "systemd-creds",
+      "syntax": "systemd-creds list",
+      "copy": "systemd-creds list",
+      "title": "管理系统凭据",
+      "desc": "查看加密凭据是否可用；需要 TPM 或主机密钥。",
+      "example": "# 管理系统凭据\nsystemd-creds list",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "systemd-creds",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "systemd-path",
+      "syntax": "systemd-path",
+      "copy": "systemd-path",
+      "title": "查看 systemd 标准路径",
+      "desc": "确认日志、配置和运行时目录的实际位置。",
+      "example": "# 查看 systemd 标准路径\nsystemd-path",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "systemd-path",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "systemd-id128",
+      "syntax": "systemd-id128 show",
+      "copy": "systemd-id128 show",
+      "title": "生成或查看 128 位 ID",
+      "desc": "给 unit、分区或应用生成稳定标识。",
+      "example": "# 生成或查看 128 位 ID\nsystemd-id128 show",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "systemd-id128",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "systemd-notify",
+      "syntax": "systemd-notify --ready",
+      "copy": "systemd-notify --ready",
+      "title": "向 systemd 报告服务就绪",
+      "desc": "写 Type=notify 服务时，启动完成后调用。",
+      "example": "# 向 systemd 报告服务就绪\nsystemd-notify --ready",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "systemd-notify",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "systemd-socket-activate",
+      "syntax": "systemd-socket-activate -l 8080 ./server",
+      "copy": "systemd-socket-activate -l 8080 ./server",
+      "title": "测试套接字激活",
+      "desc": "不写 unit 也能模拟 systemd 的按需启动。",
+      "example": "# 测试套接字激活\nsystemd-socket-activate -l 8080 ./server",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "systemd-socket-activate",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "systemd-mount",
+      "syntax": "systemd-mount /dev/sdb1 /mnt/usb",
+      "copy": "systemd-mount /dev/sdb1 /mnt/usb",
+      "title": "按 systemd 方式挂载设备",
+      "desc": "会生成临时 mount unit；卸载用 systemd-umount。",
+      "example": "# 按 systemd 方式挂载设备\nsystemd-mount /dev/sdb1 /mnt/usb",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "systemd-mount",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "systemd-umount",
+      "syntax": "systemd-umount /mnt/usb",
+      "copy": "systemd-umount /mnt/usb",
+      "title": "卸载 systemd 挂载",
+      "desc": "先确认没有进程占用挂载点。",
+      "example": "# 卸载 systemd 挂载\nsystemd-umount /mnt/usb",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "systemd-umount",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "timeout",
+      "syntax": "timeout 10 curl https://example.com",
+      "copy": "timeout 10 curl https://example.com",
+      "title": "给命令加超时",
+      "desc": "防止脚本卡在无响应的网络请求。",
+      "example": "# 给命令加超时\ntimeout 10 curl https://example.com",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "timeout",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "stdbuf",
+      "syntax": "stdbuf -oL tail -f app.log",
+      "copy": "stdbuf -oL tail -f app.log",
+      "title": "调整命令缓冲方式",
+      "desc": "让管道里的输出实时刷新，排查日志延迟时用。",
+      "example": "# 调整命令缓冲方式\nstdbuf -oL tail -f app.log",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "stdbuf",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
      }
     ],
     "net": [
@@ -17835,6 +18779,246 @@ window.TERMINAL_DATA = {
        "网卡",
        "速率",
        "链路"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "bridge",
+      "syntax": "bridge link",
+      "copy": "bridge link",
+      "title": "查看网桥与接口",
+      "desc": "虚拟化和容器网络排查先看网桥挂载关系。",
+      "example": "# 查看网桥与接口\nbridge link",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "bridge",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "tc",
+      "syntax": "tc qdisc show",
+      "copy": "tc qdisc show",
+      "title": "查看流量控制规则",
+      "desc": "排查限速、丢包和队列规则；修改规则会影响全网流量。",
+      "example": "# 查看流量控制规则\ntc qdisc show",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "tc",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "conntrack",
+      "syntax": "conntrack -L",
+      "copy": "conntrack -L",
+      "title": "查看连接跟踪表",
+      "desc": "NAT 和防火墙排障时确认连接状态。",
+      "example": "# 查看连接跟踪表\nconntrack -L",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "conntrack",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "iptables-save",
+      "syntax": "iptables-save > rules.v4",
+      "copy": "iptables-save > rules.v4",
+      "title": "导出当前防火墙规则",
+      "desc": "改规则前先留档；恢复用 iptables-restore。",
+      "example": "# 导出当前防火墙规则\niptables-save > rules.v4",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "iptables-save",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "iptables-restore",
+      "syntax": "iptables-restore < rules.v4",
+      "copy": "iptables-restore < rules.v4",
+      "title": "从文件恢复防火墙规则",
+      "desc": "会覆盖当前规则，远程操作前确认不会把自己挡在外面。",
+      "example": "# 从文件恢复防火墙规则\niptables-restore < rules.v4",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "iptables-restore",
+       "网络",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "ip6tables",
+      "syntax": "ip6tables -L",
+      "copy": "ip6tables -L",
+      "title": "查看 IPv6 防火墙规则",
+      "desc": "IPv6 常被忽略，安全排查要单独看。",
+      "example": "# 查看 IPv6 防火墙规则\nip6tables -L",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "ip6tables",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "ebtables",
+      "syntax": "ebtables -L",
+      "copy": "ebtables -L",
+      "title": "查看二层防火墙规则",
+      "desc": "网桥和 MAC 层过滤使用；不要和 iptables 混淆。",
+      "example": "# 查看二层防火墙规则\nebtables -L",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "ebtables",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "arptables",
+      "syntax": "arptables -L",
+      "copy": "arptables -L",
+      "title": "查看 ARP 过滤规则",
+      "desc": "排查 ARP 欺骗或二层访问控制。",
+      "example": "# 查看 ARP 过滤规则\narptables -L",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "arptables",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "iw",
+      "syntax": "iw dev",
+      "copy": "iw dev",
+      "title": "查看无线网卡",
+      "desc": "列出无线接口和模式，比 iwconfig 更现代。",
+      "example": "# 查看无线网卡\niw dev",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "iw",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "nmtui",
+      "syntax": "nmtui",
+      "copy": "nmtui",
+      "title": "打开网络管理文本界面",
+      "desc": "无桌面环境里改网络连接，比手写配置不容易错。",
+      "example": "# 打开网络管理文本界面\nnmtui",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "nmtui",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "networkctl",
+      "syntax": "networkctl status",
+      "copy": "networkctl status",
+      "title": "查看 systemd-networkd 状态",
+      "desc": "确认网卡是否被 networkd 接管、地址是否拿到。",
+      "example": "# 查看 systemd-networkd 状态\nnetworkctl status",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "networkctl",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "getent",
+      "syntax": "getent hosts example.com",
+      "copy": "getent hosts example.com",
+      "title": "按系统数据库解析名称",
+      "desc": "会走 NSS，能验证 DNS、LDAP 等实际解析结果。",
+      "example": "# 按系统数据库解析名称\ngetent hosts example.com",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "getent",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "socat",
+      "syntax": "socat TCP-LISTEN:8080,fork EXEC:./server",
+      "copy": "socat TCP-LISTEN:8080,fork EXEC:./server",
+      "title": "在端口和进程之间转发",
+      "desc": "调试服务或临时暴露端口；公网使用前加访问控制。",
+      "example": "# 在端口和进程之间转发\nsocat TCP-LISTEN:8080,fork EXEC:./server",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "socat",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "mtr",
+      "syntax": "mtr -n example.com",
+      "copy": "mtr -n example.com",
+      "title": "持续探测网络路径",
+      "desc": "结合 ping 和 traceroute，观察每跳丢包和延迟。",
+      "example": "# 持续探测网络路径\nmtr -n example.com",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "mtr",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "tracepath",
+      "syntax": "tracepath example.com",
+      "copy": "tracepath example.com",
+      "title": "探测路径 MTU",
+      "desc": "排查能 ping 通但大包传不过去的问题。",
+      "example": "# 探测路径 MTU\ntracepath example.com",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "tracepath",
+       "网络",
+       "系统内建"
       ],
       "danger": false,
       "src": "builtin"
@@ -20642,6 +21826,150 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "lldb",
+      "syntax": "lldb ./app",
+      "copy": "lldb ./app",
+      "title": "用 LLDB 调试程序",
+      "desc": "Clang 工具链常用；命令与 gdb 类似但不完全相同。",
+      "example": "# 用 LLDB 调试程序\nlldb ./app",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "lldb",
+       "开发",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "valgrind",
+      "syntax": "valgrind --leak-check=full ./app",
+      "copy": "valgrind --leak-check=full ./app",
+      "title": "检查内存泄漏",
+      "desc": "程序会明显变慢，适合测试环境而不是生产。",
+      "example": "# 检查内存泄漏\nvalgrind --leak-check=full ./app",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "valgrind",
+       "开发",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "ltrace",
+      "syntax": "ltrace ./app",
+      "copy": "ltrace ./app",
+      "title": "跟踪库函数调用",
+      "desc": "看程序调用了哪些库函数；对静态链接程序无效。",
+      "example": "# 跟踪库函数调用\nltrace ./app",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "ltrace",
+       "开发",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "perf",
+      "syntax": "perf stat ./app",
+      "copy": "perf stat ./app",
+      "title": "统计性能事件",
+      "desc": "查看指令数、缓存命中、上下文切换等硬件指标。",
+      "example": "# 统计性能事件\nperf stat ./app",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "perf",
+       "开发",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "objdump",
+      "syntax": "objdump -d ./app",
+      "copy": "objdump -d ./app",
+      "title": "反汇编可执行文件",
+      "desc": "排查崩溃地址或确认编译产物。",
+      "example": "# 反汇编可执行文件\nobjdump -d ./app",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "objdump",
+       "开发",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "nm",
+      "syntax": "nm -C ./app",
+      "copy": "nm -C ./app",
+      "title": "列出符号表",
+      "desc": "查函数是否被内联或优化掉；-C 展开 C++ 名称。",
+      "example": "# 列出符号表\nnm -C ./app",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "nm",
+       "开发",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "ldd",
+      "syntax": "ldd ./app",
+      "copy": "ldd ./app",
+      "title": "查看动态库依赖",
+      "desc": "确认运行时缺哪个库；不要对不可信二进制直接执行。",
+      "example": "# 查看动态库依赖\nldd ./app",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "ldd",
+       "开发",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "pkg-config",
+      "syntax": "pkg-config --cflags openssl",
+      "copy": "pkg-config --cflags openssl",
+      "title": "查询编译参数",
+      "desc": "编译第三方库时拿 include 和 link 参数。",
+      "example": "# 查询编译参数\npkg-config --cflags openssl",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "pkg-config",
+       "开发",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "meson",
+      "syntax": "meson setup build",
+      "copy": "meson setup build",
+      "title": "配置 Meson 构建目录",
+      "desc": "生成 Ninja 文件，之后在 build 目录执行 ninja。",
+      "example": "# 配置 Meson 构建目录\nmeson setup build",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "meson",
+       "开发",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
      }
     ],
     "pkg": [
@@ -22340,6 +23668,70 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "pip3",
+      "syntax": "pip3 install -r requirements.txt",
+      "copy": "pip3 install -r requirements.txt",
+      "title": "按依赖文件安装",
+      "desc": "确认 requirements 来源可信；生产环境锁定版本。",
+      "example": "# 按依赖文件安装\npip3 install -r requirements.txt",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "pip3",
+       "包管理",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "gem",
+      "syntax": "gem install rails",
+      "copy": "gem install rails",
+      "title": "安装 Ruby Gem",
+      "desc": "系统级安装可能需要 sudo；推荐用 rbenv 或 bundler 隔离。",
+      "example": "# 安装 Ruby Gem\ngem install rails",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "gem",
+       "包管理",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "bundle",
+      "syntax": "bundle install",
+      "copy": "bundle install",
+      "title": "安装 Ruby 项目依赖",
+      "desc": "读取 Gemfile 和 Gemfile.lock，确保版本一致。",
+      "example": "# 安装 Ruby 项目依赖\nbundle install",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "bundle",
+       "包管理",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "composer",
+      "syntax": "composer install",
+      "copy": "composer install",
+      "title": "安装 PHP 项目依赖",
+      "desc": "生产环境用 --no-dev，并确认 composer.lock 已提交。",
+      "example": "# 安装 PHP 项目依赖\ncomposer install",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "composer",
+       "包管理",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
      }
     ],
     "disk": [
@@ -23346,6 +24738,198 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "swapon",
+      "syntax": "swapon --show",
+      "copy": "swapon --show",
+      "title": "查看交换分区",
+      "desc": "确认 swap 是否启用、大小和优先级。",
+      "example": "# 查看交换分区\nswapon --show",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "swapon",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "swapoff",
+      "syntax": "swapoff /swapfile",
+      "copy": "swapoff /swapfile",
+      "title": "关闭交换文件",
+      "desc": "内存不足时关闭 swap 可能触发 OOM。",
+      "example": "# 关闭交换文件\nswapoff /swapfile",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "swapoff",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "mkswap",
+      "syntax": "mkswap /swapfile",
+      "copy": "mkswap /swapfile",
+      "title": "把文件格式化为交换区",
+      "desc": "会覆盖目标文件内容，确认路径后再执行。",
+      "example": "# 把文件格式化为交换区\nmkswap /swapfile",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "mkswap",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "fsck",
+      "syntax": "fsck /dev/sdb1",
+      "copy": "fsck /dev/sdb1",
+      "title": "检查文件系统",
+      "desc": "最好在卸载状态下执行；对挂载中的根分区操作有风险。",
+      "example": "# 检查文件系统\nfsck /dev/sdb1",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "fsck",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "e2fsck",
+      "syntax": "e2fsck -f /dev/sdb1",
+      "copy": "e2fsck -f /dev/sdb1",
+      "title": "强制检查 ext 文件系统",
+      "desc": "先 umount；修复前备份重要数据。",
+      "example": "# 强制检查 ext 文件系统\ne2fsck -f /dev/sdb1",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "e2fsck",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "resize2fs",
+      "syntax": "resize2fs /dev/sdb1",
+      "copy": "resize2fs /dev/sdb1",
+      "title": "调整 ext 文件系统大小",
+      "desc": "通常先扩分区再扩文件系统；缩小需要先缩文件系统。",
+      "example": "# 调整 ext 文件系统大小\nresize2fs /dev/sdb1",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "resize2fs",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "xfs_repair",
+      "syntax": "xfs_repair /dev/sdb1",
+      "copy": "xfs_repair /dev/sdb1",
+      "title": "修复 XFS 文件系统",
+      "desc": "必须卸载后执行；修复前先备份。",
+      "example": "# 修复 XFS 文件系统\nxfs_repair /dev/sdb1",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "xfs_repair",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "smartctl",
+      "syntax": "smartctl -a /dev/sda",
+      "copy": "smartctl -a /dev/sda",
+      "title": "查看磁盘 SMART 健康",
+      "desc": "确认重映射扇区、通电时间和温度，提前发现坏盘。",
+      "example": "# 查看磁盘 SMART 健康\nsmartctl -a /dev/sda",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "smartctl",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "hdparm",
+      "syntax": "hdparm -I /dev/sda",
+      "copy": "hdparm -I /dev/sda",
+      "title": "查看磁盘参数",
+      "desc": "确认传输模式、缓存和电源管理；改参数前先记录原值。",
+      "example": "# 查看磁盘参数\nhdparm -I /dev/sda",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "hdparm",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "nvme",
+      "syntax": "nvme list",
+      "copy": "nvme list",
+      "title": "列出 NVMe 设备",
+      "desc": "查看 NVMe 盘容量、型号和命名空间。",
+      "example": "# 列出 NVMe 设备\nnvme list",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "nvme",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "gdisk",
+      "syntax": "gdisk /dev/sdb",
+      "copy": "gdisk /dev/sdb",
+      "title": "编辑 GPT 分区表",
+      "desc": "交互式操作，写盘前确认设备名；误选系统盘会丢数据。",
+      "example": "# 编辑 GPT 分区表\ngdisk /dev/sdb",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "gdisk",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "sgdisk",
+      "syntax": "sgdisk -p /dev/sdb",
+      "copy": "sgdisk -p /dev/sdb",
+      "title": "查看 GPT 分区信息",
+      "desc": "只读打印分区表，适合脚本解析。",
+      "example": "# 查看 GPT 分区信息\nsgdisk -p /dev/sdb",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "sgdisk",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
      }
     ],
     "sec": [
@@ -23797,6 +25381,166 @@ window.TERMINAL_DATA = {
        "SSH",
        "密钥",
        "登录"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "certbot",
+      "syntax": "certbot renew --dry-run",
+      "copy": "certbot renew --dry-run",
+      "title": "测试证书续期",
+      "desc": "不实际续期，只验证配置和账户是否可用。",
+      "example": "# 测试证书续期\ncertbot renew --dry-run",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "certbot",
+       "安全",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "fail2ban-client",
+      "syntax": "fail2ban-client status",
+      "copy": "fail2ban-client status",
+      "title": "查看 fail2ban 状态",
+      "desc": "确认哪些 jail 启用、封了多少 IP。",
+      "example": "# 查看 fail2ban 状态\nfail2ban-client status",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "fail2ban-client",
+       "安全",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "lynis",
+      "syntax": "lynis audit system",
+      "copy": "lynis audit system",
+      "title": "做系统安全审计",
+      "desc": "输出加固建议；先读报告再改配置。",
+      "example": "# 做系统安全审计\nlynis audit system",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "lynis",
+       "安全",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "chkrootkit",
+      "syntax": "chkrootkit",
+      "copy": "chkrootkit",
+      "title": "检查常见 rootkit",
+      "desc": "结果可能有误报，需结合文件完整性和日志判断。",
+      "example": "# 检查常见 rootkit\nchkrootkit",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "chkrootkit",
+       "安全",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "rkhunter",
+      "syntax": "rkhunter --check",
+      "copy": "rkhunter --check",
+      "title": "检查 rootkit 与可疑文件",
+      "desc": "首次运行需更新数据库；告警要逐条核实。",
+      "example": "# 检查 rootkit 与可疑文件\nrkhunter --check",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "rkhunter",
+       "安全",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "auditctl",
+      "syntax": "auditctl -l",
+      "copy": "auditctl -l",
+      "title": "查看审计规则",
+      "desc": "确认关键文件和系统调用是否被审计。",
+      "example": "# 查看审计规则\nauditctl -l",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "auditctl",
+       "安全",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "ausearch",
+      "syntax": "ausearch -m avc -ts recent",
+      "copy": "ausearch -m avc -ts recent",
+      "title": "搜索审计日志",
+      "desc": "SELinux 拒绝时先查 AVC 记录。",
+      "example": "# 搜索审计日志\nausearch -m avc -ts recent",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "ausearch",
+       "安全",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "aureport",
+      "syntax": "aureport --summary",
+      "copy": "aureport --summary",
+      "title": "汇总审计事件",
+      "desc": "快速看登录、失败和异常事件的数量。",
+      "example": "# 汇总审计事件\naureport --summary",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "aureport",
+       "安全",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "pass",
+      "syntax": "pass show github",
+      "copy": "pass show github",
+      "title": "读取密码库条目",
+      "desc": "需要 GPG 私钥；不要把输出留在终端历史。",
+      "example": "# 读取密码库条目\npass show github",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "pass",
+       "安全",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "trivy",
+      "syntax": "trivy fs .",
+      "copy": "trivy fs .",
+      "title": "扫描依赖和文件漏洞",
+      "desc": "CI 里可加 --exit-code 1 阻止高危漏洞合入。",
+      "example": "# 扫描依赖和文件漏洞\ntrivy fs .",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "trivy",
+       "安全",
+       "系统内建"
       ],
       "danger": false,
       "src": "builtin"
@@ -24459,6 +26203,182 @@ window.TERMINAL_DATA = {
        "Podman",
        "容器",
        "无守护进程"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "kubectl",
+      "syntax": "kubectl get pods -A",
+      "copy": "kubectl get pods -A",
+      "title": "查看 Kubernetes Pod",
+      "desc": "排查集群服务状态；确认 context 再操作。",
+      "example": "# 查看 Kubernetes Pod\nkubectl get pods -A",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "kubectl",
+       "容器云",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "helm",
+      "syntax": "helm list -A",
+      "copy": "helm list -A",
+      "title": "查看 Helm 发布",
+      "desc": "确认 chart 版本和命名空间。",
+      "example": "# 查看 Helm 发布\nhelm list -A",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "helm",
+       "容器云",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "kustomize",
+      "syntax": "kustomize build overlays/prod",
+      "copy": "kustomize build overlays/prod",
+      "title": "渲染 Kustomize 清单",
+      "desc": "部署前先看渲染结果，避免环境变量覆盖错误。",
+      "example": "# 渲染 Kustomize 清单\nkustomize build overlays/prod",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "kustomize",
+       "容器云",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "kind",
+      "syntax": "kind create cluster --name dev",
+      "copy": "kind create cluster --name dev",
+      "title": "创建 kind 测试集群",
+      "desc": "本地验证 Kubernetes 清单，用完删除集群。",
+      "example": "# 创建 kind 测试集群\nkind create cluster --name dev",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "kind",
+       "容器云",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "minikube",
+      "syntax": "minikube start",
+      "copy": "minikube start",
+      "title": "启动本地 Kubernetes",
+      "desc": "学习或测试用；需要虚拟化或容器运行时。",
+      "example": "# 启动本地 Kubernetes\nminikube start",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "minikube",
+       "容器云",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "k3d",
+      "syntax": "k3d cluster create dev",
+      "copy": "k3d cluster create dev",
+      "title": "创建 k3d 集群",
+      "desc": "轻量多节点测试；注意端口和资源占用。",
+      "example": "# 创建 k3d 集群\nk3d cluster create dev",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "k3d",
+       "容器云",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "buildah",
+      "syntax": "buildah bud -t app .",
+      "copy": "buildah bud -t app .",
+      "title": "不用守护进程构建镜像",
+      "desc": "适合无 Docker daemon 的环境；构建后可用 podman 运行。",
+      "example": "# 不用守护进程构建镜像\nbuildah bud -t app .",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "buildah",
+       "容器云",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "skopeo",
+      "syntax": "skopeo inspect docker://nginx:latest",
+      "copy": "skopeo inspect docker://nginx:latest",
+      "title": "远程查看镜像元数据",
+      "desc": "不用拉取整个镜像就能看标签和架构。",
+      "example": "# 远程查看镜像元数据\nskopeo inspect docker://nginx:latest",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "skopeo",
+       "容器云",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "nerdctl",
+      "syntax": "nerdctl ps",
+      "copy": "nerdctl ps",
+      "title": "查看 containerd 容器",
+      "desc": "命令风格接近 docker，但后端是 containerd。",
+      "example": "# 查看 containerd 容器\nnerdctl ps",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "nerdctl",
+       "容器云",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "crictl",
+      "syntax": "crictl ps",
+      "copy": "crictl ps",
+      "title": "查看 CRI 容器",
+      "desc": "Kubernetes 节点排障常用；需要配置 runtime endpoint。",
+      "example": "# 查看 CRI 容器\ncrictl ps",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "crictl",
+       "容器云",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "docker-buildx",
+      "syntax": "docker buildx build -t app .",
+      "copy": "docker buildx build -t app .",
+      "title": "构建多架构镜像",
+      "desc": "先创建 builder；构建前确认 Dockerfile 和上下文。",
+      "example": "# 构建多架构镜像\ndocker buildx build -t app .",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "docker-buildx",
+       "容器云",
+       "系统内建"
       ],
       "danger": false,
       "src": "builtin"
@@ -25586,6 +27506,86 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "ffprobe",
+      "syntax": "ffprobe -show_streams video.mp4",
+      "copy": "ffprobe -show_streams video.mp4",
+      "title": "查看视频流参数",
+      "desc": "确认编码、分辨率、帧率和音轨。",
+      "example": "# 查看视频流参数\nffprobe -show_streams video.mp4",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "ffprobe",
+       "多媒体",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "pandoc",
+      "syntax": "pandoc README.md -o README.pdf",
+      "copy": "pandoc README.md -o README.pdf",
+      "title": "转换文档格式",
+      "desc": "Markdown 转 PDF 需要 LaTeX 或 PDF 引擎。",
+      "example": "# 转换文档格式\npandoc README.md -o README.pdf",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "pandoc",
+       "多媒体",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "lame",
+      "syntax": "lame -b 192 input.wav output.mp3",
+      "copy": "lame -b 192 input.wav output.mp3",
+      "title": "把 WAV 转成 MP3",
+      "desc": "确认采样率和声道；码率越高文件越大。",
+      "example": "# 把 WAV 转成 MP3\nlame -b 192 input.wav output.mp3",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "lame",
+       "多媒体",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "exiftool",
+      "syntax": "exiftool photo.jpg",
+      "copy": "exiftool photo.jpg",
+      "title": "读取图片元数据",
+      "desc": "查看拍摄参数和 GPS；写入前备份原图。",
+      "example": "# 读取图片元数据\nexiftool photo.jpg",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "exiftool",
+       "多媒体",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "pdftotext",
+      "syntax": "pdftotext report.pdf report.txt",
+      "copy": "pdftotext report.pdf report.txt",
+      "title": "提取 PDF 文本",
+      "desc": "扫描版 PDF 需要 OCR 才有文字层。",
+      "example": "# 提取 PDF 文本\npdftotext report.pdf report.txt",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "pdftotext",
+       "多媒体",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
      }
     ],
     "os": [
@@ -26348,6 +28348,54 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "update-grub",
+      "syntax": "update-grub",
+      "copy": "update-grub",
+      "title": "重新生成 GRUB 配置",
+      "desc": "改完内核参数或启动项后执行；需要 root。",
+      "example": "# 重新生成 GRUB 配置\nupdate-grub",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "update-grub",
+       "专属",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "update-initramfs",
+      "syntax": "update-initramfs -u",
+      "copy": "update-initramfs -u",
+      "title": "更新 initramfs",
+      "desc": "改驱动或内核后执行；更新失败可能影响启动。",
+      "example": "# 更新 initramfs\nupdate-initramfs -u",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "update-initramfs",
+       "专属",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "dkms",
+      "syntax": "dkms status",
+      "copy": "dkms status",
+      "title": "查看 DKMS 模块状态",
+      "desc": "确认第三方驱动是否随内核正确重建。",
+      "example": "# 查看 DKMS 模块状态\ndkms status",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "dkms",
+       "专属",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
      }
     ],
     "alias": [
@@ -26450,6 +28498,22 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "builtin-alias",
+      "syntax": "builtin alias",
+      "copy": "builtin alias",
+      "title": "查看当前所有别名",
+      "desc": "绕过同名函数直接调用内建 alias，确认别名定义。",
+      "example": "# 查看当前所有别名\nbuiltin alias",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "builtin-alias",
+       "别名",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
      }
     ],
     "other": [
@@ -26543,6 +28607,86 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "pv",
+      "syntax": "pv big.log | grep ERROR",
+      "copy": "pv big.log | grep ERROR",
+      "title": "查看管道处理进度",
+      "desc": "大文件处理时显示速度、已处理和剩余时间。",
+      "example": "# 查看管道处理进度\npv big.log | grep ERROR",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "pv",
+       "其他",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "parallel",
+      "syntax": "parallel -j4 gzip ::: *.log",
+      "copy": "parallel -j4 gzip ::: *.log",
+      "title": "并行执行命令",
+      "desc": "确认任务之间没有共享写冲突；-j 控制并发数。",
+      "example": "# 并行执行命令\nparallel -j4 gzip ::: *.log",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "parallel",
+       "其他",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "entr",
+      "syntax": "ls *.py | entr -r python main.py",
+      "copy": "ls *.py | entr -r python main.py",
+      "title": "文件变化时自动重跑",
+      "desc": "开发热重载用；退出按 Ctrl-C。",
+      "example": "# 文件变化时自动重跑\nls *.py | entr -r python main.py",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "entr",
+       "其他",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "fastfetch",
+      "syntax": "fastfetch",
+      "copy": "fastfetch",
+      "title": "显示系统信息摘要",
+      "desc": "比 neofetch 更新更快；适合终端启动画面。",
+      "example": "# 显示系统信息摘要\nfastfetch",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "fastfetch",
+       "其他",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "figlet",
+      "syntax": "figlet HELLO",
+      "copy": "figlet HELLO",
+      "title": "把文字变成大号字符画",
+      "desc": "生成终端标题或 README 横幅。",
+      "example": "# 把文字变成大号字符画\nfiglet HELLO",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "figlet",
+       "其他",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
      }
     ]
    }
@@ -26551,7 +28695,7 @@ window.TERMINAL_DATA = {
    "label": "Windows",
    "short": "Win",
    "status": "ready",
-   "badge": "669 条全量",
+   "badge": "923 条全量",
    "summary": "Windows cmd.exe、PowerShell 7 与跨平台开发工具命令全量收录；每条含可直接粘贴的示例，按导航、文件、文本、进程、网络、开发、包管理等场景分组。",
    "groupOverrides": {
     "os": {
@@ -26960,6 +29104,341 @@ window.TERMINAL_DATA = {
        "PowerShell",
        "历史",
        "会话"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-variable",
+      "syntax": "Get-Variable",
+      "copy": "Get-Variable",
+      "title": "查看当前会话变量",
+      "desc": "列出当前 PowerShell 会话里的变量和值，排查环境变量是否被覆盖。",
+      "example": "# 查看当前会话变量\nGet-Variable",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-variable",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "set-variable",
+      "syntax": "Set-Variable -Name MyVar -Value \"hello\"",
+      "copy": "Set-Variable -Name MyVar -Value \"hello\"",
+      "title": "创建或修改会话变量",
+      "desc": "只在当前 PowerShell 会话有效，适合临时保存脚本参数或路径。",
+      "example": "# 创建或修改会话变量\nSet-Variable -Name MyVar -Value \"hello\"",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "set-variable",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "remove-variable",
+      "syntax": "Remove-Variable -Name MyVar",
+      "copy": "Remove-Variable -Name MyVar",
+      "title": "删除会话变量",
+      "desc": "清掉临时变量，避免后续脚本误读旧值。",
+      "example": "# 删除会话变量\nRemove-Variable -Name MyVar",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "remove-variable",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-host",
+      "syntax": "Get-Host",
+      "copy": "Get-Host",
+      "title": "查看当前主机与版本信息",
+      "desc": "显示 PowerShell 版本、宿主程序和区域设置，排查脚本兼容性时先看这里。",
+      "example": "# 查看当前主机与版本信息\nGet-Host",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-host",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "read-host",
+      "syntax": "Read-Host \"请输入项目名\"",
+      "copy": "Read-Host \"请输入项目名\"",
+      "title": "暂停并读取一行输入",
+      "desc": "在脚本里做交互式确认或收集参数；输入内容会作为字符串返回。",
+      "example": "# 暂停并读取一行输入\nRead-Host \"请输入项目名\"",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "read-host",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "write-host",
+      "syntax": "Write-Host \"构建完成\" -ForegroundColor Green",
+      "copy": "Write-Host \"构建完成\" -ForegroundColor Green",
+      "title": "向终端输出带颜色的提示",
+      "desc": "只影响屏幕显示，不进入管道；需要可继续处理的数据时改用 Write-Output。",
+      "example": "# 向终端输出带颜色的提示\nWrite-Host \"构建完成\" -ForegroundColor Green",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "write-host",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "write-output",
+      "syntax": "Write-Output \"hello\"",
+      "copy": "Write-Output \"hello\"",
+      "title": "向管道输出一个对象",
+      "desc": "与 Write-Host 不同，输出会进入管道，能继续被 Select-Object 或 Out-File 处理。",
+      "example": "# 向管道输出一个对象\nWrite-Output \"hello\"",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "write-output",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "push-location",
+      "syntax": "Push-Location C:\\Projects",
+      "copy": "Push-Location C:\\Projects",
+      "title": "把当前目录压入位置栈",
+      "desc": "临时切换目录后还能用 Pop-Location 回到原处，适合脚本里连续跳目录。",
+      "example": "# 把当前目录压入位置栈\nPush-Location C:\\Projects",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "push-location",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "pop-location",
+      "syntax": "Pop-Location",
+      "copy": "Pop-Location",
+      "title": "回到上一个目录",
+      "desc": "从位置栈弹出最近保存的路径；没有保存过位置时会报错。",
+      "example": "# 回到上一个目录\nPop-Location",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "pop-location",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-psdrive",
+      "syntax": "Get-PSDrive -PSProvider FileSystem",
+      "copy": "Get-PSDrive -PSProvider FileSystem",
+      "title": "查看已挂载的 PowerShell 驱动器",
+      "desc": "列出盘符、网络映射和自定义 PSDrive，确认脚本里的路径是否真的存在。",
+      "example": "# 查看已挂载的 PowerShell 驱动器\nGet-PSDrive -PSProvider FileSystem",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-psdrive",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "new-psdrive",
+      "syntax": "New-PSDrive -Name work -PSProvider FileSystem -Root C:\\Work",
+      "copy": "New-PSDrive -Name work -PSProvider FileSystem -Root C:\\Work",
+      "title": "创建临时工作盘符",
+      "desc": "把常用目录映射成短名称，脚本结束后可用 Remove-PSDrive 清理。",
+      "example": "# 创建临时工作盘符\nNew-PSDrive -Name work -PSProvider FileSystem -Root C:\\Work",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "new-psdrive",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "remove-psdrive",
+      "syntax": "Remove-PSDrive -Name work",
+      "copy": "Remove-PSDrive -Name work",
+      "title": "删除自定义盘符",
+      "desc": "只删除映射，不会删除真实目录；删除前先确认名称。",
+      "example": "# 删除自定义盘符\nRemove-PSDrive -Name work",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "remove-psdrive",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "pause",
+      "syntax": "pause",
+      "copy": "pause",
+      "title": "暂停批处理等待按键",
+      "desc": "cmd 脚本里常用，执行到此处会显示“请按任意键继续”。",
+      "example": "# 暂停批处理等待按键\npause",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "pause",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "timeout",
+      "syntax": "timeout /t 5",
+      "copy": "timeout /t 5",
+      "title": "等待指定秒数",
+      "desc": "批处理里做延时或给用户阅读提示；按 Ctrl-C 可提前结束。",
+      "example": "# 等待指定秒数\ntimeout /t 5",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "timeout",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "call",
+      "syntax": "call build.bat",
+      "copy": "call build.bat",
+      "title": "在批处理中调用另一个脚本",
+      "desc": "调用结束后会回到当前脚本继续执行；不要漏掉 call，否则控制权不会返回。",
+      "example": "# 在批处理中调用另一个脚本\ncall build.bat",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "call",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "if",
+      "syntax": "if exist config.ini (echo yes) else (echo no)",
+      "copy": "if exist config.ini (echo yes) else (echo no)",
+      "title": "按条件执行命令",
+      "desc": "cmd 的条件分支，常用于判断文件、目录或环境变量是否存在。",
+      "example": "# 按条件执行命令\nif exist config.ini (echo yes) else (echo no)",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "if",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "for",
+      "syntax": "for %f in (*.log) do echo %f",
+      "copy": "for %f in (*.log) do echo %f",
+      "title": "遍历一组文件",
+      "desc": "cmd 的单行循环；写进 .bat 文件时变量要写成 %%f。",
+      "example": "# 遍历一组文件\nfor %f in (*.log) do echo %f",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "for",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "setlocal",
+      "syntax": "setlocal",
+      "copy": "setlocal",
+      "title": "开启局部环境变量作用域",
+      "desc": "批处理里避免临时变量污染全局环境，通常和 endlocal 成对出现。",
+      "example": "# 开启局部环境变量作用域\nsetlocal",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "setlocal",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "endlocal",
+      "syntax": "endlocal",
+      "copy": "endlocal",
+      "title": "结束局部环境变量作用域",
+      "desc": "恢复 setlocal 之前的变量状态；不要跨脚本滥用。",
+      "example": "# 结束局部环境变量作用域\nendlocal",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "endlocal",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "shift-args",
+      "syntax": "shift",
+      "copy": "shift",
+      "title": "轮转批处理参数",
+      "desc": "把 %1 变成 %0、%2 变成 %1，处理不定数量的命令行参数时使用。",
+      "example": "# 轮转批处理参数\nshift",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "shift-args",
+       "基础",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "clear-host",
+      "syntax": "Clear-Host",
+      "copy": "Clear-Host",
+      "title": "清空当前终端屏幕",
+      "desc": "只清显示，不清历史；需要保留现场时先导出日志再清屏。",
+      "example": "# 清屏\nClear-Host\n# 别名\ncls",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "clear-host",
+       "基础与导航"
       ],
       "danger": false,
       "src": "builtin"
@@ -27502,6 +29981,150 @@ window.TERMINAL_DATA = {
        "属性"
       ],
       "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "rename-item",
+      "syntax": "Rename-Item .\\old.txt new.txt",
+      "copy": "Rename-Item .\\old.txt new.txt",
+      "title": "重命名单个文件",
+      "desc": "只改名字不移动位置；批量重命名建议先用 -WhatIf 预览。",
+      "example": "# 重命名单个文件\nRename-Item .\\old.txt new.txt",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "rename-item",
+       "文件",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "clear-content",
+      "syntax": "Clear-Content .\\app.log",
+      "copy": "Clear-Content .\\app.log",
+      "title": "清空文件内容但保留文件",
+      "desc": "适合日志轮转前清空；不可恢复，先确认路径和备份。",
+      "example": "# 清空文件内容但保留文件\nClear-Content .\\app.log",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "clear-content",
+       "文件",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "resolve-path",
+      "syntax": "Resolve-Path .\\src\\*.java",
+      "copy": "Resolve-Path .\\src\\*.java",
+      "title": "把相对路径解析成绝对路径",
+      "desc": "确认脚本实际读到的是哪个目录，排查“明明有文件却找不到”时很有用。",
+      "example": "# 把相对路径解析成绝对路径\nResolve-Path .\\src\\*.java",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "resolve-path",
+       "文件",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "convert-path",
+      "syntax": "Convert-Path .\\src",
+      "copy": "Convert-Path .\\src",
+      "title": "把 PowerShell 路径转成文件系统路径",
+      "desc": "处理注册表或 PSDrive 路径时，转成普通路径再交给外部程序。",
+      "example": "# 把 PowerShell 路径转成文件系统路径\nConvert-Path .\\src",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "convert-path",
+       "文件",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "join-path",
+      "syntax": "Join-Path C:\\Projects src",
+      "copy": "Join-Path C:\\Projects src",
+      "title": "安全拼接目录与文件名",
+      "desc": "自动补上分隔符，避免手写字符串时多一个或少一个反斜杠。",
+      "example": "# 安全拼接目录与文件名\nJoin-Path C:\\Projects src",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "join-path",
+       "文件",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "split-path",
+      "syntax": "Split-Path C:\\Projects\\src\\Main.java -Leaf",
+      "copy": "Split-Path C:\\Projects\\src\\Main.java -Leaf",
+      "title": "取出路径的最后一段",
+      "desc": "脚本里从完整路径提取文件名或父目录，比字符串截取更可靠。",
+      "example": "# 取出路径的最后一段\nSplit-Path C:\\Projects\\src\\Main.java -Leaf",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "split-path",
+       "文件",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "new-item-property",
+      "syntax": "New-ItemProperty -Path HKCU:\\Software\\MyApp -Name Theme -Value dark",
+      "copy": "New-ItemProperty -Path HKCU:\\Software\\MyApp -Name Theme -Value dark",
+      "title": "新建注册表值",
+      "desc": "只对注册表或支持属性的提供程序有效；写错路径可能影响应用配置。",
+      "example": "# 新建注册表值\nNew-ItemProperty -Path HKCU:\\Software\\MyApp -Name Theme -Value dark",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "new-item-property",
+       "文件",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-childitem-recurse",
+      "syntax": "Get-ChildItem -Recurse -File",
+      "copy": "Get-ChildItem -Recurse -File",
+      "title": "递归列出所有文件",
+      "desc": "只返回文件、不混入目录，适合统计项目文件或批量处理。",
+      "example": "# 递归列出所有文件\nGet-ChildItem -Recurse -File",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-childitem-recurse",
+       "文件",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "remove-item-force",
+      "syntax": "Remove-Item .\\build -Recurse -Force",
+      "copy": "Remove-Item .\\build -Recurse -Force",
+      "title": "强制删除目录及其内容",
+      "desc": "递归删除不可逆，执行前先用 Get-ChildItem 确认路径。",
+      "example": "# 强制删除目录及其内容\nRemove-Item .\\build -Recurse -Force",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "remove-item-force",
+       "文件",
+       "系统内建"
+      ],
+      "danger": true,
       "src": "builtin"
      }
     ],
@@ -28128,6 +30751,415 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "out-string",
+      "syntax": "Get-Process | Out-String -Width 200",
+      "copy": "Get-Process | Out-String -Width 200",
+      "title": "把对象转成可读文本",
+      "desc": "需要把表格写进日志或邮件时使用；宽表格记得加 -Width。",
+      "example": "# 把对象转成可读文本\nGet-Process | Out-String -Width 200",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "out-string",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "out-host",
+      "syntax": "Get-Process | Out-Host",
+      "copy": "Get-Process | Out-Host",
+      "title": "把结果直接送到终端",
+      "desc": "绕过后续管道，只用于显示；需要继续处理数据时不要接它。",
+      "example": "# 把结果直接送到终端\nGet-Process | Out-Host",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "out-host",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "tee-object",
+      "syntax": "Get-ChildItem | Tee-Object -FilePath files.txt",
+      "copy": "Get-ChildItem | Tee-Object -FilePath files.txt",
+      "title": "同时输出到屏幕和文件",
+      "desc": "一边看结果一边留档，排查构建产物时很方便。",
+      "example": "# 同时输出到屏幕和文件\nGet-ChildItem | Tee-Object -FilePath files.txt",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "tee-object",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "convertto-json",
+      "syntax": "Get-Process | ConvertTo-Json -Depth 3",
+      "copy": "Get-Process | ConvertTo-Json -Depth 3",
+      "title": "把对象转成 JSON",
+      "desc": "调用 API 或写配置文件时使用；嵌套对象要调大 -Depth。",
+      "example": "# 把对象转成 JSON\nGet-Process | ConvertTo-Json -Depth 3",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "convertto-json",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "convertfrom-json",
+      "syntax": "Get-Content config.json -Raw | ConvertFrom-Json",
+      "copy": "Get-Content config.json -Raw | ConvertFrom-Json",
+      "title": "把 JSON 读成 PowerShell 对象",
+      "desc": "-Raw 很关键，否则逐行读取会破坏 JSON 结构。",
+      "example": "# 把 JSON 读成 PowerShell 对象\nGet-Content config.json -Raw | ConvertFrom-Json",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "convertfrom-json",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "convertto-csv",
+      "syntax": "Get-Process | ConvertTo-Csv -NoTypeInformation",
+      "copy": "Get-Process | ConvertTo-Csv -NoTypeInformation",
+      "title": "把对象转成 CSV 文本",
+      "desc": "只是转换，不会写文件；要落盘再接 Set-Content 或 Export-Csv。",
+      "example": "# 把对象转成 CSV 文本\nGet-Process | ConvertTo-Csv -NoTypeInformation",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "convertto-csv",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "convertfrom-csv",
+      "syntax": "Get-Content users.csv | ConvertFrom-Csv",
+      "copy": "Get-Content users.csv | ConvertFrom-Csv",
+      "title": "把 CSV 文本读成对象",
+      "desc": "适合处理管道里的 CSV；直接读文件更常用 Import-Csv。",
+      "example": "# 把 CSV 文本读成对象\nGet-Content users.csv | ConvertFrom-Csv",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "convertfrom-csv",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "import-csv",
+      "syntax": "Import-Csv .\\users.csv | Format-Table",
+      "copy": "Import-Csv .\\users.csv | Format-Table",
+      "title": "读取 CSV 文件",
+      "desc": "第一行会作为列名；列名有空格时用引号访问属性。",
+      "example": "# 读取 CSV 文件\nImport-Csv .\\users.csv | Format-Table",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "import-csv",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "export-csv",
+      "syntax": "Get-Process | Export-Csv processes.csv -NoTypeInformation",
+      "copy": "Get-Process | Export-Csv processes.csv -NoTypeInformation",
+      "title": "把对象写成 CSV 文件",
+      "desc": "-NoTypeInformation 去掉类型注释，Excel 打开更干净。",
+      "example": "# 把对象写成 CSV 文件\nGet-Process | Export-Csv processes.csv -NoTypeInformation",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "export-csv",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "compare-object",
+      "syntax": "Compare-Object (Get-Content a.txt) (Get-Content b.txt)",
+      "copy": "Compare-Object (Get-Content a.txt) (Get-Content b.txt)",
+      "title": "比较两个集合的差异",
+      "desc": "输出只显示差异项；加 -IncludeEqual 可同时看到相同项。",
+      "example": "# 比较两个集合的差异\nCompare-Object (Get-Content a.txt) (Get-Content b.txt)",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "compare-object",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "group-object",
+      "syntax": "Get-ChildItem | Group-Object Extension",
+      "copy": "Get-ChildItem | Group-Object Extension",
+      "title": "按属性分组统计",
+      "desc": "快速看出不同扩展名各有多少文件，适合盘点目录。",
+      "example": "# 按属性分组统计\nGet-ChildItem | Group-Object Extension",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "group-object",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "sort-object",
+      "syntax": "Get-Process | Sort-Object CPU -Descending",
+      "copy": "Get-Process | Sort-Object CPU -Descending",
+      "title": "按属性排序",
+      "desc": "默认升序，排查高 CPU 进程时加 -Descending。",
+      "example": "# 按属性排序\nGet-Process | Sort-Object CPU -Descending",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "sort-object",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-member",
+      "syntax": "Get-Process | Get-Member",
+      "copy": "Get-Process | Get-Member",
+      "title": "查看对象有哪些属性",
+      "desc": "不知道某个命令返回什么字段时，先 Get-Member 再决定 Select-Object。",
+      "example": "# 查看对象有哪些属性\nGet-Process | Get-Member",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-member",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "format-list",
+      "syntax": "Get-Service | Format-List Name,Status",
+      "copy": "Get-Service | Format-List Name,Status",
+      "title": "把对象逐字段竖排显示",
+      "desc": "字段多、表格被截断时用 Format-List 看得更完整。",
+      "example": "# 把对象逐字段竖排显示\nGet-Service | Format-List Name,Status",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "format-list",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "format-table",
+      "syntax": "Get-Process | Format-Table Name,CPU -AutoSize",
+      "copy": "Get-Process | Format-Table Name,CPU -AutoSize",
+      "title": "把对象按表格显示",
+      "desc": "-AutoSize 会根据内容调整列宽；字段太多时先选列。",
+      "example": "# 把对象按表格显示\nGet-Process | Format-Table Name,CPU -AutoSize",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "format-table",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "format-wide",
+      "syntax": "Get-Command Get-* | Format-Wide -Column 3",
+      "copy": "Get-Command Get-* | Format-Wide -Column 3",
+      "title": "把简短结果排成多列",
+      "desc": "适合命令名、模块名这类短文本，比长表格更省屏幕。",
+      "example": "# 把简短结果排成多列\nGet-Command Get-* | Format-Wide -Column 3",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "format-wide",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-unique",
+      "syntax": "Get-ChildItem | Select-Object -ExpandProperty Extension | Get-Unique",
+      "copy": "Get-ChildItem | Select-Object -ExpandProperty Extension | Get-Unique",
+      "title": "去掉重复值",
+      "desc": "输入必须先排序，否则 Get-Unique 只能去掉相邻重复。",
+      "example": "# 去掉重复值\nGet-ChildItem | Select-Object -ExpandProperty Extension | Get-Unique",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-unique",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "more-pager",
+      "syntax": "more README.md",
+      "copy": "more README.md",
+      "title": "分页查看文本",
+      "desc": "cmd 自带的分页器，按空格翻页、按 Q 退出；大文件优先用 Get-Content -Tail。",
+      "example": "# 分页查看文本\nmore README.md",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "more-pager",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "fc-compare",
+      "syntax": "fc file1.txt file2.txt",
+      "copy": "fc file1.txt file2.txt",
+      "title": "比较两个文本文件",
+      "desc": "cmd 的文件比较命令，输出差异行；二进制文件不要用。",
+      "example": "# 比较两个文本文件\nfc file1.txt file2.txt",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "fc-compare",
+       "查看",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-typeData",
+      "syntax": "Get-TypeData",
+      "copy": "Get-TypeData",
+      "title": "查看 PowerShell 的类型扩展",
+      "desc": "对象多出计算属性或特殊方法时，类型数据能解释它从哪来。",
+      "example": "# 全部类型扩展\nGet-TypeData\n# 查某个类型\nGet-TypeData -TypeName System.IO.FileInfo",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "get-typedata",
+       "查看与文本"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "update-typeData",
+      "syntax": "Update-TypeData -TypeName System.IO.FileInfo -MemberName SizeMB -MemberType ScriptProperty -Value { $this.Length / 1MB }",
+      "copy": "Update-TypeData -TypeName System.IO.FileInfo -MemberName SizeMB -MemberType ScriptProperty -Value { $this.Length / 1MB }",
+      "title": "给现有类型追加计算属性",
+      "desc": "不想改类定义，也能给 FileInfo 增加 SizeMB 这类脚本属性。",
+      "example": "# 给文件对象加 SizeMB\nUpdate-TypeData -TypeName System.IO.FileInfo -MemberName SizeMB -MemberType ScriptProperty -Value { $this.Length / 1MB }\n# 之后可直接取\n(Get-Item .\\notes.txt).SizeMB",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "update-typedata",
+       "查看与文本"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "remove-typeData",
+      "syntax": "Remove-TypeData -TypeName System.IO.FileInfo",
+      "copy": "Remove-TypeData -TypeName System.IO.FileInfo",
+      "title": "移除自定义类型扩展",
+      "desc": "类型扩展会污染当前会话；调试完或换脚本前清理掉。",
+      "example": "# 移除指定类型\nRemove-TypeData -TypeName System.IO.FileInfo\n# 移除本会话新增的全部\nRemove-TypeData -TypeName System.IO.FileInfo -ErrorAction SilentlyContinue",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "remove-typedata",
+       "查看与文本"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "export-formatData",
+      "syntax": "Export-FormatData -InputObject (Get-FormatData) -Path .\\format.ps1xml",
+      "copy": "Export-FormatData -InputObject (Get-FormatData) -Path .\\format.ps1xml",
+      "title": "把当前格式定义导出为 ps1xml",
+      "desc": "自定义表格列、颜色或视图后，导出文件便于复用和版本管理。",
+      "example": "# 导出全部格式定义\nExport-FormatData -InputObject (Get-FormatData) -Path .\\format.ps1xml\n# 只导某个类型\nGet-FormatData -TypeName System.Diagnostics.Process | Export-FormatData -Path .\\process.ps1xml",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "export-formatdata",
+       "查看与文本"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-clipboard",
+      "syntax": "Get-Clipboard",
+      "copy": "Get-Clipboard",
+      "title": "读取剪贴板文本",
+      "desc": "把网页或表格里复制的内容直接送进管道处理，不用先存文件。",
+      "example": "# 读取文本\nGet-Clipboard\n# 按行拆分\nGet-Clipboard -Raw | ForEach-Object { $_.Split(\"`n\") }",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "get-clipboard",
+       "查看与文本"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "set-clipboard",
+      "syntax": "Set-Clipboard -Value \"hello\"",
+      "copy": "Set-Clipboard -Value \"hello\"",
+      "title": "把文本写入剪贴板",
+      "desc": "生成命令、路径或 SQL 后，直接放进剪贴板，减少手工复制。",
+      "example": "# 写入文本\nSet-Clipboard -Value \"hello\"\n# 把命令输出写入剪贴板\nGet-Process | Select-Object -First 5 | Set-Clipboard",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "set-clipboard",
+       "查看与文本"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "get-experimentalFeature",
+      "syntax": "Get-ExperimentalFeature",
+      "copy": "Get-ExperimentalFeature",
+      "title": "查看已启用/可用的实验性功能",
+      "desc": "某些 PowerShell 7 新行为需要显式开启，先确认实验特性状态。",
+      "example": "# 所有实验特性\nGet-ExperimentalFeature\n# 只看已启用\nGet-ExperimentalFeature | Where-Object Enabled",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "get-experimentalFeature",
+       "查看与文本"
+      ],
+      "danger": false,
+      "src": "builtin"
      }
     ],
     "perm": [
@@ -28269,6 +31301,134 @@ window.TERMINAL_DATA = {
        "PowerShell",
        "用户组",
        "权限"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "set-localuser",
+      "syntax": "Set-LocalUser -Name student -PasswordNeverExpires $true",
+      "copy": "Set-LocalUser -Name student -PasswordNeverExpires $true",
+      "title": "修改本地用户属性",
+      "desc": "需要管理员权限；改密码策略前确认组织规定。",
+      "example": "# 修改本地用户属性\nSet-LocalUser -Name student -PasswordNeverExpires $true",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "set-localuser",
+       "权限",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "remove-localuser",
+      "syntax": "Remove-LocalUser -Name olduser",
+      "copy": "Remove-LocalUser -Name olduser",
+      "title": "删除本地用户",
+      "desc": "会删除账号但不会自动删除用户目录；先备份数据。",
+      "example": "# 删除本地用户\nRemove-LocalUser -Name olduser",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "remove-localuser",
+       "权限",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "new-localgroup",
+      "syntax": "New-LocalGroup -Name \"Developers\"",
+      "copy": "New-LocalGroup -Name \"Developers\"",
+      "title": "创建本地用户组",
+      "desc": "创建后可用 Add-LocalGroupMember 把账号加入组。",
+      "example": "# 创建本地用户组\nNew-LocalGroup -Name \"Developers\"",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "new-localgroup",
+       "权限",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "remove-localgroup",
+      "syntax": "Remove-LocalGroup -Name \"Developers\"",
+      "copy": "Remove-LocalGroup -Name \"Developers\"",
+      "title": "删除本地用户组",
+      "desc": "组内成员关系会一起移除；不可逆。",
+      "example": "# 删除本地用户组\nRemove-LocalGroup -Name \"Developers\"",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "remove-localgroup",
+       "权限",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "get-localgroupmember",
+      "syntax": "Get-LocalGroupMember -Group \"Administrators\"",
+      "copy": "Get-LocalGroupMember -Group \"Administrators\"",
+      "title": "查看组成员",
+      "desc": "确认谁有管理员权限，排查权限过大或账号遗留。",
+      "example": "# 查看组成员\nGet-LocalGroupMember -Group \"Administrators\"",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-localgroupmember",
+       "权限",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "remove-localgroupmember",
+      "syntax": "Remove-LocalGroupMember -Group \"Administrators\" -Member student",
+      "copy": "Remove-LocalGroupMember -Group \"Administrators\" -Member student",
+      "title": "把成员移出用户组",
+      "desc": "改权限前先确认账号名称，误删管理员可能锁死机器。",
+      "example": "# 把成员移出用户组\nRemove-LocalGroupMember -Group \"Administrators\" -Member student",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "remove-localgroupmember",
+       "权限",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "disable-localuser",
+      "syntax": "Disable-LocalUser -Name guest",
+      "copy": "Disable-LocalUser -Name guest",
+      "title": "禁用本地账号",
+      "desc": "保留账号和数据但禁止登录，比直接删除更安全。",
+      "example": "# 禁用本地账号\nDisable-LocalUser -Name guest",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "disable-localuser",
+       "权限",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "enable-localuser",
+      "syntax": "Enable-LocalUser -Name student",
+      "copy": "Enable-LocalUser -Name student",
+      "title": "启用本地账号",
+      "desc": "只对已存在的账号有效；启用前确认密码策略。",
+      "example": "# 启用本地账号\nEnable-LocalUser -Name student",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "enable-localuser",
+       "权限",
+       "系统内建"
       ],
       "danger": false,
       "src": "builtin"
@@ -28640,6 +31800,323 @@ window.TERMINAL_DATA = {
        "PowerShell",
        "进程",
        "等待"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "stop-service",
+      "syntax": "Stop-Service -Name Spooler",
+      "copy": "Stop-Service -Name Spooler",
+      "title": "停止 Windows 服务",
+      "desc": "停服务会影响依赖它的程序；先确认服务名和影响范围。",
+      "example": "# 停止 Windows 服务\nStop-Service -Name Spooler",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "stop-service",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "set-service",
+      "syntax": "Set-Service -Name Spooler -StartupType Manual",
+      "copy": "Set-Service -Name Spooler -StartupType Manual",
+      "title": "修改服务启动方式",
+      "desc": "可设为 Automatic、Manual 或 Disabled；禁用系统服务前要谨慎。",
+      "example": "# 修改服务启动方式\nSet-Service -Name Spooler -StartupType Manual",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "set-service",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "suspend-service",
+      "syntax": "Suspend-Service -Name Spooler",
+      "copy": "Suspend-Service -Name Spooler",
+      "title": "暂停服务",
+      "desc": "只暂停不停止，部分服务不支持暂停；恢复用 Resume-Service。",
+      "example": "# 暂停服务\nSuspend-Service -Name Spooler",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "suspend-service",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "resume-service",
+      "syntax": "Resume-Service -Name Spooler",
+      "copy": "Resume-Service -Name Spooler",
+      "title": "恢复已暂停的服务",
+      "desc": "与 Suspend-Service 配对使用。",
+      "example": "# 恢复已暂停的服务\nResume-Service -Name Spooler",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "resume-service",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-eventlog",
+      "syntax": "Get-EventLog -LogName System -Newest 20",
+      "copy": "Get-EventLog -LogName System -Newest 20",
+      "title": "读取传统事件日志",
+      "desc": "适合看 System / Application 日志；新系统更推荐 Get-WinEvent。",
+      "example": "# 读取传统事件日志\nGet-EventLog -LogName System -Newest 20",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-eventlog",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "clear-eventlog",
+      "syntax": "Clear-EventLog -LogName Application",
+      "copy": "Clear-EventLog -LogName Application",
+      "title": "清空事件日志",
+      "desc": "会删除日志记录，排障期间不要清；生产环境先导出。",
+      "example": "# 清空事件日志\nClear-EventLog -LogName Application",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "clear-eventlog",
+       "进程",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "get-counter",
+      "syntax": "Get-Counter '\\Processor(_Total)\\% Processor Time' -SampleInterval 2",
+      "copy": "Get-Counter '\\Processor(_Total)\\% Processor Time' -SampleInterval 2",
+      "title": "采样性能计数器",
+      "desc": "连续采样 CPU、内存、磁盘等指标，比任务管理器更适合留证。",
+      "example": "# 采样性能计数器\nGet-Counter '\\Processor(_Total)\\% Processor Time' -SampleInterval 2",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-counter",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-cimclass",
+      "syntax": "Get-CimClass -ClassName Win32_Process",
+      "copy": "Get-CimClass -ClassName Win32_Process",
+      "title": "查看 CIM 类结构",
+      "desc": "写 WMI/CIM 查询前先看类有哪些属性和方法。",
+      "example": "# 查看 CIM 类结构\nGet-CimClass -ClassName Win32_Process",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-cimclass",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "invoke-cimmethod",
+      "syntax": "Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{CommandLine=\"notepad.exe\"}",
+      "copy": "Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{CommandLine=\"notepad.exe\"}",
+      "title": "通过 CIM 调用系统方法",
+      "desc": "可远程创建进程或改配置；权限和参数都要先确认。",
+      "example": "# 通过 CIM 调用系统方法\nInvoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{CommandLine=\"notepad.exe\"}",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "invoke-cimmethod",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-uptime",
+      "syntax": "(Get-Date) - (Get-CimInstance Win32_OperatingSystem).LastBootUpTime",
+      "copy": "(Get-Date) - (Get-CimInstance Win32_OperatingSystem).LastBootUpTime",
+      "title": "计算系统已运行多久",
+      "desc": "排查意外重启或补丁后未重启时先看这个值。",
+      "example": "# 计算系统已运行多久\n(Get-Date) - (Get-CimInstance Win32_OperatingSystem).LastBootUpTime",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-uptime",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "set-date",
+      "syntax": "Set-Date -Adjust 01:00:00",
+      "copy": "Set-Date -Adjust 01:00:00",
+      "title": "调整系统时间",
+      "desc": "需要管理员权限；时间偏差会影响证书、日志和域认证。",
+      "example": "# 调整系统时间\nSet-Date -Adjust 01:00:00",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "set-date",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "start-job",
+      "syntax": "Start-Job -ScriptBlock { Get-Process }",
+      "copy": "Start-Job -ScriptBlock { Get-Process }",
+      "title": "启动后台 PowerShell 作业",
+      "desc": "作业在独立会话运行，用 Get-Job 查看、Receive-Job 取结果。",
+      "example": "# 启动后台 PowerShell 作业\nStart-Job -ScriptBlock { Get-Process }",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "start-job",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-job",
+      "syntax": "Get-Job",
+      "copy": "Get-Job",
+      "title": "查看后台作业",
+      "desc": "显示运行中、已完成和失败的作业；作业结束后仍会保留状态。",
+      "example": "# 查看后台作业\nGet-Job",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-job",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "receive-job",
+      "syntax": "Receive-Job -Id 1",
+      "copy": "Receive-Job -Id 1",
+      "title": "取回后台作业输出",
+      "desc": "默认取完会清空输出；需要保留时加 -Keep。",
+      "example": "# 取回后台作业输出\nReceive-Job -Id 1",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "receive-job",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "stop-job",
+      "syntax": "Stop-Job -Id 1",
+      "copy": "Stop-Job -Id 1",
+      "title": "停止后台作业",
+      "desc": "只停作业，不影响系统进程；停完记得 Remove-Job 清理。",
+      "example": "# 停止后台作业\nStop-Job -Id 1",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "stop-job",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "remove-job",
+      "syntax": "Remove-Job -Id 1",
+      "copy": "Remove-Job -Id 1",
+      "title": "删除作业记录",
+      "desc": "作业必须先完成或停止；删除后输出不可再取。",
+      "example": "# 删除作业记录\nRemove-Job -Id 1",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "remove-job",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "wait-job",
+      "syntax": "Wait-Job -Id 1",
+      "copy": "Wait-Job -Id 1",
+      "title": "等待作业完成",
+      "desc": "脚本里等待后台任务收敛，可加 -Timeout 防止一直卡住。",
+      "example": "# 等待作业完成\nWait-Job -Id 1",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "wait-job",
+       "进程",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-event",
+      "syntax": "Get-Event",
+      "copy": "Get-Event",
+      "title": "查看当前会话的事件队列",
+      "desc": "用 Register-EngineEvent / Wait-Event 做事件驱动脚本时，先看队列里有什么。",
+      "example": "# 当前事件\nGet-Event\n# 按来源过滤\nGet-Event | Where-Object SourceIdentifier -like \"*Timer*\"",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "get-event",
+       "进程与服务"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-eventSubscriber",
+      "syntax": "Get-EventSubscriber",
+      "copy": "Get-EventSubscriber",
+      "title": "查看已注册的事件订阅",
+      "desc": "事件脚本不触发，先确认订阅还在、订阅的是哪个源。",
+      "example": "# 全部订阅\nGet-EventSubscriber\n# 取消某个订阅\nUnregister-Event -SourceIdentifier MyTimer",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "get-eventsubscriber",
+       "进程与服务"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "wait-event",
+      "syntax": "Wait-Event -Timeout 5",
+      "copy": "Wait-Event -Timeout 5",
+      "title": "等待一个事件到达",
+      "desc": "脚本里需要“等到某件事发生再继续”时，用 Wait-Event 代替空转循环。",
+      "example": "# 最多等 5 秒\nWait-Event -Timeout 5\n# 等指定来源\nWait-Event -SourceIdentifier MyTimer -Timeout 10",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "wait-event",
+       "进程与服务"
       ],
       "danger": false,
       "src": "builtin"
@@ -29386,6 +32863,465 @@ window.TERMINAL_DATA = {
        "PowerShell",
        "网络",
        "ping"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-netipaddress",
+      "syntax": "Get-NetIPAddress -AddressFamily IPv4",
+      "copy": "Get-NetIPAddress -AddressFamily IPv4",
+      "title": "查看本机 IP 地址",
+      "desc": "列出所有网卡的 IPv4 地址、前缀和接口索引。",
+      "example": "# 查看本机 IP 地址\nGet-NetIPAddress -AddressFamily IPv4",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-netipaddress",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "new-netipaddress",
+      "syntax": "New-NetIPAddress -InterfaceAlias \"Ethernet\" -IPAddress 192.168.1.20 -PrefixLength 24 -DefaultGateway 192.168.1.1",
+      "copy": "New-NetIPAddress -InterfaceAlias \"Ethernet\" -IPAddress 192.168.1.20 -PrefixLength 24 -DefaultGateway 192.168.1.1",
+      "title": "给网卡配置静态 IP",
+      "desc": "需要管理员权限；改错网关会直接断网，远程操作前准备回滚方式。",
+      "example": "# 给网卡配置静态 IP\nNew-NetIPAddress -InterfaceAlias \"Ethernet\" -IPAddress 192.168.1.20 -PrefixLength 24 -DefaultGateway 192.168.1.1",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "new-netipaddress",
+       "网络",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "remove-netipaddress",
+      "syntax": "Remove-NetIPAddress -IPAddress 192.168.1.20",
+      "copy": "Remove-NetIPAddress -IPAddress 192.168.1.20",
+      "title": "删除指定的 IP 配置",
+      "desc": "会移除静态地址；确认没有其他服务依赖它。",
+      "example": "# 删除指定的 IP 配置\nRemove-NetIPAddress -IPAddress 192.168.1.20",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "remove-netipaddress",
+       "网络",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "get-netipinterface",
+      "syntax": "Get-NetIPInterface -AddressFamily IPv4",
+      "copy": "Get-NetIPInterface -AddressFamily IPv4",
+      "title": "查看网卡 IP 接口状态",
+      "desc": "确认 DHCP 是否启用、接口跃点和连接状态。",
+      "example": "# 查看网卡 IP 接口状态\nGet-NetIPInterface -AddressFamily IPv4",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-netipinterface",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "set-netipinterface",
+      "syntax": "Set-NetIPInterface -InterfaceAlias \"Ethernet\" -Dhcp Enabled",
+      "copy": "Set-NetIPInterface -InterfaceAlias \"Ethernet\" -Dhcp Enabled",
+      "title": "切换网卡 DHCP 模式",
+      "desc": "改成 DHCP 后静态地址会失效，远程机器慎用。",
+      "example": "# 切换网卡 DHCP 模式\nSet-NetIPInterface -InterfaceAlias \"Ethernet\" -Dhcp Enabled",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "set-netipinterface",
+       "网络",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "get-nettcpconnection",
+      "syntax": "Get-NetTCPConnection -State Listen",
+      "copy": "Get-NetTCPConnection -State Listen",
+      "title": "查看正在监听的 TCP 端口",
+      "desc": "排查端口占用、服务是否启动；比 netstat 更结构化。",
+      "example": "# 查看正在监听的 TCP 端口\nGet-NetTCPConnection -State Listen",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-nettcpconnection",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-netudpendpoint",
+      "syntax": "Get-NetUDPEndpoint -LocalPort 53",
+      "copy": "Get-NetUDPEndpoint -LocalPort 53",
+      "title": "查看 UDP 端口占用",
+      "desc": "DNS、游戏和部分服务用 UDP，排查占用时别只看 TCP。",
+      "example": "# 查看 UDP 端口占用\nGet-NetUDPEndpoint -LocalPort 53",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-netudpendpoint",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-netroute",
+      "syntax": "Get-NetRoute -DestinationPrefix \"0.0.0.0/0\"",
+      "copy": "Get-NetRoute -DestinationPrefix \"0.0.0.0/0\"",
+      "title": "查看默认路由",
+      "desc": "确认流量走哪张网卡、下一跳是否合理。",
+      "example": "# 查看默认路由\nGet-NetRoute -DestinationPrefix \"0.0.0.0/0\"",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-netroute",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "new-netroute",
+      "syntax": "New-NetRoute -DestinationPrefix \"10.0.0.0/24\" -InterfaceIndex 12 -NextHop 192.168.1.1",
+      "copy": "New-NetRoute -DestinationPrefix \"10.0.0.0/24\" -InterfaceIndex 12 -NextHop 192.168.1.1",
+      "title": "添加静态路由",
+      "desc": "需要管理员权限；接口索引先用 Get-NetIPInterface 查。",
+      "example": "# 添加静态路由\nNew-NetRoute -DestinationPrefix \"10.0.0.0/24\" -InterfaceIndex 12 -NextHop 192.168.1.1",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "new-netroute",
+       "网络",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "remove-netroute",
+      "syntax": "Remove-NetRoute -DestinationPrefix \"10.0.0.0/24\"",
+      "copy": "Remove-NetRoute -DestinationPrefix \"10.0.0.0/24\"",
+      "title": "删除静态路由",
+      "desc": "删除后相关网段可能立即失联。",
+      "example": "# 删除静态路由\nRemove-NetRoute -DestinationPrefix \"10.0.0.0/24\"",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "remove-netroute",
+       "网络",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "get-dnsclientcache",
+      "syntax": "Get-DnsClientCache",
+      "copy": "Get-DnsClientCache",
+      "title": "查看 DNS 缓存",
+      "desc": "域名解析异常时先看缓存里到底返回了什么。",
+      "example": "# 查看 DNS 缓存\nGet-DnsClientCache",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-dnsclientcache",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "clear-dnsclientcache",
+      "syntax": "Clear-DnsClientCache",
+      "copy": "Clear-DnsClientCache",
+      "title": "清空 DNS 缓存",
+      "desc": "改 DNS 或换网络后强制重新解析；不会影响系统其他配置。",
+      "example": "# 清空 DNS 缓存\nClear-DnsClientCache",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "clear-dnsclientcache",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-dnsclientserveraddress",
+      "syntax": "Get-DnsClientServerAddress -AddressFamily IPv4",
+      "copy": "Get-DnsClientServerAddress -AddressFamily IPv4",
+      "title": "查看网卡 DNS 服务器",
+      "desc": "确认 DNS 是否被 DHCP 或组策略改掉。",
+      "example": "# 查看网卡 DNS 服务器\nGet-DnsClientServerAddress -AddressFamily IPv4",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-dnsclientserveraddress",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "set-dnsclientserveraddress",
+      "syntax": "Set-DnsClientServerAddress -InterfaceAlias \"Ethernet\" -ServerAddresses 8.8.8.8,1.1.1.1",
+      "copy": "Set-DnsClientServerAddress -InterfaceAlias \"Ethernet\" -ServerAddresses 8.8.8.8,1.1.1.1",
+      "title": "修改网卡 DNS",
+      "desc": "需要管理员权限；改完可用 Clear-DnsClientCache 清缓存。",
+      "example": "# 修改网卡 DNS\nSet-DnsClientServerAddress -InterfaceAlias \"Ethernet\" -ServerAddresses 8.8.8.8,1.1.1.1",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "set-dnsclientserveraddress",
+       "网络",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "get-netfirewallrule",
+      "syntax": "Get-NetFirewallRule -DisplayName \"*Remote Desktop*\"",
+      "copy": "Get-NetFirewallRule -DisplayName \"*Remote Desktop*\"",
+      "title": "查看防火墙规则",
+      "desc": "按显示名筛规则，确认端口是否真的被放行。",
+      "example": "# 查看防火墙规则\nGet-NetFirewallRule -DisplayName \"*Remote Desktop*\"",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-netfirewallrule",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "new-netfirewallrule",
+      "syntax": "New-NetFirewallRule -DisplayName \"Allow 8080\" -Direction Inbound -LocalPort 8080 -Protocol TCP -Action Allow",
+      "copy": "New-NetFirewallRule -DisplayName \"Allow 8080\" -Direction Inbound -LocalPort 8080 -Protocol TCP -Action Allow",
+      "title": "新建入站防火墙规则",
+      "desc": "需要管理员权限；开放端口前确认只对必要网段生效。",
+      "example": "# 新建入站防火墙规则\nNew-NetFirewallRule -DisplayName \"Allow 8080\" -Direction Inbound -LocalPort 8080 -Protocol TCP -Action Allow",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "new-netfirewallrule",
+       "网络",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "enable-netfirewallrule",
+      "syntax": "Enable-NetFirewallRule -DisplayName \"Allow 8080\"",
+      "copy": "Enable-NetFirewallRule -DisplayName \"Allow 8080\"",
+      "title": "启用防火墙规则",
+      "desc": "规则存在但被禁用时使用。",
+      "example": "# 启用防火墙规则\nEnable-NetFirewallRule -DisplayName \"Allow 8080\"",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "enable-netfirewallrule",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "disable-netfirewallrule",
+      "syntax": "Disable-NetFirewallRule -DisplayName \"Allow 8080\"",
+      "copy": "Disable-NetFirewallRule -DisplayName \"Allow 8080\"",
+      "title": "禁用防火墙规则",
+      "desc": "禁用后端口立即暴露，确认业务不再需要。",
+      "example": "# 禁用防火墙规则\nDisable-NetFirewallRule -DisplayName \"Allow 8080\"",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "disable-netfirewallrule",
+       "网络",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "remove-netfirewallrule",
+      "syntax": "Remove-NetFirewallRule -DisplayName \"Allow 8080\"",
+      "copy": "Remove-NetFirewallRule -DisplayName \"Allow 8080\"",
+      "title": "删除防火墙规则",
+      "desc": "不可逆；删除前导出规则或记录配置。",
+      "example": "# 删除防火墙规则\nRemove-NetFirewallRule -DisplayName \"Allow 8080\"",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "remove-netfirewallrule",
+       "网络",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "get-netadapterstatistics",
+      "syntax": "Get-NetAdapterStatistics",
+      "copy": "Get-NetAdapterStatistics",
+      "title": "查看网卡流量统计",
+      "desc": "快速判断网卡是否在收发数据、有没有大量丢包。",
+      "example": "# 查看网卡流量统计\nGet-NetAdapterStatistics",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-netadapterstatistics",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "net-share",
+      "syntax": "net share",
+      "copy": "net share",
+      "title": "查看共享文件夹",
+      "desc": "cmd 的网络共享管理命令；创建共享需要管理员权限。",
+      "example": "# 查看共享文件夹\nnet share",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "net-share",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "net-use",
+      "syntax": "net use Z: \\\\server\\share",
+      "copy": "net use Z: \\\\server\\share",
+      "title": "映射网络驱动器",
+      "desc": "把共享目录挂成盘符；断开用 net use Z: /delete。",
+      "example": "# 映射网络驱动器\nnet use Z: \\\\server\\share",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "net-use",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "net-user",
+      "syntax": "net user student",
+      "copy": "net user student",
+      "title": "查看本地账号信息",
+      "desc": "显示账号状态、上次登录和所属组；改密码用 net user 用户名 新密码。",
+      "example": "# 查看本地账号信息\nnet user student",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "net-user",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "openfiles",
+      "syntax": "openfiles /query",
+      "copy": "openfiles /query",
+      "title": "查看被占用的共享文件",
+      "desc": "文件删不掉、提示被占用时，用它找出是哪个会话锁着。",
+      "example": "# 查看被占用的共享文件\nopenfiles /query",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "openfiles",
+       "网络",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-netfirewallprofile",
+      "syntax": "Get-NetFirewallProfile",
+      "copy": "Get-NetFirewallProfile",
+      "title": "查看域/专用/公用网络防火墙配置",
+      "desc": "端口不通时，先看当前网络属于哪个配置文件，防火墙是否开启。",
+      "example": "# 三个配置文件\nGet-NetFirewallProfile\n# 只看是否启用\nGet-NetFirewallProfile | Select-Object Name,Enabled",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "get-netfirewallprofile",
+       "网络"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-smbshare",
+      "syntax": "Get-SmbShare",
+      "copy": "Get-SmbShare",
+      "title": "查看本机共享文件夹",
+      "desc": "共享盘映射失败时，先确认共享名、路径和权限是否存在。",
+      "example": "# 本机共享\nGet-SmbShare\n# 只看非系统共享\nGet-SmbShare | Where-Object Name -notin @(\"IPC$\",\"admin$\")\n# 查看共享权限\nGet-SmbShareAccess -Name Docs",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "get-smbshare",
+       "网络"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-smbsession",
+      "syntax": "Get-SmbSession",
+      "copy": "Get-SmbSession",
+      "title": "查看当前 SMB 会话",
+      "desc": "共享盘被占用或需要踢掉旧会话时，先看是哪台客户端连着。",
+      "example": "# 当前 SMB 会话\nGet-SmbSession\n# 按客户端过滤\nGet-SmbSession | Where-Object ClientComputerName -eq \"192.168.1.20\"",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "get-smbsession",
+       "网络"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-smbopenfile",
+      "syntax": "Get-SmbOpenFile",
+      "copy": "Get-SmbOpenFile",
+      "title": "查看被远程打开的文件",
+      "desc": "删除共享文件提示被占用时，用 Get-SmbOpenFile 找到持有句柄的客户端。",
+      "example": "# 所有打开的文件\nGet-SmbOpenFile\n# 按路径过滤\nGet-SmbOpenFile | Where-Object Path -like \"*Docs*\"\n# 关闭指定句柄（谨慎）\nClose-SmbOpenFile -FileId 12345",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "get-smbopenfile",
+       "网络"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-netadapterbinding",
+      "syntax": "Get-NetAdapterBinding",
+      "copy": "Get-NetAdapterBinding",
+      "title": "查看网卡绑定的协议和服务",
+      "desc": "网络协议缺失、IPv6 被禁用或虚拟网卡异常时，先看绑定列表。",
+      "example": "# 所有绑定\nGet-NetAdapterBinding\n# 只看已启用\nGet-NetAdapterBinding | Where-Object Enabled\n# 按组件过滤\nGet-NetAdapterBinding -ComponentID ms_tcpip6",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "get-netadapterbinding",
+       "网络"
       ],
       "danger": false,
       "src": "builtin"
@@ -32632,6 +36568,291 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "update-help",
+      "syntax": "Update-Help",
+      "copy": "Update-Help",
+      "title": "更新 PowerShell 帮助",
+      "desc": "首次使用 Get-Help 没有详细说明时，先以管理员身份更新帮助。",
+      "example": "# 更新 PowerShell 帮助\nUpdate-Help",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "update-help",
+       "开发",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-module",
+      "syntax": "Get-Module -ListAvailable",
+      "copy": "Get-Module -ListAvailable",
+      "title": "查看已安装模块",
+      "desc": "确认某个命令来自哪个模块，排查版本冲突。",
+      "example": "# 查看已安装模块\nGet-Module -ListAvailable",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-module",
+       "开发",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "import-module",
+      "syntax": "Import-Module .\\MyModule.psm1",
+      "copy": "Import-Module .\\MyModule.psm1",
+      "title": "导入 PowerShell 模块",
+      "desc": "只影响当前会话；模块路径要写绝对或相对真实路径。",
+      "example": "# 导入 PowerShell 模块\nImport-Module .\\MyModule.psm1",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "import-module",
+       "开发",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "remove-module",
+      "syntax": "Remove-Module MyModule",
+      "copy": "Remove-Module MyModule",
+      "title": "卸载当前会话模块",
+      "desc": "卸载后模块命令立即不可用，重新 Import-Module 可恢复。",
+      "example": "# 卸载当前会话模块\nRemove-Module MyModule",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "remove-module",
+       "开发",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "invoke-expression",
+      "syntax": "Invoke-Expression \"Get-Process\"",
+      "copy": "Invoke-Expression \"Get-Process\"",
+      "title": "把字符串当命令执行",
+      "desc": "方便但也危险，不要对不可信输入使用，容易被注入。",
+      "example": "# 把字符串当命令执行\nInvoke-Expression \"Get-Process\"",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "invoke-expression",
+       "开发",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "invoke-command",
+      "syntax": "Invoke-Command -ComputerName server01 -ScriptBlock { Get-Service }",
+      "copy": "Invoke-Command -ComputerName server01 -ScriptBlock { Get-Service }",
+      "title": "在远程机器执行命令",
+      "desc": "需要 WinRM 和凭据；先 Test-WSMan 确认连通。",
+      "example": "# 在远程机器执行命令\nInvoke-Command -ComputerName server01 -ScriptBlock { Get-Service }",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "invoke-command",
+       "开发",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "new-pssession",
+      "syntax": "New-PSSession -ComputerName server01",
+      "copy": "New-PSSession -ComputerName server01",
+      "title": "建立持久远程会话",
+      "desc": "会话可复用，适合连续执行多条远程命令；用完 Remove-PSSession。",
+      "example": "# 建立持久远程会话\nNew-PSSession -ComputerName server01",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "new-pssession",
+       "开发",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "enter-pssession",
+      "syntax": "Enter-PSSession -ComputerName server01",
+      "copy": "Enter-PSSession -ComputerName server01",
+      "title": "进入交互式远程会话",
+      "desc": "提示符会变成远程机器；退出用 Exit-PSSession。",
+      "example": "# 进入交互式远程会话\nEnter-PSSession -ComputerName server01",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "enter-pssession",
+       "开发",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "exit-pssession",
+      "syntax": "Exit-PSSession",
+      "copy": "Exit-PSSession",
+      "title": "退出交互式远程会话",
+      "desc": "只断开当前会话，不会关闭远程机器。",
+      "example": "# 退出交互式远程会话\nExit-PSSession",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "exit-pssession",
+       "开发",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-pssession",
+      "syntax": "Get-PSSession",
+      "copy": "Get-PSSession",
+      "title": "查看远程会话",
+      "desc": "确认是否有残留会话占用连接或许可证。",
+      "example": "# 查看远程会话\nGet-PSSession",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-pssession",
+       "开发",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "remove-pssession",
+      "syntax": "Remove-PSSession -Id 1",
+      "copy": "Remove-PSSession -Id 1",
+      "title": "关闭远程会话",
+      "desc": "释放远程连接和资源；关闭后会话内状态丢失。",
+      "example": "# 关闭远程会话\nRemove-PSSession -Id 1",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "remove-pssession",
+       "开发",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "start-transcript",
+      "syntax": "Start-Transcript -Path .\\session.log",
+      "copy": "Start-Transcript -Path .\\session.log",
+      "title": "记录当前终端会话",
+      "desc": "把输入输出写入日志，排障或留证时很有用。",
+      "example": "# 记录当前终端会话\nStart-Transcript -Path .\\session.log",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "start-transcript",
+       "开发",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "stop-transcript",
+      "syntax": "Stop-Transcript",
+      "copy": "Stop-Transcript",
+      "title": "停止记录终端会话",
+      "desc": "与 Start-Transcript 配对；忘记停止会一直追加日志。",
+      "example": "# 停止记录终端会话\nStop-Transcript",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "stop-transcript",
+       "开发",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-psprovider",
+      "syntax": "Get-PSProvider",
+      "copy": "Get-PSProvider",
+      "title": "查看 PowerShell 提供程序",
+      "desc": "了解 FileSystem、Registry、Certificate 等不同路径类型。",
+      "example": "# 查看 PowerShell 提供程序\nGet-PSProvider",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-psprovider",
+       "开发",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-formatdata",
+      "syntax": "Get-FormatData -TypeName System.Diagnostics.Process",
+      "copy": "Get-FormatData -TypeName System.Diagnostics.Process",
+      "title": "查看对象的显示格式",
+      "desc": "自定义 Format-Table 列或写格式化文件前先看原始格式定义。",
+      "example": "# 查看对象的显示格式\nGet-FormatData -TypeName System.Diagnostics.Process",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-formatdata",
+       "开发",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "new-object",
+      "syntax": "New-Object -TypeName System.Text.StringBuilder",
+      "copy": "New-Object -TypeName System.Text.StringBuilder",
+      "title": "创建 .NET 对象实例",
+      "desc": "需要调用 .NET 类、构造字典或创建 COM 对象时，New-Object 是通用入口。",
+      "example": "# 创建 StringBuilder\nNew-Object -TypeName System.Text.StringBuilder\n# 创建哈希表\nNew-Object -TypeName System.Collections.Hashtable\n# 带参数构造\nNew-Object System.IO.FileInfo(\".\\notes.txt\")",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "new-object",
+       "开发与运行时"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "add-type",
+      "syntax": "Add-Type -AssemblyName System.Windows.Forms",
+      "copy": "Add-Type -AssemblyName System.Windows.Forms",
+      "title": "在当前会话加载 .NET 程序集或编译代码",
+      "desc": "调用 WinForms、Windows API 或临时 C# 代码前，先用 Add-Type 把类型装进来。",
+      "example": "# 加载 WinForms\nAdd-Type -AssemblyName System.Windows.Forms\n# 编译一段 C#\nAdd-Type -TypeDefinition \"public class Hi { public static string Msg() { return \\\"hi\\\"; } }\"\n[Hi]::Msg()",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "add-type",
+       "开发与运行时"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "pnputil",
+      "syntax": "pnputil /enum-drivers",
+      "copy": "pnputil /enum-drivers",
+      "title": "枚举和安装 Windows 驱动包",
+      "desc": "驱动冲突或需要离线注入驱动时，pnputil 是系统自带的管理入口。",
+      "example": "# 列出第三方驱动包\npnputil /enum-drivers\n# 安装 inf（需管理员）\npnputil /add-driver .\\driver.inf /install\n# 删除指定 oem inf（谨慎）\npnputil /delete-driver oem12.inf /uninstall",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "pnputil",
+       "开发与运行时"
+      ],
+      "danger": true,
+      "src": "builtin"
      }
     ],
     "pkg": [
@@ -34212,6 +38433,214 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "get-package",
+      "syntax": "Get-Package -Name \"*PowerShell*\"",
+      "copy": "Get-Package -Name \"*PowerShell*\"",
+      "title": "查看已安装软件包",
+      "desc": "PackageManagement 提供程序的统一查询入口，winget 之外可用。",
+      "example": "# 查看已安装软件包\nGet-Package -Name \"*PowerShell*\"",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-package",
+       "包管理",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "find-package",
+      "syntax": "Find-Package -Name \"openssh\"",
+      "copy": "Find-Package -Name \"openssh\"",
+      "title": "搜索可用软件包",
+      "desc": "先确认包名和提供程序，再执行安装。",
+      "example": "# 搜索可用软件包\nFind-Package -Name \"openssh\"",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "find-package",
+       "包管理",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "install-package",
+      "syntax": "Install-Package -Name \"openssh\" -ProviderName NuGet",
+      "copy": "Install-Package -Name \"openssh\" -ProviderName NuGet",
+      "title": "安装软件包",
+      "desc": "需要 NuGet 提供程序；安装前确认来源可信。",
+      "example": "# 安装软件包\nInstall-Package -Name \"openssh\" -ProviderName NuGet",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "install-package",
+       "包管理",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "uninstall-package",
+      "syntax": "Uninstall-Package -Name \"openssh\"",
+      "copy": "Uninstall-Package -Name \"openssh\"",
+      "title": "卸载软件包",
+      "desc": "只卸载通过 PackageManagement 安装的包，不会清理所有残留。",
+      "example": "# 卸载软件包\nUninstall-Package -Name \"openssh\"",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "uninstall-package",
+       "包管理",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-packagesource",
+      "syntax": "Get-PackageSource",
+      "copy": "Get-PackageSource",
+      "title": "查看软件包源",
+      "desc": "确认包来自哪个仓库，避免装到不明来源。",
+      "example": "# 查看软件包源\nGet-PackageSource",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-packagesource",
+       "包管理",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "register-packagesource",
+      "syntax": "Register-PackageSource -Name MyRepo -Location https://example.com/nuget -ProviderName NuGet",
+      "copy": "Register-PackageSource -Name MyRepo -Location https://example.com/nuget -ProviderName NuGet",
+      "title": "注册自定义包源",
+      "desc": "只注册可信仓库；证书和网络代理要先配好。",
+      "example": "# 注册自定义包源\nRegister-PackageSource -Name MyRepo -Location https://example.com/nuget -ProviderName NuGet",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "register-packagesource",
+       "包管理",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "unregister-packagesource",
+      "syntax": "Unregister-PackageSource -Name MyRepo",
+      "copy": "Unregister-PackageSource -Name MyRepo",
+      "title": "移除自定义包源",
+      "desc": "移除后无法再从该源安装或更新。",
+      "example": "# 移除自定义包源\nUnregister-PackageSource -Name MyRepo",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "unregister-packagesource",
+       "包管理",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-packageprovider",
+      "syntax": "Get-PackageProvider",
+      "copy": "Get-PackageProvider",
+      "title": "查看包提供程序",
+      "desc": "NuGet、Chocolatey 等提供程序的状态会直接影响安装。",
+      "example": "# 查看包提供程序\nGet-PackageProvider",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-packageprovider",
+       "包管理",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "install-packageprovider",
+      "syntax": "Install-PackageProvider -Name NuGet -Force",
+      "copy": "Install-PackageProvider -Name NuGet -Force",
+      "title": "安装包提供程序",
+      "desc": "首次用 Install-Package 前通常要先装 NuGet。",
+      "example": "# 安装包提供程序\nInstall-PackageProvider -Name NuGet -Force",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "install-packageprovider",
+       "包管理",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-installedmodule",
+      "syntax": "Get-InstalledModule",
+      "copy": "Get-InstalledModule",
+      "title": "查看已安装的 PowerShell 模块",
+      "desc": "只显示通过 PowerShellGet 安装的模块，和 Get-Module 口径不同。",
+      "example": "# 查看已安装的 PowerShell 模块\nGet-InstalledModule",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-installedmodule",
+       "包管理",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "update-module",
+      "syntax": "Update-Module -Name Pester",
+      "copy": "Update-Module -Name Pester",
+      "title": "更新 PowerShell 模块",
+      "desc": "更新后新会话才加载新版本；旧版本可能仍留在磁盘。",
+      "example": "# 更新 PowerShell 模块\nUpdate-Module -Name Pester",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "update-module",
+       "包管理",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "uninstall-module",
+      "syntax": "Uninstall-Module -Name Pester",
+      "copy": "Uninstall-Module -Name Pester",
+      "title": "卸载 PowerShell 模块",
+      "desc": "确认没有脚本依赖它；卸载后相关命令立即消失。",
+      "example": "# 卸载 PowerShell 模块\nUninstall-Module -Name Pester",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "uninstall-module",
+       "包管理",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "msiexec",
+      "syntax": "msiexec /i app.msi /qn",
+      "copy": "msiexec /i app.msi /qn",
+      "title": "静默安装 MSI 包",
+      "desc": "/qn 不显示界面，适合自动化；安装包来源必须可信。",
+      "example": "# 静默安装 MSI 包\nmsiexec /i app.msi /qn",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "msiexec",
+       "包管理",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
      }
     ],
     "disk": [
@@ -34669,6 +39098,278 @@ window.TERMINAL_DATA = {
       ],
       "danger": true,
       "src": "builtin"
+     },
+     {
+      "id": "get-physicaldisk",
+      "syntax": "Get-PhysicalDisk",
+      "copy": "Get-PhysicalDisk",
+      "title": "查看物理磁盘",
+      "desc": "显示磁盘型号、介质类型和健康状态，排查磁盘异常先看这里。",
+      "example": "# 查看物理磁盘\nGet-PhysicalDisk",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-physicaldisk",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-virtualdisk",
+      "syntax": "Get-VirtualDisk",
+      "copy": "Get-VirtualDisk",
+      "title": "查看虚拟磁盘",
+      "desc": "存储池或 Storage Spaces 环境里确认虚拟盘状态。",
+      "example": "# 查看虚拟磁盘\nGet-VirtualDisk",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-virtualdisk",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-storagepool",
+      "syntax": "Get-StoragePool",
+      "copy": "Get-StoragePool",
+      "title": "查看存储池",
+      "desc": "确认池是否健康、剩余容量和成员磁盘。",
+      "example": "# 查看存储池\nGet-StoragePool",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-storagepool",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "new-partition",
+      "syntax": "New-Partition -DiskNumber 1 -UseMaximumSize -DriveLetter D",
+      "copy": "New-Partition -DiskNumber 1 -UseMaximumSize -DriveLetter D",
+      "title": "在磁盘上新建分区",
+      "desc": "会改变分区表；操作前确认磁盘编号，别选错系统盘。",
+      "example": "# 在磁盘上新建分区\nNew-Partition -DiskNumber 1 -UseMaximumSize -DriveLetter D",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "new-partition",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "resize-partition",
+      "syntax": "Resize-Partition -DriveLetter C -Size 100GB",
+      "copy": "Resize-Partition -DriveLetter C -Size 100GB",
+      "title": "调整分区大小",
+      "desc": "缩小分区受文件系统和相邻空间限制，先备份。",
+      "example": "# 调整分区大小\nResize-Partition -DriveLetter C -Size 100GB",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "resize-partition",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "set-partition",
+      "syntax": "Set-Partition -DriveLetter D -NewDriveLetter E",
+      "copy": "Set-Partition -DriveLetter D -NewDriveLetter E",
+      "title": "修改分区盘符",
+      "desc": "盘符变化会让依赖旧路径的脚本失效。",
+      "example": "# 修改分区盘符\nSet-Partition -DriveLetter D -NewDriveLetter E",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "set-partition",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "remove-partition",
+      "syntax": "Remove-Partition -DriveLetter D",
+      "copy": "Remove-Partition -DriveLetter D",
+      "title": "删除分区",
+      "desc": "分区数据会丢失，执行前必须确认盘符和备份。",
+      "example": "# 删除分区\nRemove-Partition -DriveLetter D",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "remove-partition",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "initialize-disk",
+      "syntax": "Initialize-Disk -Number 1 -PartitionStyle GPT",
+      "copy": "Initialize-Disk -Number 1 -PartitionStyle GPT",
+      "title": "初始化新磁盘",
+      "desc": "会写入分区表；只对没有数据的新盘执行。",
+      "example": "# 初始化新磁盘\nInitialize-Disk -Number 1 -PartitionStyle GPT",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "initialize-disk",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "clear-disk",
+      "syntax": "Clear-Disk -Number 1 -RemoveData",
+      "copy": "Clear-Disk -Number 1 -RemoveData",
+      "title": "清空磁盘数据",
+      "desc": "不可逆，务必先确认磁盘编号。",
+      "example": "# 清空磁盘数据\nClear-Disk -Number 1 -RemoveData",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "clear-disk",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "optimize-volume",
+      "syntax": "Optimize-Volume -DriveLetter C -Defrag",
+      "copy": "Optimize-Volume -DriveLetter C -Defrag",
+      "title": "优化卷性能",
+      "desc": "机械盘做碎片整理，SSD 应使用 -ReTrim 而不是频繁 defrag。",
+      "example": "# 优化卷性能\nOptimize-Volume -DriveLetter C -Defrag",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "optimize-volume",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "repair-volume",
+      "syntax": "Repair-Volume -DriveLetter C -Scan",
+      "copy": "Repair-Volume -DriveLetter C -Scan",
+      "title": "扫描并修复卷错误",
+      "desc": "先 Scan 再决定是否 Fix；修复前备份重要数据。",
+      "example": "# 扫描并修复卷错误\nRepair-Volume -DriveLetter C -Scan",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "repair-volume",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "mount-diskimage",
+      "syntax": "Mount-DiskImage -ImagePath C:\\iso\\ubuntu.iso",
+      "copy": "Mount-DiskImage -ImagePath C:\\iso\\ubuntu.iso",
+      "title": "挂载 ISO 镜像",
+      "desc": "挂载后会多出一个盘符；用完 Dismount-DiskImage。",
+      "example": "# 挂载 ISO 镜像\nMount-DiskImage -ImagePath C:\\iso\\ubuntu.iso",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "mount-diskimage",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "dismount-diskimage",
+      "syntax": "Dismount-DiskImage -ImagePath C:\\iso\\ubuntu.iso",
+      "copy": "Dismount-DiskImage -ImagePath C:\\iso\\ubuntu.iso",
+      "title": "卸载 ISO 镜像",
+      "desc": "先关闭镜像里打开的文件，否则可能卸载失败。",
+      "example": "# 卸载 ISO 镜像\nDismount-DiskImage -ImagePath C:\\iso\\ubuntu.iso",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "dismount-diskimage",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-diskimage",
+      "syntax": "Get-DiskImage -ImagePath C:\\iso\\ubuntu.iso",
+      "copy": "Get-DiskImage -ImagePath C:\\iso\\ubuntu.iso",
+      "title": "查看镜像挂载状态",
+      "desc": "确认 ISO 是否已挂载、挂到哪个盘符。",
+      "example": "# 查看镜像挂载状态\nGet-DiskImage -ImagePath C:\\iso\\ubuntu.iso",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-diskimage",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "defrag",
+      "syntax": "defrag C: /O",
+      "copy": "defrag C: /O",
+      "title": "按介质类型优化磁盘",
+      "desc": "/O 让系统自动选择合适操作；不要对 SSD 频繁做传统碎片整理。",
+      "example": "# 按介质类型优化磁盘\ndefrag C: /O",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "defrag",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "fsutil",
+      "syntax": "fsutil volume diskfree C:",
+      "copy": "fsutil volume diskfree C:",
+      "title": "查看卷的剩余空间",
+      "desc": "比资源管理器更细，能看到可用字节和簇信息。",
+      "example": "# 查看卷的剩余空间\nfsutil volume diskfree C:",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "fsutil",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "mountvol",
+      "syntax": "mountvol C: /L",
+      "copy": "mountvol C: /L",
+      "title": "查看卷的挂载路径",
+      "desc": "排查盘符丢失或卷挂载异常时使用。",
+      "example": "# 查看卷的挂载路径\nmountvol C: /L",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "mountvol",
+       "磁盘",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
      }
     ],
     "sec": [
@@ -35077,6 +39778,276 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "get-executionpolicy",
+      "syntax": "Get-ExecutionPolicy -List",
+      "copy": "Get-ExecutionPolicy -List",
+      "title": "查看脚本执行策略",
+      "desc": "按作用域列出策略，确认脚本为什么被阻止。",
+      "example": "# 查看脚本执行策略\nGet-ExecutionPolicy -List",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-executionpolicy",
+       "安全",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "set-executionpolicy",
+      "syntax": "Set-ExecutionPolicy -Scope CurrentUser RemoteSigned",
+      "copy": "Set-ExecutionPolicy -Scope CurrentUser RemoteSigned",
+      "title": "修改脚本执行策略",
+      "desc": "只改当前用户作用域，避免影响整台机器；改前确认脚本来源。",
+      "example": "# 修改脚本执行策略\nSet-ExecutionPolicy -Scope CurrentUser RemoteSigned",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "set-executionpolicy",
+       "安全",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "get-authenticode-signature",
+      "syntax": "Get-AuthenticodeSignature .\\installer.exe",
+      "copy": "Get-AuthenticodeSignature .\\installer.exe",
+      "title": "验证文件数字签名",
+      "desc": "确认安装包是否被篡改、签名者是谁。",
+      "example": "# 验证文件数字签名\nGet-AuthenticodeSignature .\\installer.exe",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-authenticode-signature",
+       "安全",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "set-authenticode-signature",
+      "syntax": "Set-AuthenticodeSignature .\\script.ps1 -Certificate $cert",
+      "copy": "Set-AuthenticodeSignature .\\script.ps1 -Certificate $cert",
+      "title": "给脚本或文件签名",
+      "desc": "需要代码签名证书；签名后仍要验证时间戳。",
+      "example": "# 给脚本或文件签名\nSet-AuthenticodeSignature .\\script.ps1 -Certificate $cert",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "set-authenticode-signature",
+       "安全",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-credential",
+      "syntax": "Get-Credential",
+      "copy": "Get-Credential",
+      "title": "弹出凭据输入框",
+      "desc": "安全地收集用户名和密码，不要把明文密码写进脚本。",
+      "example": "# 弹出凭据输入框\nGet-Credential",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-credential",
+       "安全",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "convertfrom-securestring",
+      "syntax": "ConvertFrom-SecureString $secure",
+      "copy": "ConvertFrom-SecureString $secure",
+      "title": "把安全字符串转成可存储文本",
+      "desc": "输出仍是加密文本，但可能被同用户解密；不要写入公开仓库。",
+      "example": "# 把安全字符串转成可存储文本\nConvertFrom-SecureString $secure",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "convertfrom-securestring",
+       "安全",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "protect-cmsmessage",
+      "syntax": "Protect-CmsMessage -To \"user@example.com\" -Content \"secret\"",
+      "copy": "Protect-CmsMessage -To \"user@example.com\" -Content \"secret\"",
+      "title": "用证书加密消息",
+      "desc": "需要收件人证书；没有私钥无法解密。",
+      "example": "# 用证书加密消息\nProtect-CmsMessage -To \"user@example.com\" -Content \"secret\"",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "protect-cmsmessage",
+       "安全",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "unprotect-cmsmessage",
+      "syntax": "Unprotect-CmsMessage -Path .\\message.txt",
+      "copy": "Unprotect-CmsMessage -Path .\\message.txt",
+      "title": "解密 CMS 消息",
+      "desc": "需要对应私钥；解密后注意终端历史泄露。",
+      "example": "# 解密 CMS 消息\nUnprotect-CmsMessage -Path .\\message.txt",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "unprotect-cmsmessage",
+       "安全",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-cmsmessage",
+      "syntax": "Get-CmsMessage -Path .\\message.txt",
+      "copy": "Get-CmsMessage -Path .\\message.txt",
+      "title": "查看 CMS 消息结构",
+      "desc": "只读取信封信息，不会解密正文。",
+      "example": "# 查看 CMS 消息结构\nGet-CmsMessage -Path .\\message.txt",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-cmsmessage",
+       "安全",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "certutil",
+      "syntax": "certutil -hashfile .\\setup.exe SHA256",
+      "copy": "certutil -hashfile .\\setup.exe SHA256",
+      "title": "计算文件哈希或管理证书",
+      "desc": "Windows 自带，既能校验下载文件，也能管理证书存储。",
+      "example": "# 计算文件哈希或管理证书\ncertutil -hashfile .\\setup.exe SHA256",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "certutil",
+       "安全",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "cmdkey",
+      "syntax": "cmdkey /list",
+      "copy": "cmdkey /list",
+      "title": "查看保存的 Windows 凭据",
+      "desc": "确认是否残留旧账号；删除用 cmdkey /delete:目标。",
+      "example": "# 查看保存的 Windows 凭据\ncmdkey /list",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "cmdkey",
+       "安全",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "klist",
+      "syntax": "klist",
+      "copy": "klist",
+      "title": "查看 Kerberos 票据",
+      "desc": "域环境认证失败时，先看票据是否存在或过期。",
+      "example": "# 查看 Kerberos 票据\nklist",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "klist",
+       "安全",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "gpresult",
+      "syntax": "gpresult /r",
+      "copy": "gpresult /r",
+      "title": "查看组策略应用结果",
+      "desc": "确认某条策略是否真的下发，排障域环境必备。",
+      "example": "# 查看组策略应用结果\ngpresult /r",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "gpresult",
+       "安全",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "gpupdate",
+      "syntax": "gpupdate /force",
+      "copy": "gpupdate /force",
+      "title": "强制刷新组策略",
+      "desc": "改完策略立即生效；刷新期间可能短暂影响登录脚本。",
+      "example": "# 强制刷新组策略\ngpupdate /force",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "gpupdate",
+       "安全",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "secedit",
+      "syntax": "secedit /export /cfg secpol.inf",
+      "copy": "secedit /export /cfg secpol.inf",
+      "title": "导出本地安全策略",
+      "desc": "留档或对比两台机器安全配置时使用。",
+      "example": "# 导出本地安全策略\nsecedit /export /cfg secpol.inf",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "secedit",
+       "安全",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-bitlockervolume",
+      "syntax": "Get-BitLockerVolume",
+      "copy": "Get-BitLockerVolume",
+      "title": "查看 BitLocker 加密状态",
+      "desc": "排查磁盘加密、恢复密钥和挂载问题时，先看卷的 ProtectionStatus。",
+      "example": "# 所有卷\nGet-BitLockerVolume\n# 只看 C 盘\nGet-BitLockerVolume -MountPoint \"C:\"\n# 查看恢复密钥（需管理员）\n(Get-BitLockerVolume -MountPoint \"C:\").KeyProtector",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "get-bitlockervolume",
+       "安全"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-wmiobject",
+      "syntax": "Get-WmiObject -Class Win32_LogicalDisk",
+      "copy": "Get-WmiObject -Class Win32_LogicalDisk",
+      "title": "用旧版 WMI 查询系统信息",
+      "desc": "老脚本和部分 Windows 组件仍依赖 Get-WmiObject；新代码优先 Get-CimInstance。",
+      "example": "# 逻辑磁盘\nGet-WmiObject -Class Win32_LogicalDisk\n# 操作系统信息\nGet-WmiObject -Class Win32_OperatingSystem\n# 新写法对比\nGet-CimInstance -ClassName Win32_LogicalDisk",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "get-wmiobject",
+       "安全"
+      ],
+      "danger": false,
+      "src": "builtin"
      }
     ],
     "container": [
@@ -35377,6 +40348,166 @@ window.TERMINAL_DATA = {
        "Podman",
        "容器",
        "WSL"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "kubectl",
+      "syntax": "kubectl get pods -A",
+      "copy": "kubectl get pods -A",
+      "title": "查看 Kubernetes 所有 Pod",
+      "desc": "集群排障第一步；确认命名空间和上下文再用。",
+      "example": "# 查看 Kubernetes 所有 Pod\nkubectl get pods -A",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "kubectl",
+       "容器云",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "helm",
+      "syntax": "helm list -A",
+      "copy": "helm list -A",
+      "title": "查看 Helm 发布",
+      "desc": "确认 chart 版本和命名空间；升级前先看 values。",
+      "example": "# 查看 Helm 发布\nhelm list -A",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "helm",
+       "容器云",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "minikube",
+      "syntax": "minikube start",
+      "copy": "minikube start",
+      "title": "启动本地 Kubernetes",
+      "desc": "适合学习和测试；会占用较多内存和磁盘。",
+      "example": "# 启动本地 Kubernetes\nminikube start",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "minikube",
+       "容器云",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "kind",
+      "syntax": "kind create cluster --name dev",
+      "copy": "kind create cluster --name dev",
+      "title": "创建 kind 测试集群",
+      "desc": "集群跑在 Docker 容器里，用完 kind delete cluster 清理。",
+      "example": "# 创建 kind 测试集群\nkind create cluster --name dev",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "kind",
+       "容器云",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "terraform",
+      "syntax": "terraform plan",
+      "copy": "terraform plan",
+      "title": "预览基础设施变更",
+      "desc": "先 plan 再 apply；确认 provider 和远端 state 没配错。",
+      "example": "# 预览基础设施变更\nterraform plan",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "terraform",
+       "容器云",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "wrangler",
+      "syntax": "wrangler deploy",
+      "copy": "wrangler deploy",
+      "title": "部署 Cloudflare Worker",
+      "desc": "部署前确认账户和路由；生产环境先看 dry-run 输出。",
+      "example": "# 部署 Cloudflare Worker\nwrangler deploy",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "wrangler",
+       "容器云",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "aws",
+      "syntax": "aws s3 ls",
+      "copy": "aws s3 ls",
+      "title": "列出 S3 存储桶",
+      "desc": "需要配置凭据和区域；不要用长期高权限密钥。",
+      "example": "# 列出 S3 存储桶\naws s3 ls",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "aws",
+       "容器云",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "gcloud",
+      "syntax": "gcloud config list",
+      "copy": "gcloud config list",
+      "title": "查看 Google Cloud 配置",
+      "desc": "确认当前账号、项目和区域，避免改错环境。",
+      "example": "# 查看 Google Cloud 配置\ngcloud config list",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "gcloud",
+       "容器云",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "az",
+      "syntax": "az account show",
+      "copy": "az account show",
+      "title": "查看 Azure 当前账号",
+      "desc": "多订阅环境里先确认订阅 ID 再执行变更。",
+      "example": "# 查看 Azure 当前账号\naz account show",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "az",
+       "容器云",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "docker-buildx",
+      "syntax": "docker buildx build -t app:latest .",
+      "copy": "docker buildx build -t app:latest .",
+      "title": "用 Buildx 构建多架构镜像",
+      "desc": "需要先创建 builder；构建前确认 Dockerfile 路径。",
+      "example": "# 用 Buildx 构建多架构镜像\ndocker buildx build -t app:latest .",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "docker-buildx",
+       "容器云",
+       "系统内建"
       ],
       "danger": false,
       "src": "builtin"
@@ -35845,6 +40976,85 @@ window.TERMINAL_DATA = {
        "FFmpeg",
        "预览",
        "视频"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "ffprobe",
+      "syntax": "ffprobe -show_streams video.mp4",
+      "copy": "ffprobe -show_streams video.mp4",
+      "title": "查看视频流信息",
+      "desc": "确认编码、分辨率、帧率和音轨，转码前先查。",
+      "example": "# 查看视频流信息\nffprobe -show_streams video.mp4",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "ffprobe",
+       "多媒体",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "exiftool",
+      "syntax": "exiftool photo.jpg",
+      "copy": "exiftool photo.jpg",
+      "title": "读取图片元数据",
+      "desc": "查看拍摄时间、GPS 和相机参数；写入前先备份原图。",
+      "example": "# 读取图片元数据\nexiftool photo.jpg",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "exiftool",
+       "多媒体",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "pdftotext",
+      "syntax": "pdftotext report.pdf report.txt",
+      "copy": "pdftotext report.pdf report.txt",
+      "title": "把 PDF 转成文本",
+      "desc": "扫描版 PDF 没有文字层，需要先 OCR。",
+      "example": "# 把 PDF 转成文本\npdftotext report.pdf report.txt",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "pdftotext",
+       "多媒体",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "pdfinfo",
+      "syntax": "pdfinfo report.pdf",
+      "copy": "pdfinfo report.pdf",
+      "title": "查看 PDF 页数和元数据",
+      "desc": "确认页数、页面尺寸和加密状态。",
+      "example": "# 查看 PDF 页数和元数据\npdfinfo report.pdf",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "pdfinfo",
+       "多媒体",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-printer",
+      "syntax": "Get-Printer",
+      "copy": "Get-Printer",
+      "title": "查看已安装的打印机和端口",
+      "desc": "打印任务卡住或默认打印机不对时，先看打印机状态和驱动端口。",
+      "example": "# 所有打印机\nGet-Printer\n# 只看就绪的\nGet-Printer | Where-Object PrinterStatus -eq Normal\n# 查看打印队列\nGet-PrintJob -PrinterName \"Microsoft Print to PDF\"",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "get-printer",
+       "多媒体"
       ],
       "danger": false,
       "src": "builtin"
@@ -36524,6 +41734,510 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "remove-itemproperty",
+      "syntax": "Remove-ItemProperty -Path HKCU:\\Software\\MyApp -Name Setting",
+      "copy": "Remove-ItemProperty -Path HKCU:\\Software\\MyApp -Name Setting",
+      "title": "删除注册表值",
+      "desc": "会改变应用配置，删除前导出注册表项。",
+      "example": "# 删除注册表值\nRemove-ItemProperty -Path HKCU:\\Software\\MyApp -Name Setting",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "remove-itemproperty",
+       "专属",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "clear-itemproperty",
+      "syntax": "Clear-ItemProperty -Path HKCU:\\Software\\MyApp -Name Setting",
+      "copy": "Clear-ItemProperty -Path HKCU:\\Software\\MyApp -Name Setting",
+      "title": "清空注册表值",
+      "desc": "保留键但清掉内容，和 Remove-ItemProperty 不同。",
+      "example": "# 清空注册表值\nClear-ItemProperty -Path HKCU:\\Software\\MyApp -Name Setting",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "clear-itemproperty",
+       "专属",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "write-eventlog",
+      "syntax": "Write-EventLog -LogName Application -Source MyApp -EventId 1000 -Message \"Started\"",
+      "copy": "Write-EventLog -LogName Application -Source MyApp -EventId 1000 -Message \"Started\"",
+      "title": "写入事件日志",
+      "desc": "自定义应用日志需要先注册事件源。",
+      "example": "# 写入事件日志\nWrite-EventLog -LogName Application -Source MyApp -EventId 1000 -Message \"Started\"",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "write-eventlog",
+       "专属",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "new-winevent",
+      "syntax": "New-WinEvent -ProviderName MyApp -Id 1000 -Payload \"Started\"",
+      "copy": "New-WinEvent -ProviderName MyApp -Id 1000 -Payload \"Started\"",
+      "title": "写入现代事件日志",
+      "desc": "适合 ETW 提供程序；事件源必须已注册。",
+      "example": "# 写入现代事件日志\nNew-WinEvent -ProviderName MyApp -Id 1000 -Payload \"Started\"",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "new-winevent",
+       "专属",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "unregister-scheduledtask",
+      "syntax": "Unregister-ScheduledTask -TaskName Backup -Confirm:$false",
+      "copy": "Unregister-ScheduledTask -TaskName Backup -Confirm:$false",
+      "title": "删除计划任务",
+      "desc": "任务会立即移除，确认没有其他脚本依赖。",
+      "example": "# 删除计划任务\nUnregister-ScheduledTask -TaskName Backup -Confirm:$false",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "unregister-scheduledtask",
+       "专属",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "disable-scheduledtask",
+      "syntax": "Disable-ScheduledTask -TaskName Backup",
+      "copy": "Disable-ScheduledTask -TaskName Backup",
+      "title": "禁用计划任务",
+      "desc": "保留任务定义但不再触发，适合临时停用。",
+      "example": "# 禁用计划任务\nDisable-ScheduledTask -TaskName Backup",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "disable-scheduledtask",
+       "专属",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "enable-scheduledtask",
+      "syntax": "Enable-ScheduledTask -TaskName Backup",
+      "copy": "Enable-ScheduledTask -TaskName Backup",
+      "title": "启用计划任务",
+      "desc": "恢复后按原触发器运行。",
+      "example": "# 启用计划任务\nEnable-ScheduledTask -TaskName Backup",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "enable-scheduledtask",
+       "专属",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "start-scheduledtask",
+      "syntax": "Start-ScheduledTask -TaskName Backup",
+      "copy": "Start-ScheduledTask -TaskName Backup",
+      "title": "立即运行计划任务",
+      "desc": "不等触发器，手动验证任务是否正常。",
+      "example": "# 立即运行计划任务\nStart-ScheduledTask -TaskName Backup",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "start-scheduledtask",
+       "专属",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "stop-scheduledtask",
+      "syntax": "Stop-ScheduledTask -TaskName Backup",
+      "copy": "Stop-ScheduledTask -TaskName Backup",
+      "title": "停止正在运行的计划任务",
+      "desc": "只停当前实例，不会禁用任务。",
+      "example": "# 停止正在运行的计划任务\nStop-ScheduledTask -TaskName Backup",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "stop-scheduledtask",
+       "专属",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-scheduledtaskinfo",
+      "syntax": "Get-ScheduledTaskInfo -TaskName Backup",
+      "copy": "Get-ScheduledTaskInfo -TaskName Backup",
+      "title": "查看计划任务运行结果",
+      "desc": "确认上次运行时间、结果代码和下次运行时间。",
+      "example": "# 查看计划任务运行结果\nGet-ScheduledTaskInfo -TaskName Backup",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-scheduledtaskinfo",
+       "专属",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "set-scheduledtask",
+      "syntax": "Set-ScheduledTask -TaskName Backup -Description \"Daily backup\"",
+      "copy": "Set-ScheduledTask -TaskName Backup -Description \"Daily backup\"",
+      "title": "修改计划任务属性",
+      "desc": "只改描述不会改触发器；改动作要用 -Action。",
+      "example": "# 修改计划任务属性\nSet-ScheduledTask -TaskName Backup -Description \"Daily backup\"",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "set-scheduledtask",
+       "专属",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-appxpackage",
+      "syntax": "Get-AppxPackage -Name \"*Store*\"",
+      "copy": "Get-AppxPackage -Name \"*Store*\"",
+      "title": "查看已安装的 Store 应用",
+      "desc": "排查应用残留或版本冲突时使用。",
+      "example": "# 查看已安装的 Store 应用\nGet-AppxPackage -Name \"*Store*\"",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-appxpackage",
+       "专属",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "add-appxpackage",
+      "syntax": "Add-AppxPackage .\\app.msix",
+      "copy": "Add-AppxPackage .\\app.msix",
+      "title": "安装 MSIX 应用包",
+      "desc": "需要可信签名；开发包要先开启旁加载。",
+      "example": "# 安装 MSIX 应用包\nAdd-AppxPackage .\\app.msix",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "add-appxpackage",
+       "专属",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "remove-appxpackage",
+      "syntax": "Remove-AppxPackage Microsoft.Store_1.0_x64__8wekyb3d8bbwe",
+      "copy": "Remove-AppxPackage Microsoft.Store_1.0_x64__8wekyb3d8bbwe",
+      "title": "卸载 Store 应用",
+      "desc": "包名必须完整；系统关键应用不要随意卸载。",
+      "example": "# 卸载 Store 应用\nRemove-AppxPackage Microsoft.Store_1.0_x64__8wekyb3d8bbwe",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "remove-appxpackage",
+       "专属",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "get-windowsoptionalfeature",
+      "syntax": "Get-WindowsOptionalFeature -Online -FeatureName Hyper-V",
+      "copy": "Get-WindowsOptionalFeature -Online -FeatureName Hyper-V",
+      "title": "查看 Windows 可选功能",
+      "desc": "确认 Hyper-V、WSL 等功能是否已启用。",
+      "example": "# 查看 Windows 可选功能\nGet-WindowsOptionalFeature -Online -FeatureName Hyper-V",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-windowsoptionalfeature",
+       "专属",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "enable-windowsoptionalfeature",
+      "syntax": "Enable-WindowsOptionalFeature -Online -FeatureName Hyper-V -All",
+      "copy": "Enable-WindowsOptionalFeature -Online -FeatureName Hyper-V -All",
+      "title": "启用 Windows 功能",
+      "desc": "通常需要重启；远程机器启用前确认不会断网。",
+      "example": "# 启用 Windows 功能\nEnable-WindowsOptionalFeature -Online -FeatureName Hyper-V -All",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "enable-windowsoptionalfeature",
+       "专属",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "disable-windowsoptionalfeature",
+      "syntax": "Disable-WindowsOptionalFeature -Online -FeatureName Hyper-V",
+      "copy": "Disable-WindowsOptionalFeature -Online -FeatureName Hyper-V",
+      "title": "禁用 Windows 功能",
+      "desc": "可能影响依赖该功能的虚拟机和容器。",
+      "example": "# 禁用 Windows 功能\nDisable-WindowsOptionalFeature -Online -FeatureName Hyper-V",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "disable-windowsoptionalfeature",
+       "专属",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "powercfg",
+      "syntax": "powercfg /batteryreport",
+      "copy": "powercfg /batteryreport",
+      "title": "生成电池健康报告",
+      "desc": "输出 HTML 报告，查看设计容量和实际容量差异。",
+      "example": "# 生成电池健康报告\npowercfg /batteryreport",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "powercfg",
+       "专属",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "slmgr",
+      "syntax": "slmgr /dlv",
+      "copy": "slmgr /dlv",
+      "title": "查看 Windows 激活详情",
+      "desc": "显示许可证状态、到期时间和激活渠道。",
+      "example": "# 查看 Windows 激活详情\nslmgr /dlv",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "slmgr",
+       "专属",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "msinfo32",
+      "syntax": "msinfo32",
+      "copy": "msinfo32",
+      "title": "打开系统信息面板",
+      "desc": "查看硬件、驱动和系统组件，图形界面便于导出。",
+      "example": "# 打开系统信息面板\nmsinfo32",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "msinfo32",
+       "专属",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "dxdiag",
+      "syntax": "dxdiag",
+      "copy": "dxdiag",
+      "title": "打开 DirectX 诊断工具",
+      "desc": "排查显卡、声卡和游戏兼容性问题。",
+      "example": "# 打开 DirectX 诊断工具\ndxdiag",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "dxdiag",
+       "专属",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "taskmgr",
+      "syntax": "taskmgr",
+      "copy": "taskmgr",
+      "title": "打开任务管理器",
+      "desc": "图形化查看进程、启动项和性能。",
+      "example": "# 打开任务管理器\ntaskmgr",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "taskmgr",
+       "专属",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "eventvwr",
+      "syntax": "eventvwr",
+      "copy": "eventvwr",
+      "title": "打开事件查看器",
+      "desc": "图形化筛选系统日志，比命令行更直观。",
+      "example": "# 打开事件查看器\neventvwr",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "eventvwr",
+       "专属",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "regedit",
+      "syntax": "regedit",
+      "copy": "regedit",
+      "title": "打开注册表编辑器",
+      "desc": "修改注册表有风险，操作前先导出备份。",
+      "example": "# 打开注册表编辑器\nregedit",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。 该命令会修改或删除数据，执行前先确认路径并备份。",
+      "keywords": [
+       "regedit",
+       "专属",
+       "系统内建"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "get-date",
+      "syntax": "Get-Date -Format \"yyyy-MM-dd HH:mm:ss\"",
+      "copy": "Get-Date -Format \"yyyy-MM-dd HH:mm:ss\"",
+      "title": "按指定格式输出当前日期时间",
+      "desc": "读取当前时间，或把时间格式化成日志、文件名需要的样式。",
+      "example": "# 默认完整时间\nGet-Date\n# 只取日期\nGet-Date -Format \"yyyy-MM-dd\"\n# 当前 UTC 时间\n(Get-Date).ToUniversalTime()",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "get-date",
+       "系统"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-timezone",
+      "syntax": "Get-TimeZone",
+      "copy": "Get-TimeZone",
+      "title": "查看当前时区和可用时区",
+      "desc": "排查跨时区日志、定时任务和证书时间问题时，先确认系统时区。",
+      "example": "# 当前时区\nGet-TimeZone\n# 列出所有时区\nGet-TimeZone -ListAvailable\n# 改到中国标准时间（需管理员）\nSet-TimeZone -Id \"China Standard Time\"",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "get-timezone",
+       "系统"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-culture",
+      "syntax": "Get-Culture",
+      "copy": "Get-Culture",
+      "title": "查看区域和数字日期格式",
+      "desc": "脚本解析日期、数字或排序结果异常时，区域设置常是隐藏原因。",
+      "example": "# 当前区域\nGet-Culture\n# 只看名称\n(Get-Culture).Name\n# 列出所有区域\nGet-Culture -ListAvailable",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "get-culture",
+       "系统"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-error",
+      "syntax": "Get-Error",
+      "copy": "Get-Error",
+      "title": "查看最近一次错误的完整上下文",
+      "desc": "PowerShell 7 的 Get-Error 会把异常堆栈、内部异常和相关对象一起展开。",
+      "example": "# 最近一次错误\nGet-Error\n# 最近 3 次\nGet-Error -Newest 3",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "get-error",
+       "系统"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-psreadlineoption",
+      "syntax": "Get-PSReadLineOption",
+      "copy": "Get-PSReadLineOption",
+      "title": "查看命令行编辑与历史行为",
+      "desc": "想改历史搜索、补全或编辑键位时，先看当前 PSReadLine 配置。",
+      "example": "# 当前配置\nGet-PSReadLineOption\n# 只看历史保存路径\n(Get-PSReadLineOption).HistorySavePath",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "get-psreadlineoption",
+       "系统"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "set-psreadlineoption",
+      "syntax": "Set-PSReadLineOption -HistorySearchCursorMoved",
+      "copy": "Set-PSReadLineOption -HistorySearchCursorMoved",
+      "title": "调整 PSReadLine 历史搜索行为",
+      "desc": "把历史搜索改成边输入边筛选，减少反复按上下键。",
+      "example": "# 输入即搜索历史\nSet-PSReadLineOption -HistorySearchCursorMoved\n# 设置历史文件上限\nSet-PSReadLineOption -MaximumHistoryCount 5000",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "set-psreadlineoption",
+       "系统"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-psreadlinekeyhandler",
+      "syntax": "Get-PSReadLineKeyHandler",
+      "copy": "Get-PSReadLineKeyHandler",
+      "title": "查看当前键位绑定",
+      "desc": "快捷键不生效时，先确认它有没有被 PSReadLine 绑定到别的函数。",
+      "example": "# 全部键位\nGet-PSReadLineKeyHandler\n# 只看历史相关\nGet-PSReadLineKeyHandler | Where-Object Function -like \"*History*\"",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "get-psreadlinekeyhandler",
+       "系统"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "set-psreadlinekeyhandler",
+      "syntax": "Set-PSReadLineKeyHandler -Key Ctrl+r -Function ReverseSearchHistory",
+      "copy": "Set-PSReadLineKeyHandler -Key Ctrl+r -Function ReverseSearchHistory",
+      "title": "把快捷键绑定到指定编辑函数",
+      "desc": "Ctrl+R 反向搜索历史不是所有终端默认都有，可以显式绑定。",
+      "example": "# Ctrl+R 反向搜索历史\nSet-PSReadLineKeyHandler -Key Ctrl+r -Function ReverseSearchHistory\n# 查看绑定结果\nGet-PSReadLineKeyHandler -Key Ctrl+r",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "set-psreadlinekeyhandler",
+       "系统"
+      ],
+      "danger": false,
+      "src": "builtin"
      }
     ],
     "alias": [
@@ -36621,6 +42335,198 @@ window.TERMINAL_DATA = {
       ],
       "danger": false,
       "src": "builtin"
+     },
+     {
+      "id": "gci",
+      "syntax": "gci .",
+      "copy": "gci .",
+      "title": "Get-ChildItem 的短别名",
+      "desc": "交互式列目录很快；脚本里建议写完整命令，便于阅读。",
+      "example": "# Get-ChildItem 的短别名\ngci .",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "gci",
+       "别名",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "gc",
+      "syntax": "gc .\\app.log",
+      "copy": "gc .\\app.log",
+      "title": "Get-Content 的短别名",
+      "desc": "读取文本文件；大文件加 -Tail 只看最后几行。",
+      "example": "# Get-Content 的短别名\ngc .\\app.log",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "gc",
+       "别名",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "gps",
+      "syntax": "gps -Name java",
+      "copy": "gps -Name java",
+      "title": "Get-Process 的短别名",
+      "desc": "按进程名筛 Java 进程，确认 PID 后再操作。",
+      "example": "# Get-Process 的短别名\ngps -Name java",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "gps",
+       "别名",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "gsv",
+      "syntax": "gsv -Name Spooler",
+      "copy": "gsv -Name Spooler",
+      "title": "Get-Service 的短别名",
+      "desc": "查看服务状态；启动服务用 sasv。",
+      "example": "# Get-Service 的短别名\ngsv -Name Spooler",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "gsv",
+       "别名",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "sasv",
+      "syntax": "sasv -Name Spooler",
+      "copy": "sasv -Name Spooler",
+      "title": "Start-Service 的短别名",
+      "desc": "需要管理员权限；服务名要写准确。",
+      "example": "# Start-Service 的短别名\nsasv -Name Spooler",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "sasv",
+       "别名",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "spsv",
+      "syntax": "spsv -Name Spooler",
+      "copy": "spsv -Name Spooler",
+      "title": "Stop-Service 的短别名",
+      "desc": "停服务会影响依赖程序，确认后再执行。",
+      "example": "# Stop-Service 的短别名\nspsv -Name Spooler",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "spsv",
+       "别名",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "sl",
+      "syntax": "sl C:\\Projects",
+      "copy": "sl C:\\Projects",
+      "title": "Set-Location 的短别名",
+      "desc": "切换当前目录；和 Linux 的 sl 不是同一个命令。",
+      "example": "# Set-Location 的短别名\nsl C:\\Projects",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "sl",
+       "别名",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "gl",
+      "syntax": "gl",
+      "copy": "gl",
+      "title": "Get-Location 的短别名",
+      "desc": "确认当前目录，脚本排障第一步。",
+      "example": "# Get-Location 的短别名\ngl",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "gl",
+       "别名",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "ft",
+      "syntax": "ft Name,CPU",
+      "copy": "ft Name,CPU",
+      "title": "Format-Table 的短别名",
+      "desc": "快速把对象按列显示；字段多时改 fl。",
+      "example": "# Format-Table 的短别名\nft Name,CPU",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "ft",
+       "别名",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "fl",
+      "syntax": "fl *",
+      "copy": "fl *",
+      "title": "Format-List 的短别名",
+      "desc": "展开对象全部字段，适合查看完整属性。",
+      "example": "# Format-List 的短别名\nfl *",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "fl",
+       "别名",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "gm",
+      "syntax": "gm -Name Length",
+      "copy": "gm -Name Length",
+      "title": "Get-Member 的短别名",
+      "desc": "查看对象属性或方法；不知道返回结构时先用它。",
+      "example": "# Get-Member 的短别名\ngm -Name Length",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "gm",
+       "别名",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "h",
+      "syntax": "h Get-Process",
+      "copy": "h Get-Process",
+      "title": "Get-Help 的短别名",
+      "desc": "查看命令帮助；加 -Examples 看示例更快。",
+      "example": "# Get-Help 的短别名\nh Get-Process",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "h",
+       "别名",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
      }
     ],
     "other": [
@@ -36711,6 +42617,273 @@ window.TERMINAL_DATA = {
        "Windows",
        "文本",
        "编辑器"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-random",
+      "syntax": "Get-Random -Minimum 1 -Maximum 100",
+      "copy": "Get-Random -Minimum 1 -Maximum 100",
+      "title": "生成随机数",
+      "desc": "做测试数据或抽样时使用；密码场景不要用它代替加密随机源。",
+      "example": "# 生成随机数\nGet-Random -Minimum 1 -Maximum 100",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-random",
+       "其他",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "measure-command",
+      "syntax": "Measure-Command { Get-ChildItem -Recurse }",
+      "copy": "Measure-Command { Get-ChildItem -Recurse }",
+      "title": "测量命令耗时",
+      "desc": "比较两种写法或排查慢脚本时，比手掐秒表可靠。",
+      "example": "# 测量命令耗时\nMeasure-Command { Get-ChildItem -Recurse }",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "measure-command",
+       "其他",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "out-gridview",
+      "syntax": "Get-Process | Out-GridView",
+      "copy": "Get-Process | Out-GridView",
+      "title": "把结果弹到表格窗口",
+      "desc": "适合人工筛选和排序；不能在无桌面环境使用。",
+      "example": "# 把结果弹到表格窗口\nGet-Process | Out-GridView",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "out-gridview",
+       "其他",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "show-command",
+      "syntax": "Show-Command Get-Process",
+      "copy": "Show-Command Get-Process",
+      "title": "用图形面板填命令参数",
+      "desc": "不熟悉参数时可视化拼接，生成后仍要检查。",
+      "example": "# 用图形面板填命令参数\nShow-Command Get-Process",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "show-command",
+       "其他",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-verb",
+      "syntax": "Get-Verb",
+      "copy": "Get-Verb",
+      "title": "查看 PowerShell 允许的动词",
+      "desc": "写函数或模块时遵守 Verb-Noun 命名规范。",
+      "example": "# 查看 PowerShell 允许的动词\nGet-Verb",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "get-verb",
+       "其他",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "resmon",
+      "syntax": "resmon",
+      "copy": "resmon",
+      "title": "打开资源监视器",
+      "desc": "查看 CPU、磁盘、网络和句柄占用，比任务管理器更细。",
+      "example": "# 打开资源监视器\nresmon",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "resmon",
+       "其他",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "perfmon",
+      "syntax": "perfmon",
+      "copy": "perfmon",
+      "title": "打开性能监视器",
+      "desc": "配置数据收集器集，适合长期采样和留证。",
+      "example": "# 打开性能监视器\nperfmon",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "perfmon",
+       "其他",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "diskmgmt",
+      "syntax": "diskmgmt.msc",
+      "copy": "diskmgmt.msc",
+      "title": "打开磁盘管理",
+      "desc": "图形化分区、改盘符和初始化磁盘。",
+      "example": "# 打开磁盘管理\ndiskmgmt.msc",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "diskmgmt",
+       "其他",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "devmgmt",
+      "syntax": "devmgmt.msc",
+      "copy": "devmgmt.msc",
+      "title": "打开设备管理器",
+      "desc": "排查驱动异常和未知设备。",
+      "example": "# 打开设备管理器\ndevmgmt.msc",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "devmgmt",
+       "其他",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "services",
+      "syntax": "services.msc",
+      "copy": "services.msc",
+      "title": "打开服务管理面板",
+      "desc": "图形化启停服务，适合不熟悉服务名时查找。",
+      "example": "# 打开服务管理面板\nservices.msc",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "services",
+       "其他",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "snippingtool",
+      "syntax": "snippingtool",
+      "copy": "snippingtool",
+      "title": "打开截图工具",
+      "desc": "截取屏幕区域并标注，比 PrintScreen 更灵活。",
+      "example": "# 打开截图工具\nsnippingtool",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "snippingtool",
+       "其他",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "charmap",
+      "syntax": "charmap",
+      "copy": "charmap",
+      "title": "打开字符映射表",
+      "desc": "查找特殊符号并复制到文档里。",
+      "example": "# 打开字符映射表\ncharmap",
+      "note": "系统内建命令；示例路径、用户名和参数按实际环境替换。",
+      "keywords": [
+       "charmap",
+       "其他",
+       "系统内建"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-runspace",
+      "syntax": "Get-Runspace",
+      "copy": "Get-Runspace",
+      "title": "查看当前进程里的 Runspace",
+      "desc": "调试并行任务、后台作业或嵌套 PowerShell 时，Runspace 能说明执行上下文。",
+      "example": "# 所有 Runspace\nGet-Runspace\n# 只看可用的\nGet-Runspace | Where-Object RunspaceAvailability -eq Available",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "get-runspace",
+       "其他"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "get-cimsession",
+      "syntax": "Get-CimSession",
+      "copy": "Get-CimSession",
+      "title": "查看现有 CIM 会话",
+      "desc": "远程 WMI/CIM 查询前，先看会话是否还在、连的是哪台机器。",
+      "example": "# 当前会话\nGet-CimSession\n# 新建到远程主机的会话\nNew-CimSession -ComputerName web-01",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "get-cimsession",
+       "其他"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "new-cimsession",
+      "syntax": "New-CimSession -ComputerName localhost",
+      "copy": "New-CimSession -ComputerName localhost",
+      "title": "创建 CIM 会话用于远程查询",
+      "desc": "把多条 CIM 查询复用一个会话，减少重复认证和连接开销。",
+      "example": "# 本机会话\nNew-CimSession -ComputerName localhost\n# 远程会话\nNew-CimSession -ComputerName web-01 -Credential (Get-Credential)",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "new-cimsession",
+       "其他"
+      ],
+      "danger": false,
+      "src": "builtin"
+     },
+     {
+      "id": "remove-cimsession",
+      "syntax": "Remove-CimSession -ComputerName localhost",
+      "copy": "Remove-CimSession -ComputerName localhost",
+      "title": "关闭并清理 CIM 会话",
+      "desc": "远程查询结束后释放会话，避免连接和凭据长期占用。",
+      "example": "# 关闭指定主机会话\nRemove-CimSession -ComputerName localhost\n# 关闭全部会话\nGet-CimSession | Remove-CimSession",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "remove-cimsession",
+       "其他"
+      ],
+      "danger": true,
+      "src": "builtin"
+     },
+     {
+      "id": "get-pssnapin",
+      "syntax": "Get-PSSnapin",
+      "copy": "Get-PSSnapin",
+      "title": "查看已加载的 PowerShell 管理单元",
+      "desc": "Windows PowerShell 5.1 的部分管理功能以 snap-in 形式提供；PowerShell 7 主要用模块。",
+      "example": "# 已加载\nGet-PSSnapin\n# 所有已注册\nGet-PSSnapin -Registered",
+      "note": "Windows / PowerShell 官方 cmdlet 或系统工具；参数以 Get-Help 或官方文档为准，示例在 PowerShell 7 语法下编写。",
+      "keywords": [
+       "get-pssnapin",
+       "其他"
       ],
       "danger": false,
       "src": "builtin"

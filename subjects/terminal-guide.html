@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050b12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>终端入门教程 · macOS / Linux / Windows 手把手 8 节</title>
+<meta name="description" content="从打开终端到独立排障的三平台手把手教程：macOS zsh、Linux Bash、Windows PowerShell 各 8 节，带可复制命令、预期输出、验收任务和平台差异速查。">
+<link rel="icon" type="image/png" href="../assets/icons/terminal.png?v=20261127z89n">
+<link rel="stylesheet" href="../assets/css/terminal.css?v=20261127z89n">
+<link rel="stylesheet" href="../assets/css/terminal-guide.css?v=20261127z89n">
+</head>
+<body class="term-page guide-page">
+<header class="term-topbar">
+  <a class="term-back" href="terminal.html?v=20261127z89n" aria-label="返回终端指令全集"><span aria-hidden="true">←</span>命令库</a>
+  <div class="term-brand"><span class="term-mark" aria-hidden="true">&gt;_</span><b>终端入门教程</b></div>
+  <div class="term-topmeta">
+    <span class="online">● 3 平台 · 24 节</span>
+    <span class="dot" aria-hidden="true"></span>
+    <span>从打开终端到独立排障</span>
+  </div>
+</header>
+
+<main class="term-wrap guide-wrap">
+  <section class="guide-hero" aria-labelledby="guideHeroTitle">
+    <div class="guide-hero-copy">
+      <div class="term-kicker">TERMINAL FIELD GUIDE · BEGINNER TO SELF-SERVICE</div>
+      <h1 id="guideHeroTitle">别背命令，<br><em>先走一遍路。</em></h1>
+      <p>这不是命令词典，而是一条可以照着敲的路线。选你的系统，从“我在哪”开始，经过文件、文本、权限、进程、网络、装环境，最后用日志和磁盘把问题自己收掉。每节都有预期输出和验收任务，做完再往下走。</p>
+      <div class="guide-hero-actions">
+        <a class="guide-primary" id="guideStartLink" href="#guideStage">从第 1 节开始 <span aria-hidden="true">→</span></a>
+        <a class="guide-secondary" href="terminal.html?v=20261127z89n">查命令库</a>
+        <a class="guide-secondary" href="terminal-quiz.html?v=20261127z89n">做 45 道题</a>
+      </div>
+    </div>
+    <div class="guide-route" aria-label="教程路线">
+      <div class="guide-route-head"><span>零基础路线</span><b>约 40 分钟</b></div>
+      <ol>
+        <li><i>01</i><span><b>认路</b><em>打开终端、确认目录和 Shell</em></span></li>
+        <li><i>02</i><span><b>动文件</b><em>建目录、复制、移动、删除边界</em></span></li>
+        <li><i>03</i><span><b>读与搜</b><em>看日志、追输出、定位关键词</em></span></li>
+        <li><i>04</i><span><b>管权限</b><em>谁能读、谁能执行、何时用 sudo</em></span></li>
+        <li><i>05</i><span><b>查进程</b><em>谁在跑、谁占端口、怎么停</em></span></li>
+        <li><i>06</i><span><b>通网络</b><em>连通性、HTTP、SSH 和传输</em></span></li>
+        <li><i>07</i><span><b>装环境</b><em>包管理、运行时和版本确认</em></span></li>
+        <li><i>08</i><span><b>收故障</b><em>磁盘、日志、系统信息</em></span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="guide-shell" id="guideStage" aria-labelledby="guideShellTitle">
+    <div class="guide-shell-head">
+      <div>
+        <div class="term-kicker">PICK YOUR SHELL · 8 LESSONS</div>
+        <h2 id="guideShellTitle">先选系统，再开始</h2>
+        <p>macOS 用 zsh，Linux 用 Bash，Windows 用 PowerShell。命令写法不同，排查思路一致；每节都能单独跳转。</p>
+      </div>
+      <div class="guide-progress" id="guideProgress" aria-live="polite">
+        <b>0</b><i>/</i><span>8</span><em>已完成</em>
+      </div>
+    </div>
+
+    <div class="guide-os-tabs" id="guideOsTabs" role="tablist" aria-label="选择操作系统"></div>
+
+    <div class="guide-layout">
+      <aside class="guide-rail" aria-label="教程目录">
+        <div class="guide-rail-head"><b>目录</b><span id="guideRailMeta">8 节</span></div>
+        <div class="guide-rail-list" id="guideRailList"></div>
+      </aside>
+      <article class="guide-stage" id="guideLesson" aria-live="polite"></article>
+    </div>
+  </section>
+
+  <section class="guide-compare" aria-labelledby="guideCompareTitle">
+    <div class="guide-compare-head">
+      <div class="term-kicker">SAME JOB · THREE SHELLS</div>
+      <h2 id="guideCompareTitle">同一件事，三平台怎么写</h2>
+      <p>先记“要做什么”，再记各平台的写法。下表是可以直接复制的最小对照。</p>
+    </div>
+    <div class="guide-table-wrap">
+      <table class="guide-table">
+        <thead><tr><th>要做的事</th><th>macOS · zsh</th><th>Linux · Bash</th><th>Windows · PowerShell</th></tr></thead>
+        <tbody id="guideCompareBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="guide-foot-card">
+    <div>
+      <div class="term-kicker">NEXT STEP</div>
+      <h2>教程走完，去真实命令库练手</h2>
+      <p>命令库里有 <strong id="guideLibraryCount">2,915</strong> 条三平台命令，支持搜索、分组、复制和掌握进度；题库有 45 道即时判分题。</p>
+    </div>
+    <div class="guide-foot-actions">
+      <a class="guide-primary" href="terminal.html?v=20261127z89n">打开终端指令全集 <span aria-hidden="true">→</span></a>
+      <a class="guide-secondary" href="terminal-quiz.html?v=20261127z89n">挑战 45 道题</a>
+    </div>
+  </section>
+
+  <footer class="term-foot">
+    <span><b>说明：</b>命令按 macOS zsh、Linux Bash 与 Windows PowerShell 编写；不同发行版和版本可能有差异。带“谨慎”标记的步骤会改动或删除数据，执行前先确认路径并备份。</span>
+    <span><b>配套：</b>命令说明与示例改编自 tldr-pages 中文页（CC BY 4.0）；教程中的路径、用户名和端口请按自己的环境替换。</span>
+  </footer>
+</main>
+
+<div class="term-toast" id="guideToast" role="status" aria-live="polite"></div>
+<script src="../assets/js/terminal-guide.js?v=20261127z89n"></script>
+<script src="../assets/js/terminal-guide-app.js?v=20261127z89n"></script>
+</body>
+</html>

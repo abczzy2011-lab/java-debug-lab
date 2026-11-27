@@ -350,3 +350,21 @@ button{cursor:pointer}
   .term-quiz-cta-small{height:28px}
   .term-hero-actions{gap:10px;margin-top:14px}
 }
+
+/* 三平台快捷键与教程入口 */
+.term-key-columns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.term-key-group{padding:10px 11px;border-radius:10px;border:1px solid rgba(148,197,235,.1);background:rgba(3,10,18,.32)}
+.term-key-group-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:7px}
+.term-key-group-head b{font-size:10.5px;color:#dff8f3;font-weight:800}
+.term-key-group-head span{font-family:var(--term-mono);font-size:8.5px;color:#617b91;white-space:nowrap}
+.term-key-group .term-key-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.term-key-group .term-key{padding:7px 8px}
+.term-key-group .term-key kbd{font-size:9.8px}
+.term-key-group .term-key span{font-size:8.7px}
+.term-tutorial-cta{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:0 14px;border-radius:9px;border:1px solid rgba(94,234,212,.5);background:linear-gradient(135deg,rgba(94,234,212,.2),rgba(125,211,252,.1));color:#eafffb;font-size:11px;font-weight:800;box-shadow:0 10px 24px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.12);transition:transform .18s,border-color .18s,background .18s}
+.term-tutorial-cta:hover{transform:translateY(-2px);border-color:rgba(94,234,212,.78);background:linear-gradient(135deg,rgba(94,234,212,.28),rgba(125,211,252,.16))}
+.term-tutorial-cta:focus-visible{outline:2px solid var(--term-mint);outline-offset:3px}
+.term-tutorial-cta span{font-family:var(--term-mono);color:var(--term-mint)}
+@media(max-width:1100px){.term-key-columns{grid-template-columns:1fr}.term-key-group .term-key-grid{grid-template-columns:repeat(6,minmax(0,1fr))}}
+@media(max-width:760px){.term-key-group .term-key-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:480px){.term-key-group .term-key-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.term-hero-actions{align-items:stretch}.term-tutorial-cta{width:100%}}
