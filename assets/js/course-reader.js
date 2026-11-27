@@ -24,8 +24,11 @@
   function lessonWord() {
     return cfg && cfg.lessonUnit || '节';
   }
+  function cleanGoal(goal) {
+    return String(goal || '').replace(/[。；;.！!]+$/, '');
+  }
   function chapterGoals(chapter) {
-    return (chapter && chapter.goals && chapter.goals.length) ? chapter.goals : [];
+    return (chapter && chapter.goals && chapter.goals.length) ? chapter.goals.map(cleanGoal) : [];
   }
   function sourceLabel() {
     return cfg && cfg.defaultSource || '教材综合改写';
