@@ -314,3 +314,17 @@ button{cursor:pointer}
   body.term-page::before{animation:none}
   .term-back,.term-card,.term-os-tab,.term-master,.term-copy,.term-toast{transition:none}
 }
+
+/* 全量命令库：分批渲染，避免一次插入上千张卡片 */
+.term-more{display:flex;align-items:center;justify-content:center;gap:8px;margin:18px 0 4px}
+.term-more[hidden]{display:none}
+.term-load-more,.term-show-all{
+  height:34px;padding:0 16px;border-radius:10px;cursor:pointer;
+  font-family:var(--term-mono);font-size:10.5px;font-weight:700;
+  color:#d8f8f1;border:1px solid rgba(94,234,212,.25);
+  background:rgba(94,234,212,.08);transition:background .18s,border-color .18s,transform .18s
+}
+.term-show-all{color:#a9c4d8;border-color:rgba(151,190,221,.2);background:rgba(151,190,221,.06)}
+.term-load-more:hover,.term-show-all:hover{transform:translateY(-1px);border-color:rgba(94,234,212,.44);background:rgba(94,234,212,.14)}
+.term-load-more:focus-visible,.term-show-all:focus-visible{outline:2px solid var(--term-mint);outline-offset:3px}
+@media (max-width:720px){.term-more{flex-wrap:wrap}.term-load-more,.term-show-all{flex:1;min-width:120px}}

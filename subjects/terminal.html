@@ -7,32 +7,32 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
-<title>终端常用指令 · macOS 200 条 · 8 个分组</title>
-<meta name="description" content="学习终端常用指令：macOS 200 条常用命令，按基础导航、文件目录、查看搜索、权限链接、进程系统、网络远程、开发环境和 macOS 专属 8 个分组整理；每条都有常用写法、示例和避坑提示，Linux 与 Windows 复用同一套框架。">
-<link rel="icon" type="image/png" href="../assets/icons/terminal.png?v=20261126z86">
-<link rel="stylesheet" href="../assets/css/terminal.css?v=20261126z86">
+<title>终端指令全集 · macOS / Linux / Windows 全量命令库</title>
+<meta name="description" content="macOS、Linux、Windows 三平台终端指令全集：全量 tldr 中文命令页与系统内建命令，按基础导航、文件目录、文本处理、权限、进程、网络、开发、包管理、磁盘、安全、容器、多媒体、平台专属、别名与其他工具分组；每条都有可直接复制的示例和来源说明。">
+<link rel="icon" type="image/png" href="../assets/icons/terminal.png?v=20261127z87n">
+<link rel="stylesheet" href="../assets/css/terminal.css?v=20261127z87n">
 </head>
 <body class="term-page">
 <header class="term-topbar">
-  <a class="term-back" href="../java-debug-lab.html?v=20261126z86" aria-label="返回学科地图"><span aria-hidden="true">←</span>学科地图</a>
-  <div class="term-brand"><span class="term-mark" aria-hidden="true">$_</span><b>终端常用指令</b></div>
+  <a class="term-back" href="../java-debug-lab.html?v=20261127z87n" aria-label="返回学科地图"><span aria-hidden="true">←</span>学科地图</a>
+  <div class="term-brand"><span class="term-mark" aria-hidden="true">$_</span><b>终端指令全集</b></div>
   <div class="term-topmeta">
-    <span class="online">● macOS 200 条已上线</span>
+    <span class="online">● macOS / Linux / Windows 三平台全量</span>
     <span class="dot" aria-hidden="true"></span>
-    <span>Linux / Windows 框架已预留</span>
+    <span>全量 tldr 中文命令页 + 平台内建命令</span>
   </div>
 </header>
 
 <main class="term-wrap">
   <section class="term-hero" aria-labelledby="termHeroTitle">
     <div class="term-hero-copy">
-      <div class="term-kicker">TERMINAL BASICS · macOS FIRST</div>
+      <div class="term-kicker">TERMINAL COMMAND LIBRARY · MACOS / LINUX / WINDOWS</div>
       <h1 id="termHeroTitle">把终端<br><em>用成习惯</em></h1>
-      <p>200 条 Mac 终端常用指令，按真实使用场景拆成 <strong>8 个分组</strong>：从导航、文件和搜索，到权限、进程、网络、开发工具与 macOS 系统管理。每条都有能直接复制的常用写法、一个示例和一句避坑提示。</p>
+      <p>不再只列 200 条常用样本：macOS 908 / Linux 920 / Windows 654，三平台合计 <strong>2,482 条全量命令</strong>，按 <strong>15 个真实使用场景</strong>拆开。覆盖系统内建、GNU / util-linux、systemd、包管理、容器与云、开发工具链、网络排障、安全加密和平台专属工具；每条都有可复制示例和来源说明。</p>
       <div class="term-hero-stats" aria-label="终端课程规模">
-        <div><b>200</b><span>条 Mac 指令</span></div>
-        <div><b>8</b><span>个使用分组</span></div>
-        <div><b>2</b><span>个系统框架</span></div>
+        <div><b id="termHeroCount">2,482</b><span>条全量指令</span></div>
+        <div><b id="termHeroGroups">15</b><span>个使用分组</span></div>
+        <div><b>3</b><span>个平台</span></div>
       </div>
     </div>
     <div class="term-window" aria-hidden="true">
@@ -51,11 +51,11 @@
   <section class="term-panel" aria-labelledby="termPanelTitle">
     <div class="term-panel-head">
       <div>
-        <div class="term-kicker">COMMAND LIBRARY · 8 GROUPS</div>
-        <h2 id="termPanelTitle">macOS 常用指令</h2>
-        <p class="term-panel-sub" id="termPanelSubtitle">从 zsh 的第一条 pwd 到文件、权限、进程、网络、开发和 macOS 系统工具，200 条常驻命令按使用场景拆开。</p>
+        <div class="term-kicker">COMMAND LIBRARY · 15 GROUPS · 3 PLATFORMS</div>
+        <h2 id="termPanelTitle">macOS 指令全集</h2>
+        <p class="term-panel-sub" id="termPanelSubtitle">从 pwd 到 launchctl，全量 Mac 命令按 15 个使用场景拆开；切换上方平台即可查 Linux 与 Windows。</p>
       </div>
-      <div class="term-progress" id="termProgress"><b>0</b><i>/</i><span>200</span><em>已掌握</em></div>
+      <div class="term-progress" id="termProgress"><b>0</b><i>/</i><span>908</span><em>已掌握</em></div>
     </div>
 
     <div class="term-os-tabs" id="termOsTabs" role="tablist" aria-label="选择操作系统"></div>
@@ -69,11 +69,15 @@
     </div>
 
     <div class="term-result-meta">
-      <strong id="termResultCount">200 条指令</strong>
+      <strong id="termResultCount">全量命令</strong>
       <button class="term-reset" id="termReset" type="button">清除筛选</button>
     </div>
 
     <div class="term-grid" id="termGrid"></div>
+    <div class="term-more" id="termMore" hidden>
+      <button class="term-load-more" id="termLoadMore" type="button">显示更多</button>
+      <button class="term-show-all" id="termShowAll" type="button">显示全部</button>
+    </div>
     <div class="term-empty" id="termEmpty" hidden>
       <strong>没有匹配的指令</strong>
       换个关键词，或者点“清除筛选”回到完整列表。
@@ -95,13 +99,13 @@
   </section>
 
   <footer class="term-foot">
-    <span><b>说明：</b>命令基于 macOS 自带 zsh 与常用开发工具；不同 shell 或版本可能有细微差异。带“谨慎”标记的命令，执行前先用 pwd 和 ls 确认路径。</span>
-    <span><b>路线：</b>macOS 200 条 → Linux / Windows 共用同一套 8 分组框架，内容下一版补。</span>
+    <span><b>说明：</b>命令基于 macOS zsh、Linux Bash 与 Windows PowerShell / cmd；Windows 另含 Git Bash / WSL 可用的跨平台工具，不同发行版或版本可能存在差异。带“谨慎”标记的命令，执行前先用 pwd / cd 和 ls / dir 确认路径。</span>
+    <span><b>来源：</b>命令说明与示例改编自 tldr-pages 中文页（CC BY 4.0）；三平台全量收录，别名和平台专属工具单独分组。</span>
   </footer>
 </main>
 
 <div class="term-toast" id="termToast" role="status" aria-live="polite"></div>
-<script src="../assets/js/terminal-commands.js?v=20261126z86"></script>
-<script src="../assets/js/terminal-app.js?v=20261126z86"></script>
+<script src="../assets/js/terminal-commands.js?v=20261127z87n"></script>
+<script src="../assets/js/terminal-app.js?v=20261127z87n"></script>
 </body>
 </html>
