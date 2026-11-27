@@ -215,6 +215,7 @@
       if(revealEls[i].el === el){ item = revealEls[i]; break; }
     }
     if(!item || el.classList.contains('fx-in')) return;
+    if(el.dataset && el.dataset.fxDone) return;
     el.classList.add('fx-in');
     item.timeout = window.setTimeout(function(){ finish(el); }, 1500);
     if(observer) observer.unobserve(el);
