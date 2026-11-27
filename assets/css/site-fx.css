@@ -13,25 +13,27 @@
    JS 未运行、出错或被禁用时内容保持原样可见。 */
 html.fx-motion .fx-intro{
   opacity:0;
-  transform:translate3d(0,18px,0);
+  transform:translate3d(0,14px,0);
 }
 html.fx-motion .fx-intro.fx-in{
   animation:fx-rise .72s var(--fx-ease) var(--fx-delay,0s) both;
+  will-change:transform,opacity;
 }
 @keyframes fx-rise{
-  from{opacity:0;transform:translate3d(0,18px,0)}
+  from{opacity:0;transform:translate3d(0,14px,0)}
   to{opacity:1;transform:translate3d(0,0,0)}
 }
 
 html.fx-motion .fx-reveal{
   opacity:0;
-  transform:translate3d(0,16px,0) scale(.996);
+  transform:translate3d(0,12px,0) scale(.998);
 }
 html.fx-motion .fx-reveal.fx-in{
   animation:fx-reveal .66s var(--fx-ease) var(--fx-delay,0s) both;
+  will-change:transform,opacity;
 }
 @keyframes fx-reveal{
-  from{opacity:0;transform:translate3d(0,16px,0) scale(.996)}
+  from{opacity:0;transform:translate3d(0,12px,0) scale(.998)}
   to{opacity:1;transform:none}
 }
 
@@ -43,10 +45,16 @@ html.fx-motion .fx-reveal.fx-in{
 }
 html.fx-motion .fx-tilt:hover{
   transform:perspective(1000px) rotateX(var(--fx-rx,0deg)) rotateY(var(--fx-ry,0deg)) translate3d(0,-3px,0);
+  will-change:transform;
 }
 html.fx-motion .fx-tilt:active{
-  transform:perspective(1000px) rotateX(var(--fx-rx,0deg)) rotateY(var(--fx-ry,0deg)) translate3d(0,-1px,0) scale(.986);
+  transform:perspective(1000px) rotateX(var(--fx-rx,0deg)) rotateY(var(--fx-ry,0deg)) translate3d(0,-1px,0) scale(.992);
   transition-duration:.08s;
+}
+html.fx-motion .fx-tilt:focus-visible:not(:hover){
+  transform:translate3d(0,-3px,0);
+  outline:2px solid rgba(200,169,118,.42);
+  outline-offset:3px;
 }
 
 
@@ -64,7 +72,7 @@ html.fx-motion .fx-tilt:active{
   mix-blend-mode:screen;
   transition:opacity .22s ease;
 }
-html.fx-motion .fx-tilt:hover .fx-glint{opacity:.9}
+html.fx-motion .fx-tilt:hover .fx-glint{opacity:.9;will-change:opacity}
 
 /* 顶部细进度条：长页面阅读位置，不占布局。 */
 .fx-progress{
@@ -82,7 +90,7 @@ html.fx-motion .fx-tilt:hover .fx-glint{opacity:.9}
 .fx-progress.fx-on{opacity:.92}
 
 @media (max-width:760px){
-  .fx-tilt:hover,.fx-tilt:active{transform:none!important}
+  .fx-tilt:hover,.fx-tilt:active,.fx-tilt:focus-visible{transform:none!important}
 }
 @media (hover:none){
   .fx-tilt:hover,.fx-tilt:active{transform:none!important}
@@ -97,6 +105,6 @@ html.fx-motion .fx-tilt:hover .fx-glint{opacity:.9}
     transform:none!important;
     animation:none!important;
   }
-  .fx-tilt:hover,.fx-tilt:active{transform:none!important}
+  .fx-tilt:hover,.fx-tilt:active,.fx-tilt:focus-visible{transform:none!important}
   .fx-progress{transition:none}
 }

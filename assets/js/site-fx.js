@@ -1,5 +1,5 @@
 /* ============================================================
-   z95 · 全站光影与滚动节奏
+   z95 · 全站光影与滚动节奏（z101 打磨版）
    - 首页 / 学科入口 / 课程目录 / 终端 / 考试页的轻量入场
    - IntersectionObserver 滚动揭示，动画完即清理类，恢复原有 hover
    - 桌面精细指针下的卡片微倾
@@ -22,6 +22,20 @@
 
   function slice(list){ return Array.prototype.slice.call(list); }
   function canMove(){ return !(reduceQuery && reduceQuery.matches); }
+
+  // rAF 在后台/被节流的窗口里可能不执行；所有仅用于“开始动画”的首帧
+  // 都用这个兜底，避免 Hero 一直停在 opacity:0。
+  function nextFrame(fn){
+    var called = false, frame = 0;
+    function run(){
+      if(called) return;
+      called = true;
+      if(frame) window.cancelAnimationFrame(frame);
+      fn();
+    }
+    frame = window.requestAnimationFrame(run);
+    window.setTimeout(run, 120);
+  }
 
   function boot(){
     addProgress();
@@ -52,7 +66,7 @@
     window.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', schedule, { passive: true });
     window.addEventListener('load', schedule, { once: true });
-    window.requestAnimationFrame(update);
+    update();
   }
 
   function initMotion(){
@@ -62,7 +76,14 @@
     root.classList.add('fx-motion');
     motionOn = true;
 
+    // 如果窗口被遮挡、后台节流或 frame clock 暂停，动画永远不会前进。
+    // 300ms 内没有拿到一帧，就退回静态页面，绝不让内容停在 opacity:0。
+    var frameSeen = false;
+    window.requestAnimationFrame(function(){ frameSeen = true; });
+    window.setTimeout(function(){ if(!frameSeen) clearMotion(); }, 300);
+
     markIntro();
+    startIntro(introEls);
     markReveal();
     observer = new IntersectionObserver(onIntersect, {
       rootMargin: '0px 0px -7% 0px',
@@ -71,13 +92,17 @@
     revealEls.forEach(function(item){ observer.observe(item.el); });
 
     // 已在视口中的元素也走一次观察，避免首屏出现半截。
-    window.requestAnimationFrame(function(){
+    function revealInView(){
+      var vh = window.innerHeight || document.documentElement.clientHeight || 720;
       revealEls.forEach(function(item){
-        if(item.el.getBoundingClientRect().top < window.innerHeight * 0.96) {
-          reveal(item);
+        if(item.el.getBoundingClientRect().top < vh * 0.96) {
+          reveal(item.el);
         }
       });
-    });
+    }
+    nextFrame(revealInView);
+    window.setTimeout(revealInView, 360);
+    window.setTimeout(revealInView, 900);
 
     buildTilt();
   }
@@ -104,28 +129,34 @@
       '.hero-actions'
     ].forEach(function(sel){
       var nodes = slice(document.querySelectorAll(sel));
-      nodes.slice(0, 9).forEach(function(el, i){
-        addIntro(el, 0.025 + i * 0.055);
-      });
-    });
-    window.requestAnimationFrame(function(){
-      introEls.forEach(function(item){
-        item.el.classList.add('fx-in');
-        item.timeout = window.setTimeout(function(){ finish(item.el); }, 1500);
+      nodes.slice(0, 9).forEach(function(el){
+        addIntro(el);
       });
     });
   }
 
   function addIntro(el, delay){
-    if(!el || el.classList.contains('fx-intro')) return;
-    if(el.dataset && el.dataset.fxDone) return;
-    if(!el.getClientRects().length) return;
+    if(!el || el.classList.contains('fx-intro')) return false;
+    if(el.dataset && el.dataset.fxDone) return false;
+    if(!el.getClientRects().length) return false;
+    if(delay == null) delay = 0.025 + introEls.length * 0.055;
     el.classList.add('fx-intro');
     el.style.setProperty('--fx-delay', delay.toFixed(3) + 's');
     el.addEventListener('animationend', function(e){
       if(e.animationName === 'fx-rise') finish(el);
     }, { once: true });
     introEls.push({ el: el, timeout: 0 });
+    return true;
+  }
+
+  function startIntro(items){
+    if(!items.length) return;
+    nextFrame(function(){
+      items.forEach(function(item){
+        item.el.classList.add('fx-in');
+        item.timeout = window.setTimeout(function(){ finish(item.el); }, 1500);
+      });
+    });
   }
 
   function markReveal(){
@@ -201,20 +232,13 @@
     if(!motionOn || !observer) return;
     var introBefore = introEls.length;
     markIntro();
-    if(introEls.length > introBefore){
-      window.requestAnimationFrame(function(){
-        introEls.slice(introBefore).forEach(function(item){
-          item.el.classList.add('fx-in');
-          item.timeout = window.setTimeout(function(){ finish(item.el); }, 1500);
-        });
-      });
-    }
+    startIntro(introEls.slice(introBefore));
     buildTilt();
     var revealBefore = revealEls.length;
     markReveal();
     revealEls.slice(revealBefore).forEach(function(item){
       observer.observe(item.el);
-      if(item.el.getBoundingClientRect().top < window.innerHeight * 0.96) reveal(item);
+      if(item.el.getBoundingClientRect().top < window.innerHeight * 0.96) reveal(item.el);
     });
   }
 
@@ -242,7 +266,7 @@
     var selector = '';
     if(document.getElementById('subject')) selector = '.subject-card,.fs-subject';
     else if(document.querySelector('.hub,.hub-shell')) selector = '.entry';
-    else if(document.querySelector('.ch-card')) selector = '.ch-card,.module-card';
+    else if(document.querySelector('.ch-card,.module-card')) selector = '.ch-card,.module-card';
     if(!selector) return;
     var nodes = slice(document.querySelectorAll(selector));
     nodes.forEach(function(el){
@@ -315,6 +339,12 @@
   }
 
   function bindEnvironment(){
+    function wake(){
+      if(motionOn || !canMove() || root.classList.contains('fx-motion')) return;
+      try { initMotion(); } catch (err) { root.classList.remove('fx-motion'); }
+    }
+    window.addEventListener('focus', wake);
+    document.addEventListener('visibilitychange', function(){ if(!document.hidden) wake(); });
     if(reduceQuery){
       var handler = function(){
         if(reduceQuery.matches){
