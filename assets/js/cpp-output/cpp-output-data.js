@@ -1,6 +1,6 @@
-/* C++ 输出实现场 · 18 题 / 54 组测试。expected 由参考逻辑生成；线上用 GCC 14.1 -std=c++20 判题。 */
+/* C++ 输出实现场 · 27 题 / 81 组测试。expected 由参考逻辑生成；线上用 GCC 14.1 -std=c++20 判题。 */
 window.CPP_OUTPUT_BANK = {
-  "version": "20261127z104",
+  "version": "20261127z105",
   "title": "C++ 输出实现场",
   "levels": [
     {
@@ -761,6 +761,375 @@ window.CPP_OUTPUT_BANK = {
       "input": "一行，空格分隔的 token 数不超过 100。",
       "output": "一行，表达式结果。",
       "reference": "string line;getline(cin,line);stringstream ss(line);vector<long long> st;string tok;while(ss>>tok){if(tok==\"+\"||tok==\"-\"||tok==\"*\"||tok==\"/\"){long long b=st.back();st.pop_back();long long a=st.back();st.pop_back();if(tok==\"+\")st.push_back(a+b);else if(tok==\"-\")st.push_back(a-b);else if(tok==\"*\")st.push_back(a*b);else st.push_back(a/b);}else st.push_back(stoll(tok));}cout<<st.back()<<'\\n';"
+    },
+    {
+      "id": "b7",
+      "level": "basic",
+      "no": 7,
+      "title": "区间偶数之和",
+      "subtitle": "long long 与前缀计数",
+      "brief": "求闭区间 [L, R] 内所有偶数的和。",
+      "goal": "读入两个整数 L、R，输出区间内偶数的和。",
+      "hints": [
+        "先写前缀函数：1..x 中偶数的和 = 2+4+…+2k。",
+        "答案可能超过 int，用 long long。"
+      ],
+      "testCases": [
+        {
+          "label": "公开样例",
+          "stdin": "1 10",
+          "expected": "30"
+        },
+        {
+          "label": "隐藏用例 1",
+          "stdin": "5 5",
+          "expected": "0"
+        },
+        {
+          "label": "隐藏用例 2",
+          "stdin": "0 7",
+          "expected": "12"
+        }
+      ],
+      "sampleStdin": "1 10",
+      "sampleStdout": "30",
+      "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    long long L, R;\n    cin >> L >> R;\n    // 用前缀公式，别逐个累加\n\n    return 0;\n}",
+      "fastMs": 70,
+      "concepts": [
+        "long long",
+        "前缀和"
+      ],
+      "input": "一行两个整数 L、R（0 ≤ L ≤ R ≤ 10^9）。",
+      "output": "一行，区间内偶数之和。",
+      "reference": "long long L,R;cin>>L>>R;auto pref=[](long long x){if(x<=0)return 0LL;long long k=x/2;return k*(k+1);};cout<<pref(R)-pref(L-1)<<'\\n';"
+    },
+    {
+      "id": "b8",
+      "level": "basic",
+      "no": 8,
+      "title": "字符分类统计",
+      "subtitle": "getline 与 ASCII 判断",
+      "brief": "统计一行文本里的字母、数字、空格和其他字符。",
+      "goal": "读入一整行（可含空格），输出四个计数：字母、数字、空格、其他，用空格分隔。",
+      "hints": [
+        "整行必须用 getline，不能 cin >>。",
+        "字母指 A-Z/a-z；空格只统计普通空格 ' '。"
+      ],
+      "testCases": [
+        {
+          "label": "公开样例",
+          "stdin": "Hello World 123!",
+          "expected": "10 3 2 1"
+        },
+        {
+          "label": "隐藏用例 1",
+          "stdin": "abc",
+          "expected": "3 0 0 0"
+        },
+        {
+          "label": "隐藏用例 2",
+          "stdin": " 42??",
+          "expected": "0 2 1 2"
+        }
+      ],
+      "sampleStdin": "Hello World 123!",
+      "sampleStdout": "10 3 2 1",
+      "starter": "#include <iostream>\n#include <string>\nusing namespace std;\n\nint main() {\n    string line;\n    getline(cin, line);\n    // 遍历每个字符，分四类计数\n\n    return 0;\n}",
+      "fastMs": 70,
+      "concepts": [
+        "getline",
+        "字符判断"
+      ],
+      "input": "一行 ASCII 文本，长度不超过 1000。",
+      "output": "一行四个整数：letters digits spaces other。",
+      "reference": "string s;getline(cin,s);int a=0,b=0,c=0,d=0;for(char ch:s){if(isalpha((unsigned char)ch))++a;else if(isdigit((unsigned char)ch))++b;else if(ch==' ')++c;else ++d;}cout<<a<<' '<<b<<' '<<c<<' '<<d<<'\\n';"
+    },
+    {
+      "id": "b9",
+      "level": "basic",
+      "no": 9,
+      "title": "数字反转去前导零",
+      "subtitle": "字符串与边界",
+      "brief": "把非负整数的十进制数字顺序倒过来，并去掉前导零。",
+      "goal": "读入一个非负整数 n（0 ≤ n ≤ 10^18），输出反转后的整数；若结果全为零，输出 0。",
+      "hints": [
+        "可以当字符串处理，reverse 后去掉前导 '0'。",
+        "输入 0 时输出 0，不要输出空行。"
+      ],
+      "testCases": [
+        {
+          "label": "公开样例",
+          "stdin": "1200",
+          "expected": "21"
+        },
+        {
+          "label": "隐藏用例 1",
+          "stdin": "7",
+          "expected": "7"
+        },
+        {
+          "label": "隐藏用例 2",
+          "stdin": "1000000009",
+          "expected": "9000000001"
+        }
+      ],
+      "sampleStdin": "1200",
+      "sampleStdout": "21",
+      "starter": "#include <algorithm>\n#include <iostream>\n#include <string>\nusing namespace std;\n\nint main() {\n    string s;\n    cin >> s;\n    // reverse 后去掉多余的前导零\n\n    return 0;\n}",
+      "fastMs": 70,
+      "concepts": [
+        "string",
+        "reverse"
+      ],
+      "input": "一行，一个非负整数 n。",
+      "output": "一行，反转后的十进制表示。",
+      "reference": "string s;cin>>s;reverse(s.begin(),s.end());size_t i=0;while(i+1<s.size()&&s[i]=='0')++i;cout<<s.substr(i)<<'\\n';"
+    },
+    {
+      "id": "i7",
+      "level": "intermediate",
+      "no": 7,
+      "title": "单词首字母大写",
+      "subtitle": "split、大小写与空格规范化",
+      "brief": "把一行中的每个单词改成首字母大写、其余小写，单词之间用一个空格分隔。",
+      "goal": "读入一行英文单词，单词之间可能有多余空格；输出规范化后的标题形式。",
+      "hints": [
+        "用 stringstream 按空白切词。",
+        "只改首字符的大小写，其余字符按 lower 处理。"
+      ],
+      "testCases": [
+        {
+          "label": "公开样例",
+          "stdin": "hello WORLD",
+          "expected": "Hello World"
+        },
+        {
+          "label": "隐藏用例 1",
+          "stdin": "  c++   is   fun  ",
+          "expected": "C++ Is Fun"
+        },
+        {
+          "label": "隐藏用例 2",
+          "stdin": "aBc dEf",
+          "expected": "Abc Def"
+        }
+      ],
+      "sampleStdin": "hello WORLD",
+      "sampleStdout": "Hello World",
+      "starter": "#include <iostream>\n#include <sstream>\n#include <string>\nusing namespace std;\n\nint main() {\n    string line;\n    getline(cin, line);\n    // 按空白切词，逐词改写并控制空格\n\n    return 0;\n}",
+      "fastMs": 80,
+      "concepts": [
+        "stringstream",
+        "大小写"
+      ],
+      "input": "一行，长度不超过 1000，至少包含一个单词。",
+      "output": "一行，单词间只有一个空格。",
+      "reference": "string line;getline(cin,line);stringstream ss(line);string w;bool first=true;while(ss>>w){if(!first)cout<<' ';first=false;w[0]=toupper((unsigned char)w[0]);for(size_t i=1;i<w.size();++i)w[i]=tolower((unsigned char)w[i]);cout<<w;}cout<<'\\n';"
+    },
+    {
+      "id": "i8",
+      "level": "intermediate",
+      "no": 8,
+      "title": "区间素数计数",
+      "subtitle": "筛法与前缀和",
+      "brief": "多次询问区间 [L, R] 内有多少个素数。",
+      "goal": "第一行 n 表示询问数；接下来 n 行每行 L、R。对每个询问输出素数个数。",
+      "hints": [
+        "先用埃氏筛预处理到所有 R 的最大值。",
+        "用前缀和 prefix[i] 表示 1..i 的素数个数，区间答案 = prefix[R] - prefix[L-1]。"
+      ],
+      "testCases": [
+        {
+          "label": "公开样例",
+          "stdin": "3\n1 10\n10 20\n1 100",
+          "expected": "4\n4\n25"
+        },
+        {
+          "label": "隐藏用例 1",
+          "stdin": "1\n2 2",
+          "expected": "1"
+        },
+        {
+          "label": "隐藏用例 2",
+          "stdin": "2\n0 1\n100 200",
+          "expected": "0\n21"
+        }
+      ],
+      "sampleStdin": "3\n1 10\n10 20\n1 100",
+      "sampleStdout": "4\n4\n25",
+      "starter": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    // 读入所有询问，按最大 R 建筛与前缀和\n\n    return 0;\n}",
+      "fastMs": 90,
+      "concepts": [
+        "筛法",
+        "前缀和"
+      ],
+      "input": "1 ≤ n ≤ 1000，0 ≤ L ≤ R ≤ 10^6。",
+      "output": "n 行，每行一个整数。",
+      "reference": "int n;cin>>n;vector<pair<int,int>> q(n);int mx=0;for(auto& p:q){cin>>p.first>>p.second;mx=max(mx,p.second);}vector<char> is(mx+1,1);if(mx>=0)is[0]=0;if(mx>=1)is[1]=0;for(int p=2;p*p<=mx;++p)if(is[p])for(int k=p*p;k<=mx;k+=p)is[k]=0;vector<int> pre(mx+1);for(int i=1;i<=mx;++i)pre[i]=pre[i-1]+is[i];for(auto [l,r]:q)cout<<pre[r]-(l?pre[l-1]:0)<<'\\n';"
+    },
+    {
+      "id": "i9",
+      "level": "intermediate",
+      "no": 9,
+      "title": "最大子段和",
+      "subtitle": "Kadane 与负值边界",
+      "brief": "求一个整数序列中连续子段的最大和。",
+      "goal": "第一行 n；第二行 n 个整数。子段不能为空，输出最大的连续子段和。",
+      "hints": [
+        "维护 cur = 以当前元素结尾的最大和，best = 全局最大。",
+        "全为负数时答案也是某个负数，不要把 best 初始化为 0。"
+      ],
+      "testCases": [
+        {
+          "label": "公开样例",
+          "stdin": "5\n-2 1 -3 4 -1",
+          "expected": "4"
+        },
+        {
+          "label": "隐藏用例 1",
+          "stdin": "3\n-5 -2 -8",
+          "expected": "-2"
+        },
+        {
+          "label": "隐藏用例 2",
+          "stdin": "1\n0",
+          "expected": "0"
+        }
+      ],
+      "sampleStdin": "5\n-2 1 -3 4 -1",
+      "sampleStdout": "4",
+      "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    // Kadane：cur 以当前元素结尾，best 全局\n\n    return 0;\n}",
+      "fastMs": 80,
+      "concepts": [
+        "动态规划",
+        "Kadane"
+      ],
+      "input": "1 ≤ n ≤ 10^5，|a[i]| ≤ 10^4。",
+      "output": "一行，最大子段和。",
+      "reference": "int n;cin>>n;long long best,cur;cin>>cur;best=cur;for(int i=1;i<n;++i){long long x;cin>>x;cur=max(x,cur+x);best=max(best,cur);}cout<<best<<'\\n';"
+    },
+    {
+      "id": "c7",
+      "level": "challenge",
+      "no": 7,
+      "title": "单源最短路",
+      "subtitle": "Dijkstra 与小根堆",
+      "brief": "求有向带权图中 1 号点到 n 号点的最短距离。",
+      "goal": "第一行 n、m；接下来 m 行 u、v、w 表示一条 u→v 的边。输出 1 到 n 的最短距离；不可达输出 -1。",
+      "hints": [
+        "边权非负，用 Dijkstra。",
+        "优先队列存 (距离, 节点)，用 greater 变成小根堆；跳过 d != dist[u] 的过期条目。"
+      ],
+      "testCases": [
+        {
+          "label": "公开样例",
+          "stdin": "4 4\n1 2 10\n1 3 1\n3 2 2\n2 4 1",
+          "expected": "4"
+        },
+        {
+          "label": "隐藏用例 1",
+          "stdin": "3 2\n1 2 5\n1 3 2",
+          "expected": "2"
+        },
+        {
+          "label": "隐藏用例 2",
+          "stdin": "3 1\n1 2 10",
+          "expected": "-1"
+        }
+      ],
+      "sampleStdin": "4 4\n1 2 10\n1 3 1\n3 2 2\n2 4 1",
+      "sampleStdout": "4",
+      "starter": "#include <iostream>\n#include <queue>\n#include <vector>\nusing namespace std;\n\nint main() {\n    int n, m;\n    cin >> n >> m;\n    // 建邻接表，Dijkstra 求 1 到 n\n\n    return 0;\n}",
+      "fastMs": 100,
+      "concepts": [
+        "Dijkstra",
+        "优先队列"
+      ],
+      "input": "1 ≤ n ≤ 10^4，0 ≤ m ≤ 2×10^5，1 ≤ w ≤ 10^4。",
+      "output": "一行，最短距离或 -1。",
+      "reference": "int n,m;cin>>n>>m;vector<vector<pair<int,int>>> g(n+1);for(int i=0;i<m;++i){int u,v,w;cin>>u>>v>>w;g[u].push_back({v,w});}const long long INF=4e18;vector<long long> d(n+1,INF);d[1]=0;priority_queue<pair<long long,int>,vector<pair<long long,int>>,greater<>> pq;pq.push({0,1});while(!pq.empty()){auto [du,u]=pq.top();pq.pop();if(du!=d[u])continue;for(auto [v,w]:g[u])if(du+w<d[v]){d[v]=du+w;pq.push({d[v],v});}}cout<<(d[n]==INF?-1:d[n])<<'\\n';"
+    },
+    {
+      "id": "c8",
+      "level": "challenge",
+      "no": 8,
+      "title": "0/1 背包",
+      "subtitle": "一维 DP 与倒序容量",
+      "brief": "在容量 W 内选择物品，使总价值最大；每件物品只能选一次。",
+      "goal": "第一行 n、W；接下来 n 行每行 weight、value。输出最大总价值。",
+      "hints": [
+        "dp[c] 表示容量 c 的最大价值，初始化 0。",
+        "0/1 背包必须倒序枚举容量，避免同一件物品被重复使用。"
+      ],
+      "testCases": [
+        {
+          "label": "公开样例",
+          "stdin": "4 10\n5 10\n4 40\n6 30\n3 50",
+          "expected": "90"
+        },
+        {
+          "label": "隐藏用例 1",
+          "stdin": "3 5\n1 6\n2 10\n3 12",
+          "expected": "22"
+        },
+        {
+          "label": "隐藏用例 2",
+          "stdin": "1 100\n100 7",
+          "expected": "7"
+        }
+      ],
+      "sampleStdin": "4 10\n5 10\n4 40\n6 30\n3 50",
+      "sampleStdout": "90",
+      "starter": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    int n, W;\n    cin >> n >> W;\n    // 一维 dp，容量从大到小更新\n\n    return 0;\n}",
+      "fastMs": 90,
+      "concepts": [
+        "0/1 背包",
+        "DP"
+      ],
+      "input": "1 ≤ n ≤ 100，0 ≤ W ≤ 10^5，weight ≤ W。",
+      "output": "一行，最大总价值。",
+      "reference": "int n,W;cin>>n>>W;vector<long long> dp(W+1);for(int i=0;i<n;++i){int w,v;cin>>w>>v;for(int c=W;c>=w;--c)dp[c]=max(dp[c],dp[c-w]+v);}cout<<dp[W]<<'\\n';"
+    },
+    {
+      "id": "c9",
+      "level": "challenge",
+      "no": 9,
+      "title": "最长公共子序列",
+      "subtitle": "二维 DP 与边界",
+      "brief": "求两个字符串的最长公共子序列长度。",
+      "goal": "读入两行非空小写字符串，输出 LCS 长度。",
+      "hints": [
+        "dp[i][j] 表示 a 前 i 个字符与 b 前 j 个字符的 LCS。",
+        "字符相等时 dp[i][j] = dp[i-1][j-1] + 1；否则取上/左最大值。"
+      ],
+      "testCases": [
+        {
+          "label": "公开样例",
+          "stdin": "abcde\nace",
+          "expected": "3"
+        },
+        {
+          "label": "隐藏用例 1",
+          "stdin": "abc\ndef",
+          "expected": "0"
+        },
+        {
+          "label": "隐藏用例 2",
+          "stdin": "aaaa\naa",
+          "expected": "2"
+        }
+      ],
+      "sampleStdin": "abcde\nace",
+      "sampleStdout": "3",
+      "starter": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\n\nint main() {\n    string a, b;\n    cin >> a >> b;\n    // 二维 DP，注意下标从 1 开始\n\n    return 0;\n}",
+      "fastMs": 100,
+      "concepts": [
+        "LCS",
+        "二维 DP"
+      ],
+      "input": "两行字符串长度不超过 2000。",
+      "output": "一行，LCS 长度。",
+      "reference": "string a,b;cin>>a>>b;int n=a.size(),m=b.size();vector<vector<int>> dp(n+1,vector<int>(m+1));for(int i=1;i<=n;++i)for(int j=1;j<=m;++j)dp[i][j]=a[i-1]==b[j-1]?dp[i-1][j-1]+1:max(dp[i-1][j],dp[i][j-1]);cout<<dp[n][m]<<'\\n';"
     }
   ],
   "rules": {

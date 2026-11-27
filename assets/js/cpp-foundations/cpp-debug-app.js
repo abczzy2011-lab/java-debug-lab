@@ -1,4 +1,4 @@
-/* C++ 改错实验室：24 题、原地修复、Judge0 GCC 14.1 真实编译、逐用例评分 */
+/* C++ 改错实验室：36 题、原地修复、Judge0 GCC 14.1 真实编译、逐用例评分 */
 (function () {
   'use strict';
 
@@ -98,8 +98,11 @@
     state.current = null;
     state.lastResults = null;
     stopRun();
+    var rank = { basic: 0, medium: 1, hard: 2 };
     var visible = tasks.filter(function (task) {
       return state.filter === 'all' || task.level === state.filter;
+    }).slice().sort(function (a, b) {
+      return (rank[a.level] - rank[b.level]) || (a.order - b.order);
     });
     var cards = visible.map(function (task) {
       var level = levelOf(task);

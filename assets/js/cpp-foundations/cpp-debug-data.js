@@ -1,7 +1,7 @@
-/* C++ 改错实验室 · 24 题 / 72 组用例。每题保留一份 buggy 代码、参考修复与解析；
+/* C++ 改错实验室 · 36 题 / 108 组用例。每题保留一份 buggy 代码、参考修复与解析；
    判题使用 Judge0 GCC 14.1，编译选项 -std=c++20 -O2。 */
 window.CPP_DEBUG_TASKS = {
-  "version": "20261127z104",
+  "version": "20261127z105",
   "title": "C++ 改错实验室",
   "tasks": [
     {
@@ -915,6 +915,462 @@ window.CPP_DEBUG_TASKS = {
         }
       ],
       "targetMs": 130
+    },
+    {
+      "id": "b9",
+      "level": "basic",
+      "order": 9,
+      "title": "冒泡排序少扫了一位",
+      "summary": "内层边界写小导致末尾没排到",
+      "prompt": "读入 n 个整数，按升序输出。现在排序后的最后一段仍然乱序，先让 3 1 2 通过。",
+      "source": "C++ Primer Plus · 第 6 章 循环",
+      "minutes": 7,
+      "code": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> a(n);\n    for (int& x : a) cin >> x;\n    for (int i = 0; i < n - 1; ++i)\n        for (int j = 0; j < n - i - 2; ++j)   // BUG: 内层少扫一位\n            if (a[j] > a[j + 1]) swap(a[j], a[j + 1]);\n    for (int i = 0; i < n; ++i) cout << a[i] << (i + 1 == n ? '\\n' : ' ');\n    return 0;\n}",
+      "fixed": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> a(n);\n    for (int& x : a) cin >> x;\n    for (int i = 0; i < n - 1; ++i)\n        for (int j = 0; j < n - i - 1; ++j)\n            if (a[j] > a[j + 1]) swap(a[j], a[j + 1]);\n    for (int i = 0; i < n; ++i) cout << a[i] << (i + 1 == n ? '\\n' : ' ');\n    return 0;\n}",
+      "analysis": "第 i 轮冒泡后，末尾 i 个元素已经就位，内层只需要扫到 `n-i-1`。写成 `n-i-2` 会漏掉每轮最后一个相邻比较，n=2 时甚至完全不比较。把边界改回 `j < n - i - 1`。",
+      "hints": [
+        "n=2 时内层循环执行几次？",
+        "`j+1` 最大能取到哪个下标？"
+      ],
+      "tests": [
+        {
+          "public": true,
+          "label": "公开样例",
+          "stdin": "3\n3 1 2",
+          "expected": "1 2 3"
+        },
+        {
+          "public": false,
+          "label": "隐藏用例 1",
+          "stdin": "4\n4 3 2 1",
+          "expected": "1 2 3 4"
+        },
+        {
+          "public": false,
+          "label": "隐藏用例 2",
+          "stdin": "5\n5 1 4 2 3",
+          "expected": "1 2 3 4 5"
+        }
+      ],
+      "targetMs": 70
+    },
+    {
+      "id": "b10",
+      "level": "basic",
+      "order": 10,
+      "title": "交换函数只改了副本",
+      "summary": "值传递让交换没有生效",
+      "prompt": "读入两个整数，交换后输出。现在 swap 调用后两个数还是原样。",
+      "source": "C++ Primer Plus · 第 7 章 函数",
+      "minutes": 6,
+      "code": "#include <bits/stdc++.h>\nusing namespace std;\n\nvoid swap(int a, int b) {   // BUG: 传值，改的是副本\n    int t = a;\n    a = b;\n    b = t;\n}\nint main() {\n    int x, y;\n    cin >> x >> y;\n    swap(x, y);\n    cout << x << ' ' << y << '\\n';\n    return 0;\n}",
+      "fixed": "#include <bits/stdc++.h>\nusing namespace std;\n\nvoid swap(int& a, int& b) {\n    int t = a;\n    a = b;\n    b = t;\n}\nint main() {\n    int x, y;\n    cin >> x >> y;\n    swap(x, y);\n    cout << x << ' ' << y << '\\n';\n    return 0;\n}",
+      "analysis": "C++ 只有值传递；形参 `int a` 是实参的副本，函数里交换副本不会影响调用方。把参数改成 `int&` 传引用，函数体内的赋值才落到原对象。",
+      "hints": [
+        "函数返回后，main 里的 x 有没有被修改？",
+        "引用参数需要在调用时写 & 吗？"
+      ],
+      "tests": [
+        {
+          "public": true,
+          "label": "公开样例",
+          "stdin": "3 5",
+          "expected": "5 3"
+        },
+        {
+          "public": false,
+          "label": "隐藏用例 1",
+          "stdin": "-1 2",
+          "expected": "2 -1"
+        },
+        {
+          "public": false,
+          "label": "隐藏用例 2",
+          "stdin": "0 9",
+          "expected": "9 0"
+        }
+      ],
+      "targetMs": 65
+    },
+    {
+      "id": "b11",
+      "level": "basic",
+      "order": 11,
+      "title": "C 字符串用 == 比较",
+      "summary": "指针比较永远不相等",
+      "prompt": "输入 yes/no，输出 OK 或 NO。现在输入 yes 也被判成 NO。",
+      "source": "Beginning C++17 · 第 7 章 字符串",
+      "minutes": 6,
+      "code": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    char s[16];\n    cin >> s;\n    if (s == \"yes\") cout << \"OK\\n\";   // BUG: 比较的是指针\n    else cout << \"NO\\n\";\n    return 0;\n}",
+      "fixed": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    char s[16];\n    cin >> s;\n    if (strcmp(s, \"yes\") == 0) cout << \"OK\\n\";\n    else cout << \"NO\\n\";\n    return 0;\n}",
+      "analysis": "数组名 `s` 退化成指向首元素的指针，`\"yes\"` 是另一个地址；`==` 比较地址而不是内容。C 字符串用 `strcmp`，C++ 的 `std::string` 才可以直接 `==`。",
+      "hints": [
+        "数组名在表达式里会变成什么？",
+        "strcmp 返回 0 表示什么？"
+      ],
+      "tests": [
+        {
+          "public": true,
+          "label": "公开样例",
+          "stdin": "yes",
+          "expected": "OK"
+        },
+        {
+          "public": false,
+          "label": "隐藏用例 1",
+          "stdin": "no",
+          "expected": "NO"
+        },
+        {
+          "public": false,
+          "label": "隐藏用例 2",
+          "stdin": "YES",
+          "expected": "NO"
+        }
+      ],
+      "targetMs": 65
+    },
+    {
+      "id": "b12",
+      "level": "basic",
+      "order": 12,
+      "title": "读到 0 就提前结束",
+      "summary": "哨兵值其实是合法数据",
+      "prompt": "读入 n 个整数并求和。现在遇到 0 就停止，后面的数全被丢掉。",
+      "source": "C++ Primer Plus · 第 5 章 循环",
+      "minutes": 6,
+      "code": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    long long sum = 0;\n    int x;\n    while (cin >> x && x != 0) sum += x;   // BUG: 0 被当成结束符\n    cout << sum << '\\n';\n    return 0;\n}",
+      "fixed": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    long long sum = 0;\n    for (int i = 0; i < n; ++i) {\n        int x;\n        cin >> x;\n        sum += x;\n    }\n    cout << sum << '\\n';\n    return 0;\n}",
+      "analysis": "题目已经给了 n，循环次数就应该由 n 决定；用值 0 当哨兵会误伤合法数据。改成计数循环，0 也能正常参与求和。",
+      "hints": [
+        "输入里 0 是结束标志还是普通数据？",
+        "n 在这个程序里有什么用？"
+      ],
+      "tests": [
+        {
+          "public": true,
+          "label": "公开样例",
+          "stdin": "5\n1 0 2 3 4",
+          "expected": "10"
+        },
+        {
+          "public": false,
+          "label": "隐藏用例 1",
+          "stdin": "3\n0 0 0",
+          "expected": "0"
+        },
+        {
+          "public": false,
+          "label": "隐藏用例 2",
+          "stdin": "4\n-1 0 1 5",
+          "expected": "5"
+        }
+      ],
+      "targetMs": 65
+    },
+    {
+      "id": "m9",
+      "level": "medium",
+      "order": 9,
+      "title": "erase 之后又 ++ 跳过了元素",
+      "summary": "遍历删除时的迭代器失效",
+      "prompt": "读入 n 个整数，删除所有偶数，先输出剩余个数，再输出剩余元素。现在部分偶数被漏删。",
+      "source": "Effective STL · Item 33；C++ Primer Plus · 第 16 章 vector",
+      "minutes": 9,
+      "code": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> v(n);\n    for (int& x : v) cin >> x;\n    for (auto it = v.begin(); it != v.end(); ++it) {\n        if (*it % 2 == 0) v.erase(it);   // BUG: erase 后迭代器失效，++ 又跳一个\n    }\n    cout << v.size() << '\\n';\n    for (size_t i = 0; i < v.size(); ++i) cout << v[i] << (i + 1 == v.size() ? '\\n' : ' ');\n    return 0;\n}",
+      "fixed": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> v(n);\n    for (int& x : v) cin >> x;\n    for (auto it = v.begin(); it != v.end();) {\n        if (*it % 2 == 0) it = v.erase(it);\n        else ++it;\n    }\n    cout << v.size() << '\\n';\n    for (size_t i = 0; i < v.size(); ++i) cout << v[i] << (i + 1 == v.size() ? '\\n' : ' ');\n    return 0;\n}",
+      "analysis": "`erase` 返回下一个有效元素，原迭代器立即失效；循环头再 `++it` 会跳过这个返回位置。删除分支用 `it = v.erase(it)` 且不要额外自增，保留分支才 `++it`。",
+      "hints": [
+        "erase 的返回值指向哪个元素？",
+        "删除后执行 ++it 会跳过谁？"
+      ],
+      "tests": [
+        {
+          "public": true,
+          "label": "公开样例",
+          "stdin": "5\n1 2 3 4 5",
+          "expected": "3\n1 3 5"
+        },
+        {
+          "public": false,
+          "label": "隐藏用例 1",
+          "stdin": "4\n2 4 6 8",
+          "expected": "0\n"
+        },
+        {
+          "public": false,
+          "label": "隐藏用例 2",
+          "stdin": "6\n2 1 4 3 6 5",
+          "expected": "3\n1 3 5"
+        }
+      ],
+      "targetMs": 85
+    },
+    {
+      "id": "m10",
+      "level": "medium",
+      "order": 10,
+      "title": "累加和装进了 int",
+      "summary": "大数求和溢出",
+      "prompt": "读入 n 个整数并求和。现在大数用例会输出负数或明显错误的结果。",
+      "source": "C++ Primer Plus · 第 3 章 数据类型",
+      "minutes": 8,
+      "code": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    int sum = 0;   // BUG: int 装不下大和\n    for (int i = 0; i < n; ++i) {\n        int x;\n        cin >> x;\n        sum += x;\n    }\n    cout << sum << '\\n';\n    return 0;\n}",
+      "fixed": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    long long sum = 0;\n    for (int i = 0; i < n; ++i) {\n        int x;\n        cin >> x;\n        sum += x;\n    }\n    cout << sum << '\\n';\n    return 0;\n}",
+      "analysis": "单个元素可以用 int，但 n 个 10^9 相加会超过 32 位范围。累加器必须用 `long long`；`sum += x` 会先把结果转成 long long 再存回，不会截断。",
+      "hints": [
+        "int 最大约 21 亿，3 个 10 亿相加是多少？",
+        "只改输出格式能解决溢出吗？"
+      ],
+      "tests": [
+        {
+          "public": true,
+          "label": "公开样例",
+          "stdin": "3\n1000000000 1000000000 1000000000",
+          "expected": "3000000000"
+        },
+        {
+          "public": false,
+          "label": "隐藏用例 1",
+          "stdin": "4\n2000000000 2000000000 1 1",
+          "expected": "4000000002"
+        },
+        {
+          "public": false,
+          "label": "隐藏用例 2",
+          "stdin": "2\n-1000000000 -1000000000",
+          "expected": "-2000000000"
+        }
+      ],
+      "targetMs": 80
+    },
+    {
+      "id": "m11",
+      "level": "medium",
+      "order": 11,
+      "title": "range-for 改的是副本",
+      "summary": "auto 少了引用，元素没翻倍",
+      "prompt": "读入 n 个整数，把每个元素翻倍后输出。现在输出还是原值。",
+      "source": "Effective Modern C++ · Item 1；C++ Primer Plus · 第 16 章",
+      "minutes": 8,
+      "code": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> v(n);\n    for (int& x : v) cin >> x;\n    for (auto x : v) x *= 2;   // BUG: x 是每个元素的副本\n    for (size_t i = 0; i < v.size(); ++i) cout << v[i] << (i + 1 == v.size() ? '\\n' : ' ');\n    return 0;\n}",
+      "fixed": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> v(n);\n    for (int& x : v) cin >> x;\n    for (auto& x : v) x *= 2;\n    for (size_t i = 0; i < v.size(); ++i) cout << v[i] << (i + 1 == v.size() ? '\\n' : ' ');\n    return 0;\n}",
+      "analysis": "`auto x` 按值拷贝元素，修改副本不会回写容器；`auto& x` 绑定到真实元素。只读遍历可以 `const auto&`，需要修改时必须 `auto&`。",
+      "hints": [
+        "auto 和 auto& 在 range-for 里分别绑定什么？",
+        "如果要避免复制又只想读，应该写什么？"
+      ],
+      "tests": [
+        {
+          "public": true,
+          "label": "公开样例",
+          "stdin": "4\n1 2 3 4",
+          "expected": "2 4 6 8"
+        },
+        {
+          "public": false,
+          "label": "隐藏用例 1",
+          "stdin": "3\n-1 0 5",
+          "expected": "-2 0 10"
+        },
+        {
+          "public": false,
+          "label": "隐藏用例 2",
+          "stdin": "2\n100 200",
+          "expected": "200 400"
+        }
+      ],
+      "targetMs": 80
+    },
+    {
+      "id": "m12",
+      "level": "medium",
+      "order": 12,
+      "title": "矩阵按列求和",
+      "summary": "循环顺序与输出维度错位",
+      "prompt": "读入 n 行 m 列的矩阵，输出每一行的和。现在输出的是每一列的和，行数也变成了 m。",
+      "source": "C++ Primer Plus · 第 16 章 数组",
+      "minutes": 9,
+      "code": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n, m;\n    cin >> n >> m;\n    vector<vector<int>> a(n, vector<int>(m));\n    for (int i = 0; i < n; ++i)\n        for (int j = 0; j < m; ++j) cin >> a[i][j];\n    for (int j = 0; j < m; ++j) {          // BUG: 外层是列\n        long long s = 0;\n        for (int i = 0; i < n; ++i) s += a[i][j];   // 累加的是第 j 列\n        cout << s << '\\n';\n    }\n    return 0;\n}",
+      "fixed": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n, m;\n    cin >> n >> m;\n    vector<vector<int>> a(n, vector<int>(m));\n    for (int i = 0; i < n; ++i)\n        for (int j = 0; j < m; ++j) cin >> a[i][j];\n    for (int i = 0; i < n; ++i) {\n        long long s = 0;\n        for (int j = 0; j < m; ++j) s += a[i][j];\n        cout << s << '\\n';\n    }\n    return 0;\n}",
+      "analysis": "题目要“每行一个和”，外层循环就必须遍历行 i，内层遍历列 j。原代码把 i/j 角色对调，既算错维度，也输出 m 行而不是 n 行。",
+      "hints": [
+        "输出行数应该等于 n 还是 m？",
+        "a[i][j] 的第一个下标代表行还是列？"
+      ],
+      "tests": [
+        {
+          "public": true,
+          "label": "公开样例",
+          "stdin": "2 3\n1 2 3\n4 5 6",
+          "expected": "6\n15"
+        },
+        {
+          "public": false,
+          "label": "隐藏用例 1",
+          "stdin": "3 2\n1 1\n2 2\n3 3",
+          "expected": "2\n4\n6"
+        },
+        {
+          "public": false,
+          "label": "隐藏用例 2",
+          "stdin": "2 2\n-1 1\n5 -5",
+          "expected": "0\n0"
+        }
+      ],
+      "targetMs": 85
+    },
+    {
+      "id": "h9",
+      "level": "hard",
+      "order": 9,
+      "title": "LCS 相等时用错了转移",
+      "summary": "相等却取了 max 而不是左上 +1",
+      "prompt": "求两个字符串的最长公共子序列长度。现在字符相等的位置也没有延长公共子序列。",
+      "source": "C++ Primer Plus · 第 17 章；算法导论 · 动态规划",
+      "minutes": 12,
+      "code": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    string a, b;\n    cin >> a >> b;\n    int n = a.size(), m = b.size();\n    vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));\n    for (int i = 1; i <= n; ++i) {\n        for (int j = 1; j <= m; ++j) {\n            if (a[i - 1] == b[j - 1])\n                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);   // BUG: 应取左上 +1\n            else\n                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);\n        }\n    }\n    cout << dp[n][m] << '\\n';\n    return 0;\n}",
+      "fixed": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    string a, b;\n    cin >> a >> b;\n    int n = a.size(), m = b.size();\n    vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));\n    for (int i = 1; i <= n; ++i) {\n        for (int j = 1; j <= m; ++j) {\n            if (a[i - 1] == b[j - 1])\n                dp[i][j] = dp[i - 1][j - 1] + 1;\n            else\n                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);\n        }\n    }\n    cout << dp[n][m] << '\\n';\n    return 0;\n}",
+      "analysis": "当 a[i-1] 与 b[j-1] 相等时，这个字符可以接到 `dp[i-1][j-1]` 的最优解后面，长度加 1；取上/左最大值只表示“不用这个字符”，会丢掉这次匹配。",
+      "hints": [
+        "相等时为什么不用 max(上, 左)？",
+        "dp[i-1][j-1] 对应哪个子问题？"
+      ],
+      "tests": [
+        {
+          "public": true,
+          "label": "公开样例",
+          "stdin": "abcde\nace",
+          "expected": "3"
+        },
+        {
+          "public": false,
+          "label": "隐藏用例 1",
+          "stdin": "abc\ndef",
+          "expected": "0"
+        },
+        {
+          "public": false,
+          "label": "隐藏用例 2",
+          "stdin": "aaaa\naa",
+          "expected": "2"
+        }
+      ],
+      "targetMs": 110
+    },
+    {
+      "id": "h10",
+      "level": "hard",
+      "order": 10,
+      "title": "并查集把非根节点直接挂走",
+      "summary": "union 前没先 find，子树被拆散",
+      "prompt": "读入 n 个点和 m 条无向边，输出连通分量个数。现在部分已经连通的点被算成两个分量。",
+      "source": "算法导论 · 并查集；C++ Primer Plus · 第 17 章",
+      "minutes": 14,
+      "code": "#include <bits/stdc++.h>\nusing namespace std;\n\nint parent[100005];\nint find(int x) { return parent[x] == x ? x : parent[x] = find(parent[x]); }\nint main() {\n    int n, m;\n    cin >> n >> m;\n    for (int i = 1; i <= n; ++i) parent[i] = i;\n    for (int i = 0; i < m; ++i) {\n        int u, v;\n        cin >> u >> v;\n        parent[u] = v;   // BUG: 没有先找根，可能把整棵子树挂走\n    }\n    int cnt = 0;\n    for (int i = 1; i <= n; ++i) if (find(i) == i) ++cnt;\n    cout << cnt << '\\n';\n    return 0;\n}",
+      "fixed": "#include <bits/stdc++.h>\nusing namespace std;\n\nint parent[100005];\nint find(int x) { return parent[x] == x ? x : parent[x] = find(parent[x]); }\nint main() {\n    int n, m;\n    cin >> n >> m;\n    for (int i = 1; i <= n; ++i) parent[i] = i;\n    for (int i = 0; i < m; ++i) {\n        int u, v;\n        cin >> u >> v;\n        int ru = find(u), rv = find(v);\n        if (ru != rv) parent[ru] = rv;\n    }\n    int cnt = 0;\n    for (int i = 1; i <= n; ++i) if (find(i) == i) ++cnt;\n    cout << cnt << '\\n';\n    return 0;\n}",
+      "analysis": "合并两个集合必须把“根”挂到“根”上。直接 `parent[u] = v` 在 u 不是根时，会把 u 下面整棵子树从原集合拆出来，连通关系就丢了。先 `find(u)`、`find(v)`，不同根才合并。",
+      "hints": [
+        "parent[u]=v 修改的是 u 的父指针还是根？",
+        "如果 u 是某棵子树的中间节点，它的孩子还认它吗？"
+      ],
+      "tests": [
+        {
+          "public": true,
+          "label": "公开样例",
+          "stdin": "3 2\n1 2\n1 3",
+          "expected": "1"
+        },
+        {
+          "public": false,
+          "label": "隐藏用例 1",
+          "stdin": "5 4\n1 2\n2 3\n1 3\n4 5",
+          "expected": "2"
+        },
+        {
+          "public": false,
+          "label": "隐藏用例 2",
+          "stdin": "4 3\n1 2\n1 3\n1 4",
+          "expected": "1"
+        }
+      ],
+      "targetMs": 110
+    },
+    {
+      "id": "h11",
+      "level": "hard",
+      "order": 11,
+      "title": "重边让入度永远减不完",
+      "summary": "拓扑排序的入度与邻接表不一致",
+      "prompt": "读入 n 个点、m 条有向边，输出字典序最小的拓扑序；有环输出 CYCLE。现在有重边的图会卡住。",
+      "source": "算法导论 · 拓扑排序；C++ Primer Plus · 第 17 章",
+      "minutes": 14,
+      "code": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n, m;\n    cin >> n >> m;\n    vector<set<int>> g(n + 1);\n    vector<int> indeg(n + 1, 0);\n    for (int i = 0; i < m; ++i) {\n        int u, v;\n        cin >> u >> v;\n        g[u].insert(v);\n        ++indeg[v];          // BUG: 重边只存一次，却加了两次入度\n    }\n    priority_queue<int, vector<int>, greater<int>> q;\n    for (int i = 1; i <= n; ++i) if (!indeg[i]) q.push(i);\n    vector<int> out;\n    while (!q.empty()) {\n        int u = q.top(); q.pop();\n        out.push_back(u);\n        for (int v : g[u])\n            if (--indeg[v] == 0) q.push(v);\n    }\n    if ((int)out.size() != n) { cout << \"CYCLE\\n\"; return 0; }\n    for (size_t i = 0; i < out.size(); ++i) cout << out[i] << (i + 1 == out.size() ? '\\n' : ' ');\n    return 0;\n}",
+      "fixed": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n, m;\n    cin >> n >> m;\n    vector<set<int>> g(n + 1);\n    vector<int> indeg(n + 1, 0);\n    for (int i = 0; i < m; ++i) {\n        int u, v;\n        cin >> u >> v;\n        if (g[u].insert(v).second) ++indeg[v];\n    }\n    priority_queue<int, vector<int>, greater<int>> q;\n    for (int i = 1; i <= n; ++i) if (!indeg[i]) q.push(i);\n    vector<int> out;\n    while (!q.empty()) {\n        int u = q.top(); q.pop();\n        out.push_back(u);\n        for (int v : g[u])\n            if (--indeg[v] == 0) q.push(v);\n    }\n    if ((int)out.size() != n) { cout << \"CYCLE\\n\"; return 0; }\n    for (size_t i = 0; i < out.size(); ++i) cout << out[i] << (i + 1 == out.size() ? '\\n' : ' ');\n    return 0;\n}",
+      "analysis": "邻接表用 `set` 去重，但入度按输入边数累加，重边会让 v 的入度多 1，而遍历邻接表只会减 1，v 永远进不了队列。要么用 multiset 保留重边，要么插入成功时才增加入度。",
+      "hints": [
+        "g[u].insert(v) 返回的 second 表示什么？",
+        "重边对入度和邻接表应该产生同样次数的影响吗？"
+      ],
+      "tests": [
+        {
+          "public": true,
+          "label": "公开样例",
+          "stdin": "4 4\n1 2\n1 2\n1 3\n2 4",
+          "expected": "1 2 3 4"
+        },
+        {
+          "public": false,
+          "label": "隐藏用例 1",
+          "stdin": "4 4\n1 2\n1 3\n2 4\n3 4",
+          "expected": "1 2 3 4"
+        },
+        {
+          "public": false,
+          "label": "隐藏用例 2",
+          "stdin": "3 3\n1 2\n2 3\n3 1",
+          "expected": "CYCLE"
+        }
+      ],
+      "targetMs": 115
+    },
+    {
+      "id": "h12",
+      "level": "hard",
+      "order": 12,
+      "title": "无向图只存了单向边",
+      "summary": "反向最短路永远不可达",
+      "prompt": "读入一张无向带权图，求 1 到 n 的最短距离；不可达输出 -1。现在从 1 出发常常直接判成不可达。",
+      "source": "C++ Primer Plus · 第 17 章；算法导论 · 最短路",
+      "minutes": 14,
+      "code": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n, m;\n    cin >> n >> m;\n    vector<vector<pair<int, int>>> g(n + 1);\n    for (int i = 0; i < m; ++i) {\n        int u, v, w;\n        cin >> u >> v >> w;\n        g[u].push_back({v, w});   // BUG: 无向图只加了 u→v\n    }\n    const long long INF = (long long)4e18;\n    vector<long long> dist(n + 1, INF);\n    dist[1] = 0;\n    priority_queue<pair<long long, int>, vector<pair<long long, int>>, greater<>> pq;\n    pq.push({0, 1});\n    while (!pq.empty()) {\n        auto [d, u] = pq.top(); pq.pop();\n        if (d != dist[u]) continue;\n        for (auto [v, w] : g[u]) {\n            if (d + w < dist[v]) {\n                dist[v] = d + w;\n                pq.push({dist[v], v});\n            }\n        }\n    }\n    cout << (dist[n] == INF ? -1 : dist[n]) << '\\n';\n    return 0;\n}",
+      "fixed": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n, m;\n    cin >> n >> m;\n    vector<vector<pair<int, int>>> g(n + 1);\n    for (int i = 0; i < m; ++i) {\n        int u, v, w;\n        cin >> u >> v >> w;\n        g[u].push_back({v, w});\n        g[v].push_back({u, w});\n    }\n    const long long INF = (long long)4e18;\n    vector<long long> dist(n + 1, INF);\n    dist[1] = 0;\n    priority_queue<pair<long long, int>, vector<pair<long long, int>>, greater<>> pq;\n    pq.push({0, 1});\n    while (!pq.empty()) {\n        auto [d, u] = pq.top(); pq.pop();\n        if (d != dist[u]) continue;\n        for (auto [v, w] : g[u]) {\n            if (d + w < dist[v]) {\n                dist[v] = d + w;\n                pq.push({dist[v], v});\n            }\n        }\n    }\n    cout << (dist[n] == INF ? -1 : dist[n]) << '\\n';\n    return 0;\n}",
+      "analysis": "无向边 u—v 等价于同时存在 u→v 和 v→u。只加 `g[u].push_back({v,w})` 时，从 1 出发走到某点后可能再也回不去；补上反向边即可。",
+      "hints": [
+        "无向边应该向邻接表加几条有向边？",
+        "如果题目改成有向图，还需要加反向边吗？"
+      ],
+      "tests": [
+        {
+          "public": true,
+          "label": "公开样例",
+          "stdin": "4 3\n1 2 1\n3 2 1\n3 4 1",
+          "expected": "3"
+        },
+        {
+          "public": false,
+          "label": "隐藏用例 1",
+          "stdin": "2 1\n2 1 5",
+          "expected": "5"
+        },
+        {
+          "public": false,
+          "label": "隐藏用例 2",
+          "stdin": "4 3\n1 3 4\n3 2 2\n2 4 1",
+          "expected": "7"
+        }
+      ],
+      "targetMs": 120
     }
   ]
 };

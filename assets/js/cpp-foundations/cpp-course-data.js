@@ -1,4 +1,4 @@
-/* C++ 五篇 18 章 36 课：按 8 本书主题重写，正文内联，不依赖额外 JSON。 */
+/* C++ 五篇 18 章 54 课：按 8 本书主题重写，正文内联，不依赖额外 JSON。 */
 window.CPP_COURSE_PARTS = [
   {
     "title": "语言底座",
@@ -118,9 +118,50 @@ window.CPP_COURSE_CHAPTERS = [
             "lang": "cpp"
           }
         ]
+      },
+      {
+        "id": "cpp-1-3",
+        "title": "1.3 多文件项目、ODR 与库链接",
+        "level": "intermediate",
+        "minutes": 55,
+        "lead": "单个 .cpp 能跑起来，不代表多文件项目能链接成功。本课把翻译单元、ODR、静态库/共享库和最小 CMake 串成一条真实工程链。",
+        "source": "A Tour of C++ 3E §1.2、§15；C++ Primer Plus 6E 第 9 章；Beginning C++17 第 10 章",
+        "points": [
+          "多文件项目的目录与职责",
+          "ODR 与 inline/static",
+          "静态库与共享库",
+          "头文件包含路径与链接顺序",
+          "最小 CMake 工程"
+        ],
+        "sections": [
+          {
+            "h": "从三个文件开始：声明、实现、调用",
+            "p": "一个最小多文件项目通常分成 `include/` 放公共头文件，`src/` 放实现，`main.cpp` 只负责组装。头文件写函数声明和类型定义，`.cpp` 写函数体；每个 `.cpp` 独立编译成 `.o`，最后由链接器合并。**不要把实现函数的定义写进头文件**，除非它是 `inline`、模板或 `constexpr`。",
+            "code": "// include/mathx.h\n#pragma once\nint add(int a, int b);\n\n// src/mathx.cpp\n#include \"mathx.h\"\nint add(int a, int b) { return a + b; }\n\n// src/main.cpp\n#include <iostream>\n#include \"mathx.h\"\nint main() { std::cout << add(20, 22) << '\\n'; }\n// 编译：g++ -std=c++20 -Iinclude src/mathx.cpp src/main.cpp -o app",
+            "output": "42",
+            "tip": "`#include \"x.h\"` 先在当前文件目录找，再用 `-I` 路径；`#include <x>` 只走系统/`-I` 路径。头文件用 `#pragma once` 或 include guard，二者选一即可。",
+            "lang": "cpp"
+          },
+          {
+            "h": "ODR：同一个名字只能有一份定义",
+            "p": "ODR（One Definition Rule）要求：普通函数、全局变量、非 inline 的类静态成员在整个程序中只能定义一次；类定义、模板、inline 函数可以在多个翻译单元出现，但必须逐字一致。违反 ODR 通常不会在编译期报错，而是在链接期报 `multiple definition`，或者更糟——运行期行为不一致。",
+            "code": "// bad.h：被两个 .cpp 包含就会重复定义\n#pragma once\nint counter = 0;              // 错误：每个翻译单元一份定义\nint next_id() { return ++counter; }\n\n// good.h\n#pragma once\ninline int& counter() { static int value = 0; return value; }\ninline int next_id() { return ++counter(); }",
+            "output": "bad.h → multiple definition of `counter`\ngood.h → 单一实例，链接通过",
+            "tip": "C++17 起可用 `inline` 变量在头文件里定义全局对象；C++20 的 `constinit` 只保证静态初始化，不改变链接属性。头文件里的 `static` 变量每个翻译单元各一份，通常不是你想要的“全局”。",
+            "lang": "cpp"
+          },
+          {
+            "h": "静态库、共享库与最小 CMake",
+            "p": "静态库 `.a` 在链接时把目标代码复制进可执行文件；共享库 `.so` 在运行时加载，多个程序可共享同一份代码。CMake 用 target 表达依赖，比手写一长串 `g++` 更可靠：`add_library` 声明库，`target_include_directories` 传头文件路径，`target_link_libraries` 连依赖。",
+            "code": "cmake_minimum_required(VERSION 3.16)\nproject(mathx LANGUAGES CXX)\nadd_library(mathx STATIC src/mathx.cpp)\ntarget_include_directories(mathx PUBLIC include)\ntarget_compile_features(mathx PUBLIC cxx_std_20)\nadd_executable(app src/main.cpp)\ntarget_link_libraries(app PRIVATE mathx)\n# 构建：cmake -S . -B build && cmake --build build -j",
+            "output": "构建目录 build/，产物 build/app",
+            "tip": "共享库要处理导出符号、运行时路径和 ABI；初学项目先用静态库，减少“编译成功但运行找不到 .so”的干扰。CMake 的 PUBLIC/PRIVATE 决定头文件路径是否传递给下游 target。",
+            "lang": "cmake"
+          }
+        ]
       }
     ],
-    "sectionsCount": 6
+    "sectionsCount": 9
   },
   {
     "id": "cpp-ch02",
@@ -216,9 +257,50 @@ window.CPP_COURSE_CHAPTERS = [
             "lang": "cpp"
           }
         ]
+      },
+      {
+        "id": "cpp-2-3",
+        "title": "2.3 求值顺序、溢出与数值边界",
+        "level": "intermediate",
+        "minutes": 55,
+        "lead": "类型和值类别之后，真正咬人的是求值顺序、隐式转换和边界值。本课把“看起来能算”的表达式拆成可预测的步骤。",
+        "source": "C++ Primer Plus 6E 第 3–4 章；C++ PL 4E §10；Effective Modern C++ Item 1–4",
+        "points": [
+          "表达式求值顺序与序列点",
+          "有符号溢出与无符号回绕",
+          "浮点误差与比较",
+          "窄化转换与花括号",
+          "numeric_limits 与安全边界"
+        ],
+        "sections": [
+          {
+            "h": "不要在一个表达式里赌求值顺序",
+            "p": "C++ 只保证部分求值顺序：`&&`、`||`、逗号运算符和条件运算符有短路/序列语义，函数实参的求值顺序直到 C++17 仍不确定。`f(i++, i)` 这类表达式在 C++17 后参数求值仍可能交错，属于未指定行为；同一对象被多次无序列修改则是未定义行为。把有副作用的操作拆成独立语句，永远比背规则可靠。",
+            "code": "#include <iostream>\nint main() {\n    int i = 0;\n    int a = i++;\n    int b = i++;\n    std::cout << a << ' ' << b << ' ' << i << '\\n';\n}",
+            "output": "0 1 2",
+            "tip": "`i++ + i++` 不是“自增两次再相加”的保证，C++17 前是未定义行为，之后仍是未指定顺序。工程里直接拆成两行。",
+            "lang": "cpp"
+          },
+          {
+            "h": "有符号溢出是 UB，无符号回绕是定义行为",
+            "p": "有符号整数溢出在 C++ 标准里是未定义行为，编译器可以假设它不会发生，从而做出让结果“更奇怪”的优化；无符号整数按模 2^N 回绕，是确定的。判断加法是否溢出要在运算前检查，而不是算完再判断。`std::numeric_limits<int>::max()` 是最小值/最大值的安全来源。",
+            "code": "#include <iostream>\n#include <limits>\nint main() {\n    int a = std::numeric_limits<int>::max();\n    int b = 1;\n    if (a > std::numeric_limits<int>::max() - b) {\n        std::cout << \"overflow\\n\";\n    } else {\n        std::cout << a + b << '\\n';\n    }\n    unsigned u = 0;\n    std::cout << u - 1 << '\\n';   // 4294967295（32 位 unsigned）\n}",
+            "output": "overflow\n4294967295",
+            "tip": "把 `int` 换成 `long long` 只能推迟溢出，不能消除。涉及金额/计数时明确位宽，并在边界处检查；不要依赖“溢出后变负数”这种实现巧合。",
+            "lang": "cpp"
+          },
+          {
+            "h": "浮点比较、窄化与安全转换",
+            "p": "二进制浮点无法精确表示 0.1、0.2 这类十进制小数，`0.1 + 0.2 == 0.3` 通常为 false。比较浮点要用相对/绝对误差；需要精确十进制时用整数分或十进制库。花括号初始化禁止窄化转换，是捕获“精度悄悄丢失”的第一道防线。",
+            "code": "#include <cmath>\n#include <iostream>\nint main() {\n    double x = 0.1 + 0.2;\n    std::cout << (x == 0.3) << '\\n';\n    std::cout << (std::abs(x - 0.3) < 1e-9) << '\\n';\n    // int n{3.14};   // 编译错误：窄化\n    int m = static_cast<int>(3.14);\n    std::cout << m << '\\n';\n}",
+            "output": "0\n1\n3",
+            "tip": "`-Wconversion -Wsign-conversion` 能抓出大量隐式窄化。浮点误差阈值要按量级选，不要到处写 `1e-9`；比较大数时用相对误差。",
+            "lang": "cpp"
+          }
+        ]
       }
     ],
-    "sectionsCount": 6
+    "sectionsCount": 9
   },
   {
     "id": "cpp-ch03",
@@ -314,9 +396,50 @@ window.CPP_COURSE_CHAPTERS = [
             "lang": "cpp"
           }
         ]
+      },
+      {
+        "id": "cpp-3-3",
+        "title": "3.3 递归、函数对象与调用约定",
+        "level": "intermediate",
+        "minutes": 55,
+        "lead": "函数不只是“把代码装起来”。递归的基准条件、函数对象的捕获、参数传递方式和 inline 的边界，决定了调用是清晰还是隐蔽的维护债。",
+        "source": "C++ Primer Plus 6E 第 7–8 章；C++ PL 4E §12；Beginning C++17 第 8 章",
+        "points": [
+          "递归与基准条件",
+          "尾递归与栈深度",
+          "函数对象与 lambda 的调用",
+          "参数传递：值/引用/const 引用",
+          "inline 与调用开销"
+        ],
+        "sections": [
+          {
+            "h": "递归先写基准，再写推进",
+            "p": "递归函数必须有两个东西：能直接返回的基准条件，以及每次都会向基准靠近的递归步骤。缺少任一条件都会栈溢出。阶乘、二叉树遍历、DFS 都是典型形态；写之前先用 n=0、n=1 手算，确认不会无限下探。",
+            "code": "#include <iostream>\nlong long fact(int n) {\n    if (n <= 1) return 1;          // 基准\n    return n * fact(n - 1);        // 推进\n}\nint main() { std::cout << fact(10) << '\\n'; }",
+            "output": "3628800",
+            "tip": "递归深度受线程栈限制，通常几千到几万层。深度可能很大时改用显式栈/迭代；不要用递归处理用户可控的超深链。",
+            "lang": "cpp"
+          },
+          {
+            "h": "函数对象、lambda 与 std::function",
+            "p": "lambda 是一个带 `operator()` 的匿名函数对象，捕获列表决定它持有谁的副本/引用。`std::function` 做类型擦除，能存任意可调用对象，但有间接调用和可能堆分配的开销；模板参数 `F` 则保留具体类型，通常更快。",
+            "code": "#include <functional>\n#include <iostream>\nint apply_twice(std::function<int(int)> f, int x) { return f(f(x)); }\ntemplate <class F> int apply_twice_t(F f, int x) { return f(f(x)); }\nint main() {\n    int base = 3;\n    auto add = [base](int x) { return x + base; };\n    std::cout << apply_twice(add, 1) << ' ' << apply_twice_t(add, 1) << '\\n';\n}",
+            "output": "7 7",
+            "tip": "按引用捕获 `[&]` 后把 lambda 存起来跨作用域使用，极易悬垂。需要保存时按值捕获或明确所有权；`std::function` 不是零成本抽象。",
+            "lang": "cpp"
+          },
+          {
+            "h": "参数传递与 inline 的真实边界",
+            "p": "传值会复制；传 `const T&` 避免复制且表达只读；传 `T&` 表示要修改调用方对象。对内置小类型（int、double、指针）传值通常更快，对 `std::string`/大结构用 `const&`。`inline` 只是允许跨翻译单元定义、给编译器一个提示，不保证一定展开。",
+            "code": "#include <iostream>\n#include <string>\nvoid print(const std::string& s) { std::cout << s << '\\n'; }\nvoid add_one(int& x) { ++x; }\nint main() {\n    std::string s = \"hello\";\n    print(s);\n    int n = 41;\n    add_one(n);\n    std::cout << n << '\\n';\n}",
+            "output": "hello\n42",
+            "tip": "返回引用/指针时必须保证被引用对象活得比调用方更久。不要返回局部变量的引用；这是 C++ 里最常见、编译器却未必报警的错误之一。",
+            "lang": "cpp"
+          }
+        ]
       }
     ],
-    "sectionsCount": 6
+    "sectionsCount": 9
   },
   {
     "id": "cpp-ch04",
@@ -413,9 +536,50 @@ window.CPP_COURSE_CHAPTERS = [
             "lang": "bash"
           }
         ]
+      },
+      {
+        "id": "cpp-4-3",
+        "title": "4.3 内存布局、对齐与缓存行",
+        "level": "intermediate",
+        "minutes": 60,
+        "lead": "同样一组字段，声明顺序不同可能差出一倍内存；同样一个循环，访问顺序不同可能差出一个数量级。本课把对象布局和缓存行为变成可观察的量。",
+        "source": "C++ PL 4E §6.2、§47；Effective Modern C++ Item 41；C++ Concurrency in Action 2E §3",
+        "points": [
+          "sizeof 与对齐规则",
+          "结构体填充与字段顺序",
+          "缓存行与伪共享",
+          "数组行/列访问顺序",
+          "alignas 与 padding"
+        ],
+        "sections": [
+          {
+            "h": "sizeof 不是字段大小简单相加",
+            "p": "编译器会插入 padding，让每个成员按自身对齐要求摆放，并让整个结构的大小是其最大对齐值的整数倍。`char` 后接 `int` 通常要空 3 字节；把大对齐成员放前面、小成员集中放后面，往往能减少填充。",
+            "code": "#include <iostream>\nstruct A { char c; int i; char d; };\nstruct B { int i; char c; char d; };\nint main() {\n    std::cout << sizeof(A) << ' ' << sizeof(B) << '\\n';\n    std::cout << alignof(A) << ' ' << alignof(B) << '\\n';\n}",
+            "output": "12 8\n4 4",
+            "tip": "`sizeof` 是编译期常量，但受平台/ABI 影响。跨平台协议不要直接序列化结构体；用固定宽度类型并显式打包/解析。",
+            "lang": "cpp"
+          },
+          {
+            "h": "缓存行：相邻字段可能互相拖慢",
+            "p": "CPU 以缓存行为单位搬运数据，常见 64 字节。两个线程分别频繁写同一缓存行里的不同字段，会因缓存一致性协议反复失效，这叫伪共享。把热点字段用 `alignas(64)` 分开，或用线程本地累加再汇总，可以显著减少抖动。",
+            "code": "#include <atomic>\n#include <iostream>\nstruct FalseShare { std::atomic<long long> a{0}; std::atomic<long long> b{0}; };\nstruct Padded {\n    alignas(64) std::atomic<long long> a{0};\n    alignas(64) std::atomic<long long> b{0};\n};\nint main() {\n    std::cout << sizeof(FalseShare) << ' ' << sizeof(Padded) << '\\n';\n}",
+            "output": "16 128",
+            "tip": "填充会增加内存占用，不是所有字段都需要 64 字节隔离；先用性能工具确认热点，再针对共享缓存行的计数器/队列头尾做 padding。",
+            "lang": "cpp"
+          },
+          {
+            "h": "访问顺序决定缓存命中率",
+            "p": "二维数组在内存中按行连续存放。按 `a[i][j]` 外层 i、内层 j 遍历，能顺序扫过整行；反过来 `a[j][i]` 会每次跨一行，缓存命中率大幅下降。`std::vector<std::vector<int>>` 的行不保证连续，性能敏感时用一维数组加手动下标。",
+            "code": "#include <iostream>\n#include <vector>\nint main() {\n    const int n = 1000;\n    std::vector<std::vector<int>> a(n, std::vector<int>(n, 1));\n    long long sum = 0;\n    for (int i = 0; i < n; ++i)\n        for (int j = 0; j < n; ++j)\n            sum += a[i][j];\n    std::cout << sum << '\\n';\n}",
+            "output": "1000000",
+            "tip": "矩阵乘、卷积、图像处理都受访问顺序影响。先写正确版本，再用 `perf`/基准测试确认缓存瓶颈，最后才考虑分块（blocking）。",
+            "lang": "cpp"
+          }
+        ]
       }
     ],
-    "sectionsCount": 6
+    "sectionsCount": 9
   },
   {
     "id": "cpp-ch05",
@@ -512,9 +676,50 @@ window.CPP_COURSE_CHAPTERS = [
             "lang": "cpp"
           }
         ]
+      },
+      {
+        "id": "cpp-5-3",
+        "title": "5.3 委派构造、static 成员与不变式检查",
+        "level": "intermediate",
+        "minutes": 55,
+        "lead": "构造器不是“赋值函数”。成员初始化顺序、委派构造、静态成员和不变式检查共同决定对象从第一刻起是否合法。",
+        "source": "C++ Primer Plus 6E 第 10–12 章；C++ PL 4E §16；Effective Modern C++ Item 41",
+        "points": [
+          "成员初始化列表与声明顺序",
+          "委派构造与 explicit",
+          "static 成员与 inline 变量",
+          "不变式与检查函数",
+          "const 成员与 mutable"
+        ],
+        "sections": [
+          {
+            "h": "初始化顺序只看声明顺序",
+            "p": "成员按类中**声明顺序**初始化，与初始化列表的书写顺序无关。若列表顺序与声明顺序不一致，编译器会警告；更危险的是用一个尚未初始化的成员去初始化另一个成员。把所有初始化放进列表、按声明顺序书写，是避免“未初始化读取”的最低成本规则。",
+            "code": "#include <iostream>\nclass Point {\n    int y_;\n    int x_;\npublic:\n    Point(int x, int y) : x_(x), y_(y) {}\n    void dump() const { std::cout << x_ << ',' << y_ << '\\n'; }\n};\nint main() { Point p(3, 4); p.dump(); }",
+            "output": "3,4",
+            "tip": "`-Wreorder` 会提示初始化列表顺序与声明不一致。成员默认初始化用 `int x_{0};` 写在声明处，能防止忘记初始化。",
+            "lang": "cpp"
+          },
+          {
+            "h": "委派构造与 explicit",
+            "p": "C++11 起构造器可以委派给同类的另一个构造器，把公共校验集中到一处。单参数构造器若允许隐式转换，容易让 `Foo f = 42;` 这类代码悄悄发生；加 `explicit` 只允许显式构造，接口更可预测。",
+            "code": "#include <iostream>\nclass Meter {\n    double value_;\npublic:\n    explicit Meter(double v) : value_(v) {\n        if (v < 0) value_ = 0;\n    }\n    Meter() : Meter(0.0) {}\n    double value() const { return value_; }\n};\nint main() {\n    Meter m(3.5);\n    // Meter bad = 3.5;  // explicit 阻止\n    std::cout << m.value() << '\\n';\n}",
+            "output": "3.5",
+            "tip": "委派构造不能和成员初始化列表同时写同一个成员；被委派的构造器先完整执行，再执行当前构造器体。`explicit` 对多参数构造器在 C++11 后也有意义（列表初始化）。",
+            "lang": "cpp"
+          },
+          {
+            "h": "static 成员、inline 变量与不变式",
+            "p": "`static` 数据成员属于类而不是对象，所有实例共享一份。C++17 起可在类内用 `inline static` 定义，避免在 .cpp 里再写一遍。不变式（invariant）是“对象始终必须满足的条件”，用 private 校验函数在构造器和修改器里检查，比事后调试便宜。",
+            "code": "#include <cassert>\n#include <iostream>\nclass Counter {\n    inline static int live_ = 0;\n    int value_ = 0;\n    void check() const { assert(value_ >= 0); }\npublic:\n    Counter() { ++live_; }\n    ~Counter() { --live_; }\n    void add(int n) { value_ += n; check(); }\n    static int live() { return live_; }\n};\nint main() {\n    Counter a, b;\n    a.add(5);\n    std::cout << Counter::live() << ' ' << sizeof(a) << '\\n';\n}",
+            "output": "2 4",
+            "tip": "`assert` 在 `NDEBUG` 下消失，发布版的不变式检查要改用异常/错误码。`static` 成员的初始化顺序跨翻译单元仍可能不确定，避免在静态初始化阶段互相依赖。",
+            "lang": "cpp"
+          }
+        ]
       }
     ],
-    "sectionsCount": 6
+    "sectionsCount": 9
   },
   {
     "id": "cpp-ch06",
@@ -611,9 +816,50 @@ window.CPP_COURSE_CHAPTERS = [
             "lang": "cpp"
           }
         ]
+      },
+      {
+        "id": "cpp-6-3",
+        "title": "6.3 copy-and-swap、特殊成员与异常安全",
+        "level": "hard",
+        "minutes": 65,
+        "lead": "拷贝赋值写一半、移动后仍被使用、swap 抛异常——这些不是边缘情况，而是资源管理类的常见崩点。本课把 Rule of Five 落到可复用写法。",
+        "source": "Effective Modern C++ Item 11–17；C++ PL 4E §17；C++ Primer Plus 6E 第 12 章",
+        "points": [
+          "自赋值与异常安全",
+          "copy-and-swap 惯用法",
+          "noexcept 移动与容器行为",
+          "特殊成员函数生成规则",
+          "ADL swap 与 std::swap"
+        ],
+        "sections": [
+          {
+            "h": "拷贝赋值的三件事：自赋值、释放、异常",
+            "p": "朴素写法 `delete[] old; old = new copy;` 一旦分配抛异常，对象就处于半销毁状态；如果 `this == &other`，还会先释放自己再读自己。copy-and-swap 用“先构造副本、再交换”把释放和异常隔离开：副本构造失败时原对象不变，交换本身不抛异常。",
+            "code": "#include <algorithm>\n#include <cstring>\n#include <iostream>\nclass Buffer {\n    char* data_ = nullptr;\n    std::size_t size_ = 0;\npublic:\n    explicit Buffer(std::size_t n) : data_(new char[n]{}), size_(n) {}\n    ~Buffer() { delete[] data_; }\n    Buffer(const Buffer& o) : data_(new char[o.size_]), size_(o.size_) {\n        std::memcpy(data_, o.data_, size_);\n    }\n    Buffer& operator=(const Buffer& o) {\n        if (this != &o) {\n            Buffer tmp(o);\n            std::swap(data_, tmp.data_);\n            std::swap(size_, tmp.size_);\n        }\n        return *this;\n    }\n    std::size_t size() const { return size_; }\n};\nint main() { Buffer a(4), b(6); a = b; std::cout << a.size() << '\\n'; }",
+            "output": "6",
+            "tip": "现代项目优先 Rule of Zero：用 `std::vector`/`std::string`/`unique_ptr` 成员，编译器生成的拷贝/移动就是正确的。只有手写资源封装才需要 Rule of Five。",
+            "lang": "cpp"
+          },
+          {
+            "h": "移动构造要 noexcept，否则容器会退回拷贝",
+            "p": "`std::vector` 扩容时需要把旧元素搬到新内存。如果移动构造没有标记 `noexcept`，且拷贝构造可用，标准库会选择拷贝以保证强异常安全——性能可能差一个量级。移动构造/移动赋值应尽量 `noexcept`，并在移动后把源对象置为可析构的空状态。",
+            "code": "#include <iostream>\n#include <utility>\n#include <vector>\nstruct Item {\n    int value = 0;\n    Item() = default;\n    explicit Item(int v) : value(v) {}\n    Item(const Item&) = default;\n    Item(Item&& o) noexcept : value(o.value) { o.value = 0; }\n    Item& operator=(Item&& o) noexcept {\n        value = o.value; o.value = 0; return *this;\n    }\n};\nint main() {\n    std::vector<Item> v;\n    v.push_back(Item(7));\n    std::cout << v[0].value << '\\n';\n}",
+            "output": "7",
+            "tip": "标记 `noexcept` 后如果真抛异常会直接 `terminate`；移动操作只做指针/整数搬运，不要在里面分配可能失败的内存。",
+            "lang": "cpp"
+          },
+          {
+            "h": "特殊成员生成规则与 ADL swap",
+            "p": "声明析构、拷贝构造、拷贝赋值、移动构造、移动赋值中的任意一个，都会抑制另一些特殊成员的隐式生成；用 `= default` / `= delete` 明确表达意图。自定义类型的交换应调用 `using std::swap; swap(a,b);`，让 ADL 找到类型自己的高效 swap，而不是永远走三次移动。",
+            "code": "#include <iostream>\n#include <utility>\nclass Handle {\n    int id_ = 0;\npublic:\n    Handle() = default;\n    explicit Handle(int id) : id_(id) {}\n    Handle(const Handle&) = delete;\n    Handle& operator=(const Handle&) = delete;\n    Handle(Handle&&) noexcept = default;\n    Handle& operator=(Handle&&) noexcept = default;\n    void swap(Handle& o) noexcept { std::swap(id_, o.id_); }\n    int id() const { return id_; }\n};\nint main() {\n    Handle a(1), b(2);\n    using std::swap;\n    swap(a, b);\n    std::cout << a.id() << ' ' << b.id() << '\\n';\n}",
+            "output": "2 1",
+            "tip": "删掉拷贝后，按值传参/返回可能编译失败；需要拷贝语义的类型不要一刀切 `= delete`。ADL swap 必须写 `using std::swap;`，否则限定调用会绕过自定义版本。",
+            "lang": "cpp"
+          }
+        ]
       }
     ],
-    "sectionsCount": 6
+    "sectionsCount": 9
   },
   {
     "id": "cpp-ch07",
@@ -710,9 +956,50 @@ window.CPP_COURSE_CHAPTERS = [
             "lang": "cpp"
           }
         ]
+      },
+      {
+        "id": "cpp-7-3",
+        "title": "7.3 多重继承、虚继承与接口设计",
+        "level": "advanced",
+        "minutes": 65,
+        "lead": "多重继承不是“继承更多就更强”。菱形继承、虚基类、接口与实现分离，都是为了在复杂层次里保住对象语义和生命周期。",
+        "source": "C++ PL 4E §21–22；C++ Primer Plus 6E 第 14 章；A Tour of C++ 3E §5",
+        "points": [
+          "多重继承与菱形问题",
+          "虚继承与虚基类",
+          "接口类与纯虚函数",
+          "final/override 与名字隐藏",
+          "dynamic_cast 的边界"
+        ],
+        "sections": [
+          {
+            "h": "多重继承先画对象图",
+            "p": "一个类同时继承 A、B 时，对象里会包含两份基类子对象，除非使用虚继承。菱形结构 `D -> B,C -> A` 若不虚继承，D 里会有两份 A，访问 `A::member` 就产生歧义；虚继承让所有路径共享同一份 A 子对象。",
+            "code": "#include <iostream>\nstruct A { int value = 1; };\nstruct B : virtual A {};\nstruct C : virtual A {};\nstruct D : B, C {};\nint main() {\n    D d;\n    std::cout << d.value << ' ' << sizeof(D) << '\\n';\n}",
+            "output": "1 24",
+            "tip": "虚继承会增加对象大小和访问间接层，不是默认选择。只有确实需要共享基类状态时才用；接口类通常不含数据，不需要虚继承。",
+            "lang": "cpp"
+          },
+          {
+            "h": "接口类：只暴露契约，不暴露实现",
+            "p": "接口类通常只有纯虚函数和虚析构，不含数据成员。它让调用方依赖“能做什么”，而不是“怎么存”。析构必须虚，否则通过基类指针 delete 派生对象时不会调用派生析构。`final` 可以封住不该被扩展的类，`override` 让重写错误在编译期暴露。",
+            "code": "#include <iostream>\n#include <memory>\nstruct Logger {\n    virtual ~Logger() = default;\n    virtual void log(const char* msg) const = 0;\n};\nstruct ConsoleLogger final : Logger {\n    void log(const char* msg) const override { std::cout << msg << '\\n'; }\n};\nint main() {\n    std::unique_ptr<Logger> p = std::make_unique<ConsoleLogger>();\n    p->log(\"ready\");\n}",
+            "output": "ready",
+            "tip": "接口类不要有 public 数据成员；需要状态时放到实现类/私有成员。通过基类指针删除对象时，基类析构必须 virtual。",
+            "lang": "cpp"
+          },
+          {
+            "h": "dynamic_cast 是最后手段",
+            "p": "`dynamic_cast<Derived*>(base)` 在运行时检查真实类型，失败返回 nullptr（引用则抛 `bad_cast`）；它要求基类多态（至少一个虚函数）。频繁使用通常说明接口设计让调用方知道了太多实现细节。优先用虚函数/访问者模式在基类侧分派。",
+            "code": "#include <iostream>\nstruct Base { virtual ~Base() = default; };\nstruct Derived : Base { int value = 9; };\nint main() {\n    Base b;\n    Derived d;\n    Base* arr[] = {&b, &d};\n    for (Base* p : arr) {\n        if (auto q = dynamic_cast<Derived*>(p)) std::cout << q->value << '\\n';\n        else std::cout << \"base\\n\";\n    }\n}",
+            "output": "base\n9",
+            "tip": "RTTI 可能被构建选项关闭；跨 DLL/共享库的 type_info 比较也可能因 ABI 不同失效。接口边界稳定的项目尽量不用 dynamic_cast 做常规分派。",
+            "lang": "cpp"
+          }
+        ]
       }
     ],
-    "sectionsCount": 6
+    "sectionsCount": 9
   },
   {
     "id": "cpp-ch08",
@@ -809,9 +1096,50 @@ window.CPP_COURSE_CHAPTERS = [
             "lang": "cpp"
           }
         ]
+      },
+      {
+        "id": "cpp-8-3",
+        "title": "8.3 可变参数模板、折叠表达式与编译期多态",
+        "level": "advanced",
+        "minutes": 70,
+        "lead": "模板的最后一层不是“写得更泛”，而是把参数包、折叠表达式和 `if constexpr` 组合成零运行时开销的分派。",
+        "source": "C++ PL 4E §26；Effective Modern C++ Item 23–27；C++20 The Complete Guide 第 8–12 章",
+        "points": [
+          "参数包展开",
+          "折叠表达式",
+          "if constexpr 与编译期分支",
+          "tuple 与 index_sequence",
+          "CRTP 与静态多态"
+        ],
+        "sections": [
+          {
+            "h": "参数包：先展开，再处理",
+            "p": "可变参数模板用 `typename... Ts` 接收零个或多个类型，用 `args...` 展开。展开必须发生在支持包展开的上下文：函数实参、初始化列表、模板实参、继承列表等。递归展开是最直观的写法，C++17 的折叠表达式则把常见归约写成一行。",
+            "code": "#include <iostream>\ntemplate <class... Ts>\nvoid print_all(Ts... args) {\n    ((std::cout << args << ' '), ...);\n    std::cout << '\\n';\n}\nint main() { print_all(1, \"two\", 3.5); }",
+            "output": "1 two 3.5",
+            "tip": "折叠表达式 `(expr, ...)` 对每个包元素执行 expr，逗号保证从左到右。空包时逗号折叠得到 `void()`，不会报错；二元折叠要显式给初值。",
+            "lang": "cpp"
+          },
+          {
+            "h": "折叠表达式：把递归变成一行",
+            "p": "`(args + ...)` 是二元右折叠，`(0 + ... + args)` 指定初值；`(args && ...)` 做逻辑与，`(std::max)(...)` 不能直接当运算符，需要 lambda 包一层。折叠表达式在编译期展开，没有递归函数调用开销。",
+            "code": "#include <iostream>\ntemplate <class... Ts>\nauto sum(Ts... xs) { return (0 + ... + xs); }\ntemplate <class... Ts>\nauto all_true(Ts... xs) { return (true && ... && xs); }\nint main() {\n    std::cout << sum(1, 2, 3, 4) << '\\n';\n    std::cout << all_true(true, true, false) << '\\n';\n}",
+            "output": "10\n0",
+            "tip": "`sum()` 空包返回 0，类型是 int；要支持不同类型时用 `std::common_type_t<Ts...>` 或显式初值。折叠表达式不能直接展开成员访问，需要 pack expansion 辅助。",
+            "lang": "cpp"
+          },
+          {
+            "h": "if constexpr 与静态多态",
+            "p": "`if constexpr` 在编译期丢弃不满足的分支，discarded 分支仍会被解析但不会实例化；这让“同一份模板代码适配不同类型”成为可能。CRTP（奇异递归模板）让派生类在编译期把自己传给基类，实现无虚表的多态。",
+            "code": "#include <iostream>\n#include <type_traits>\ntemplate <class T>\nvoid show(T x) {\n    if constexpr (std::is_integral_v<T>) std::cout << \"int:\" << x << '\\n';\n    else std::cout << \"other:\" << x << '\\n';\n}\ntemplate <class D>\nstruct Base {\n    void call() { static_cast<D*>(this)->impl(); }\n};\nstruct Derived : Base<Derived> { void impl() { std::cout << \"derived\\n\"; } };\nint main() { show(3); show(2.5); Derived d; d.call(); }",
+            "output": "int:3\nother:2.5\nderived",
+            "tip": "`if constexpr` 不是运行时 `if` 的替代品；两个分支的代码仍要语法合法。CRTP 的静态转换要求派生类真实继承，错误使用会 UB。",
+            "lang": "cpp"
+          }
+        ]
       }
     ],
-    "sectionsCount": 6
+    "sectionsCount": 9
   },
   {
     "id": "cpp-ch09",
@@ -908,9 +1236,50 @@ window.CPP_COURSE_CHAPTERS = [
             "lang": "cpp"
           }
         ]
+      },
+      {
+        "id": "cpp-9-3",
+        "title": "9.3 容器适配、分配器与自定义 hash",
+        "level": "advanced",
+        "minutes": 65,
+        "lead": "选错容器比写错算法更常见。本课从增长策略、内存布局、哈希质量三个角度，把“用哪个容器”变成可解释的选择。",
+        "source": "Effective STL Item 1–23；C++ PL 4E §31–34；C++ Primer Plus 6E 第 16 章",
+        "points": [
+          "vector/deque/list 的真实成本",
+          "reserve 与增长策略",
+          "back_inserter/inserter 适配器",
+          "自定义 hash 与相等",
+          "allocator 与内存池边界"
+        ],
+        "sections": [
+          {
+            "h": "容器选择看访问模式，不看名字",
+            "p": "`vector` 连续存储、随机访问最快、尾部插入摊还 O(1)，但中间插入要搬移；`deque` 分段连续，头尾插入都快，随机访问多一层间接；`list` 节点分散，插入删除 O(1) 但遍历缓存差。绝大多数场景 `vector` 是默认答案，除非测量证明头尾插删是瓶颈。",
+            "code": "#include <chrono>\n#include <iostream>\n#include <list>\n#include <vector>\nint main() {\n    const int n = 100000;\n    std::vector<int> v;\n    std::list<int> l;\n    auto t0 = std::chrono::steady_clock::now();\n    for (int i = 0; i < n; ++i) v.push_back(i);\n    auto t1 = std::chrono::steady_clock::now();\n    for (int i = 0; i < n; ++i) l.push_back(i);\n    auto t2 = std::chrono::steady_clock::now();\n    std::cout << (t1 - t0).count() << ' ' << (t2 - t1).count() << '\\n';\n}",
+            "output": "输出两个纳秒级耗时，vector 通常更小",
+            "tip": "`list` 每个节点单独分配，内存碎片和缓存未命中会吃掉 O(1) 的理论优势。需要“稳定迭代器 + 频繁中间插删”时才考虑。",
+            "lang": "cpp"
+          },
+          {
+            "h": "reserve、shrink 与适配器",
+            "p": "`vector` 扩容通常按 1.5 或 2 倍增长，扩容时所有元素搬移并使迭代器/引用失效。已知规模时先 `reserve`；`shrink_to_fit` 只是请求，不保证。`back_inserter` 把 `push_back` 包装成输出迭代器，`inserter` 把 `insert` 包装成插入迭代器，让算法能写入容器。",
+            "code": "#include <algorithm>\n#include <iostream>\n#include <iterator>\n#include <vector>\nint main() {\n    std::vector<int> v;\n    v.reserve(10);\n    std::fill_n(std::back_inserter(v), 5, 7);\n    std::vector<int> out;\n    std::copy(v.begin(), v.end(), std::back_inserter(out));\n    std::cout << v.size() << ' ' << out.size() << '\\n';\n}",
+            "output": "5 5",
+            "tip": "`reserve` 只预留容量，不改变 size；访问 `v[5]` 仍是越界。`back_inserter` 要求容器有 `push_back`，`inserter` 要求 `insert`。",
+            "lang": "cpp"
+          },
+          {
+            "h": "自定义 hash 必须与相等一致",
+            "p": "`unordered_map` 先按 hash 分桶，再用 `==` 判断键是否相同。自定义类型要么特化 `std::hash`，要么传 Hash 函数对象；hash 与相等必须满足：相等对象 hash 相同，hash 相同不要求相等。`operator==` 与 hash 不一致会导致“插入了却查不到”。",
+            "code": "#include <iostream>\n#include <string>\n#include <unordered_map>\nstruct Key { int a; int b; };\nstruct Hash {\n    std::size_t operator()(const Key& k) const {\n        return std::hash<int>{}(k.a) ^ (std::hash<int>{}(k.b) << 1);\n    }\n};\nbool operator==(const Key& x, const Key& y) { return x.a == y.a && x.b == y.b; }\nint main() {\n    std::unordered_map<Key, int, Hash> m;\n    m[{1, 2}] = 3;\n    std::cout << m[{1, 2}] << '\\n';\n}",
+            "output": "3",
+            "tip": "hash 质量差会让所有键挤进同一个桶，退化成链表。不要把可变字段放进 hash key；键在容器里被修改会让它永远找不到。",
+            "lang": "cpp"
+          }
+        ]
       }
     ],
-    "sectionsCount": 6
+    "sectionsCount": 9
   },
   {
     "id": "cpp-ch10",
@@ -1007,9 +1376,50 @@ window.CPP_COURSE_CHAPTERS = [
             "lang": "cpp"
           }
         ]
+      },
+      {
+        "id": "cpp-10-3",
+        "title": "10.3 文本处理、正则与文件系统",
+        "level": "intermediate",
+        "minutes": 60,
+        "lead": "真实程序处理的是脏文本：空格、换行、编码、路径。本课把 getline、stringstream、regex 和 filesystem 串成一条可用的文本处理链。",
+        "source": "C++ Primer Plus 6E 第 17 章；C++ PL 4E §36–38；C++20 The Complete Guide 第 14 章",
+        "points": [
+          "getline 与空白处理",
+          "stringstream 解析结构化文本",
+          "正则表达式与匹配边界",
+          "UTF-8 与字节/字符差异",
+          "filesystem 路径与错误处理"
+        ],
+        "sections": [
+          {
+            "h": "getline 与 cin 的换行债",
+            "p": "`cin >> x` 跳过前导空白、读到下一个空白为止，但把换行留在流里；紧接着 `getline` 会立刻读到空行。混用时先用 `cin.ignore(std::numeric_limits<std::streamsize>::max(), '\\n')` 吃掉剩余行，或者全程用 `getline` + `stringstream` 解析。",
+            "code": "#include <iostream>\n#include <limits>\n#include <string>\nint main() {\n    int n;\n    std::cin >> n;\n    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\\n');\n    std::string line;\n    std::getline(std::cin, line);\n    std::cout << n << \" [\" << line << \"]\\n\";\n}",
+            "output": "输入：3\\nhello world\n输出：3 [hello world]",
+            "tip": "`getline` 返回流引用，循环写法 `while (std::getline(in, line))` 能正确处理 EOF 和空行。不要用 `cin.good()` 单独判断，流状态位组合很多。",
+            "lang": "cpp"
+          },
+          {
+            "h": "stringstream 做小解析器",
+            "p": "`std::stringstream` 把字符串当流用，适合按空格切分、逐 token 转换。它比手写 `find`/`substr` 清晰，但每个 token 都做一次格式化，性能敏感时用 `string_view` + 手写扫描。",
+            "code": "#include <iostream>\n#include <sstream>\n#include <string>\nint main() {\n    std::string line = \"10 20 30\";\n    std::istringstream in(line);\n    int x, sum = 0;\n    while (in >> x) sum += x;\n    std::cout << sum << '\\n';\n}",
+            "output": "60",
+            "tip": "`while (in >> x)` 在遇到非数字时退出，剩余内容还在流里；要区分“读完”和“格式错误”，检查 `in.eof()` 与 `in.fail()`。",
+            "lang": "cpp"
+          },
+          {
+            "h": "regex 匹配、filesystem 与编码边界",
+            "p": "`std::regex` 提供 ECMAScript/扩展语法，适合规则明确的文本抽取；但编译正则较慢，热路径要复用 `std::regex` 对象。`std::filesystem` 用 `path` 处理跨平台分隔符，`exists`/`is_regular_file` 可能抛异常，也有 `error_code` 重载。`std::string` 存的是字节，UTF-8 中文的一个字符占多字节，`size()` 不是字符数。",
+            "code": "#include <filesystem>\n#include <iostream>\n#include <regex>\n#include <string>\nint main() {\n    std::regex re(R\"(\\d+)\");\n    std::string s = \"order 42 total 7\";\n    for (auto it = std::sregex_iterator(s.begin(), s.end(), re); it != std::sregex_iterator(); ++it)\n        std::cout << it->str() << ' ';\n    std::cout << '\\n';\n    std::filesystem::path p = \"data/readme.txt\";\n    std::cout << p.filename().string() << '\\n';\n}",
+            "output": "42 7\nreadme.txt",
+            "tip": "中文正则/大小写转换要用 `std::wstring` 或 ICU，不要直接对 UTF-8 字节做 `toupper`。文件操作失败要检查 `error_code`，不要假设路径一定存在。",
+            "lang": "cpp"
+          }
+        ]
       }
     ],
-    "sectionsCount": 6
+    "sectionsCount": 9
   },
   {
     "id": "cpp-ch11",
@@ -1106,9 +1516,50 @@ window.CPP_COURSE_CHAPTERS = [
             "lang": "cpp"
           }
         ]
+      },
+      {
+        "id": "cpp-11-3",
+        "title": "11.3 所有权建模：容器、循环引用与 shared_from_this",
+        "level": "advanced",
+        "minutes": 65,
+        "lead": "智能指针不是“自动内存管理”的魔法。谁拥有、谁借用、谁观察，决定了 unique_ptr、shared_ptr、weak_ptr 的正确组合。",
+        "source": "Effective Modern C++ Item 18–22；C++ PL 4E §34；A Tour of C++ 3E §15",
+        "points": [
+          "unique_ptr 容器与工厂",
+          "shared_ptr 循环引用",
+          "weak_ptr 观察者模式",
+          "enable_shared_from_this",
+          "所有权 API 设计"
+        ],
+        "sections": [
+          {
+            "h": "unique_ptr 是默认所有权类型",
+            "p": "`unique_ptr` 独占所有权、零额外引用计数开销，可放入容器表达“工厂产出的对象列表”。`vector<unique_ptr<Base>>` 支持多态且自动释放；用 `make_unique` 创建，避免裸 new。需要转移时 `std::move`，转移后源指针为空。",
+            "code": "#include <iostream>\n#include <memory>\n#include <vector>\nstruct Base { virtual ~Base() = default; virtual int id() const = 0; };\nstruct Impl : Base { int id() const override { return 7; } };\nint main() {\n    std::vector<std::unique_ptr<Base>> v;\n    v.push_back(std::make_unique<Impl>());\n    std::cout << v[0]->id() << '\\n';\n}",
+            "output": "7",
+            "tip": "`unique_ptr` 不能复制，按值传参会编译失败；函数参数用 `const unique_ptr<T>&` 表示借用，用 `unique_ptr<T>` 表示接管所有权。",
+            "lang": "cpp"
+          },
+          {
+            "h": "shared_ptr 循环引用与 weak_ptr",
+            "p": "`shared_ptr` 用引用计数共享所有权；两个对象互相持有 `shared_ptr` 会形成环，引用计数永远不归零。把其中一条边改成 `weak_ptr`，用 `lock()` 临时提升为 `shared_ptr` 再访问，能打破环。",
+            "code": "#include <iostream>\n#include <memory>\nstruct Node {\n    int value = 0;\n    std::shared_ptr<Node> next;\n    std::weak_ptr<Node> prev;\n};\nint main() {\n    auto a = std::make_shared<Node>();\n    auto b = std::make_shared<Node>();\n    a->value = 1; b->value = 2;\n    a->next = b; b->prev = a;\n    if (auto p = b->prev.lock()) std::cout << p->value << '\\n';\n    std::cout << a.use_count() << ' ' << b.use_count() << '\\n';\n}",
+            "output": "1\n1 2",
+            "tip": "`weak_ptr` 不增加引用计数；`lock()` 可能返回空，访问前必须判空。观察者/缓存/父指针是 weak_ptr 的典型位置。",
+            "lang": "cpp"
+          },
+          {
+            "h": "enable_shared_from_this 与所有权 API",
+            "p": "类内部需要返回指向自己的 `shared_ptr` 时，继承 `enable_shared_from_this`，调用 `shared_from_this()`；前提是对象已经被 `shared_ptr` 管理，否则抛 `bad_weak_ptr`。API 设计要明确：函数是借用（裸指针/引用）、共享（shared_ptr）、还是接管（unique_ptr），不要用同一套签名混着用。",
+            "code": "#include <iostream>\n#include <memory>\nstruct Self : std::enable_shared_from_this<Self> {\n    int value = 5;\n    std::shared_ptr<Self> get() { return shared_from_this(); }\n};\nint main() {\n    auto p = std::make_shared<Self>();\n    auto q = p->get();\n    std::cout << q->value << ' ' << p.use_count() << '\\n';\n}",
+            "output": "5 2",
+            "tip": "在构造器里调用 `shared_from_this()` 会失败，因为对象还没被 shared_ptr 接管。所有权 API 一旦发布就很难改，先在接口文档里写清生命周期。",
+            "lang": "cpp"
+          }
+        ]
       }
     ],
-    "sectionsCount": 6
+    "sectionsCount": 9
   },
   {
     "id": "cpp-ch12",
@@ -1205,9 +1656,50 @@ window.CPP_COURSE_CHAPTERS = [
             "lang": "cpp"
           }
         ]
+      },
+      {
+        "id": "cpp-12-3",
+        "title": "12.3 函数式组合、捕获陷阱与 ranges 性能",
+        "level": "advanced",
+        "minutes": 65,
+        "lead": "lambda 和 ranges 让代码更短，但捕获生命周期、视图悬垂和惰性求值的副作用会把 bug 藏得更深。本课把“短”变成“可控”。",
+        "source": "Effective Modern C++ Item 31–34；C++20 The Complete Guide 第 13–16 章；C++ PL 4E §36",
+        "points": [
+          "lambda 捕获的生命周期",
+          "函数组合与高阶函数",
+          "ranges 视图的借用语义",
+          "惰性求值与副作用",
+          "std::function 的开销边界"
+        ],
+        "sections": [
+          {
+            "h": "捕获列表就是生命周期声明",
+            "p": "`[&]` 捕获引用，lambda 存活超过被捕获对象就悬垂；`[=]` 捕获值，默认是拷贝，成员/大对象可能复制。异步任务、事件回调、线程入口不要用默认引用捕获；需要共享状态时用 `shared_ptr` 明确所有权，或按值捕获小型 ID。",
+            "code": "#include <functional>\n#include <iostream>\n#include <memory>\nstd::function<int()> make_counter() {\n    auto count = std::make_shared<int>(0);\n    return [count] { return ++*count; };\n}\nint main() {\n    auto c = make_counter();\n    std::cout << c() << ' ' << c() << '\\n';\n}",
+            "output": "1 2",
+            "tip": "`[=]` 捕获 `this` 时捕获的是指针，不是对象副本；成员函数里的异步 lambda 要显式复制需要的成员，或捕获 `shared_from_this()`。",
+            "lang": "cpp"
+          },
+          {
+            "h": "组合函数：把谓词和变换拼起来",
+            "p": "高阶函数接收/返回函数。用模板组合可以避免 `std::function` 的类型擦除开销；用 lambda 包一层能表达“先过滤再变换”。组合时注意参数/返回类型，以及捕获对象的可调用性。",
+            "code": "#include <iostream>\n#include <vector>\n#include <algorithm>\ntemplate <class F, class G>\nauto compose(F f, G g) {\n    return [f, g](auto x) { return f(g(x)); };\n}\nint main() {\n    auto inc = [](int x) { return x + 1; };\n    auto twice = [](int x) { return x * 2; };\n    auto f = compose(inc, twice);\n    std::cout << f(5) << '\\n';\n}",
+            "output": "11",
+            "tip": "组合顺序要写清：`compose(f,g)(x)` 通常是 `f(g(x))`。捕获的 lambda 若含引用，组合对象也不能活过被引用对象。",
+            "lang": "cpp"
+          },
+          {
+            "h": "ranges 视图：惰性但会借东西",
+            "p": "`views::filter`、`views::transform` 不拥有底层数据，只保存迭代器/引用；底层容器销毁后视图悬垂。视图是惰性的，每次遍历都重新计算，副作用不要在视图里做。需要物化时用 `ranges::to`（C++23）或手动拷贝到 vector。",
+            "code": "#include <iostream>\n#include <ranges>\n#include <vector>\nint main() {\n    std::vector<int> v{1, 2, 3, 4, 5, 6};\n    auto even = v | std::views::filter([](int x) { return x % 2 == 0; })\n                    | std::views::transform([](int x) { return x * x; });\n    for (int x : even) std::cout << x << ' ';\n    std::cout << '\\n';\n}",
+            "output": "4 16 36",
+            "tip": "视图不能返回局部容器的引用；函数返回 `auto` 视图时，底层容器必须由调用方持有。惰性视图重复遍历会重复计算，性能敏感时先物化。",
+            "lang": "cpp"
+          }
+        ]
       }
     ],
-    "sectionsCount": 6
+    "sectionsCount": 9
   },
   {
     "id": "cpp-ch13",
@@ -1305,9 +1797,50 @@ window.CPP_COURSE_CHAPTERS = [
             "lang": "cpp"
           }
         ]
+      },
+      {
+        "id": "cpp-13-3",
+        "title": "13.3 比较、格式化与 C++20 边界实践",
+        "level": "advanced",
+        "minutes": 65,
+        "lead": "C++20 把比较、格式化、源码位置都往前推了一步，但编译器支持并不整齐。本课教你用“可移植的现代写法”，而不是背特性清单。",
+        "source": "C++20 The Complete Guide 第 4–7、14 章；C++ PL 4E §17；cppreference",
+        "points": [
+          "<=> 与排序契约",
+          "自定义比较与投影",
+          "std::format 的可用性",
+          "source_location 与日志",
+          "编译器支持探测"
+        ],
+        "sections": [
+          {
+            "h": "<=> 生成全序比较，但语义要自己保证",
+            "p": "默认 `<=>` 按成员字典序生成，配合默认 `==` 可自动获得 `<`、`>`、`<=`、`>=`。它要求成员都支持比较；对浮点/指针/自定义语义要谨慎。排序容器要求严格弱序：`comp(a,b)` 与 `comp(b,a)` 不能同时为真，`comp(a,a)` 必须为假。",
+            "code": "#include <compare>\n#include <iostream>\n#include <string>\nstruct Version {\n    int major;\n    int minor;\n    auto operator<=>(const Version&) const = default;\n};\nint main() {\n    Version a{1, 2}, b{1, 3};\n    std::cout << (a < b) << ' ' << (a == b) << '\\n';\n}",
+            "output": "1 0",
+            "tip": "自己写比较器时不要用 `<=` 当“小于”，相等元素会违反严格弱序，`std::sort` 可能越界。用 `std::tie`/`std::tuple` 做多字段比较能保证字典序。",
+            "lang": "cpp"
+          },
+          {
+            "h": "format 与 source_location：先探测再使用",
+            "p": "`std::format` 提供类型安全的 Python 风格格式化，但 GCC 11 还没有完整实现，libstdc++ 需要较新版本；`std::source_location` 在 GCC 11 可用。工程里用 `__has_include(<format>)` 或 CMake 特性检测，不要把“本机能编”当成“所有环境能编”。",
+            "code": "#include <iostream>\n#if __has_include(<format>)\n#include <format>\n#endif\nint main() {\n#if __has_include(<format>)\n    std::cout << std::format(\"{} + {} = {}\\n\", 2, 3, 5);\n#else\n    std::cout << \"format unavailable\\n\";\n#endif\n}",
+            "output": "2 + 3 = 5",
+            "tip": "`std::format` 的格式串在编译期检查（C++20 起），但实现支持晚于语言标准。跨平台项目保留 snprintf/ostream 回退路径，或在 CI 固定编译器版本。",
+            "lang": "cpp"
+          },
+          {
+            "h": "source_location 与结构化日志",
+            "p": "`std::source_location::current()` 默认参数能捕获调用点的文件、行号、函数名，比 `__FILE__` 宏更适合封装日志函数。注意它记录的是**调用日志函数的位置**，不是日志函数内部；默认参数在调用点求值，正好满足这个语义。",
+            "code": "#include <iostream>\n#include <source_location>\nvoid log(const char* msg, const std::source_location& loc = std::source_location::current()) {\n    std::cout << loc.file_name() << ':' << loc.line() << ' ' << msg << '\\n';\n}\nint main() {\n    log(\"start\");\n}",
+            "output": "main.cpp:7 start",
+            "tip": "`source_location` 不是运行时反射，不能动态获取任意栈帧；要栈回溯用 `backtrace`/调试器。日志函数尽量 `noexcept`，避免在异常路径里再抛。",
+            "lang": "cpp"
+          }
+        ]
       }
     ],
-    "sectionsCount": 6
+    "sectionsCount": 9
   },
   {
     "id": "cpp-ch14",
@@ -1405,9 +1938,50 @@ window.CPP_COURSE_CHAPTERS = [
             "lang": "cpp"
           }
         ]
+      },
+      {
+        "id": "cpp-14-3",
+        "title": "14.3 错误策略、异常安全与 RAII 边界",
+        "level": "advanced",
+        "minutes": 70,
+        "lead": "异常不是唯一的错误通道。API 边界用异常还是错误码，取决于调用方能否恢复、是否跨 ABI、是否实时。本课给出一套可执行的错误策略。",
+        "source": "C++ PL 4E §30；Effective Modern C++ Item 14；C++ Core Guidelines E.1–E.31",
+        "points": [
+          "异常安全的三档保证",
+          "RAII 与析构中的错误",
+          "错误码/optional/variant 边界",
+          "noexcept 与 terminate",
+          "跨模块错误传播"
+        ],
+        "sections": [
+          {
+            "h": "异常安全：基本、强、不抛",
+            "p": "基本保证：异常后对象仍可析构、无泄漏；强保证：操作失败后对象保持原值（copy-and-swap 常用于此）；不抛保证：`noexcept`，失败直接 terminate。容器扩容、赋值、插入通常提供强保证；手写资源类要明确自己提供哪一档。",
+            "code": "#include <iostream>\n#include <stdexcept>\n#include <vector>\nint main() {\n    std::vector<int> v{1, 2, 3};\n    try {\n        v.at(10) = 9;\n    } catch (const std::out_of_range&) {\n        std::cout << \"caught: out of range\\n\";\n    }\n    std::cout << v.size() << '\\n';\n}",
+            "output": "caught: out of range\n3",
+            "tip": "`operator[]` 不检查边界，`at()` 才抛 `out_of_range`。异常安全不是“try 包一切”，而是每个资源/对象在失败点都能正确回收。",
+            "lang": "cpp"
+          },
+          {
+            "h": "析构函数不要抛异常",
+            "p": "栈展开过程中如果析构函数再抛异常，会直接 `std::terminate`。析构里的清理动作要 `noexcept`；可能失败的关闭/刷新操作放到显式的 `close()`，由调用方处理错误。RAII 包装器可以把 `close()` 的错误记录下来，在析构时忽略但不能抛。",
+            "code": "#include <cstdio>\n#include <iostream>\nclass File {\n    std::FILE* fp_;\npublic:\n    explicit File(const char* path) : fp_(std::fopen(path, \"w\")) {}\n    ~File() { if (fp_) std::fclose(fp_); }\n    File(const File&) = delete;\n    File& operator=(const File&) = delete;\n    bool ok() const { return fp_ != nullptr; }\n};\nint main() {\n    File f(\"/tmp/cpp-raii-demo.txt\");\n    std::cout << f.ok() << '\\n';\n}",
+            "output": "1",
+            "tip": "析构函数默认是 `noexcept`；要写 `~File() noexcept(false)` 等于给程序埋 terminate。资源获取失败时，构造器可以抛异常，此时析构不会执行，要保证已获取的资源被局部 RAII 对象接管。",
+            "lang": "cpp"
+          },
+          {
+            "h": "错误码、optional、variant 的选择",
+            "p": "可恢复、频繁、跨 ABI/实时场景更适合错误码/`expected` 风格；构造失败、不可恢复的环境错误适合异常。`optional<T>` 表达“有/没有”，`variant<T, Error>` 表达“成功值或错误值”。不要让错误码和异常在同一层混用，调用方会不知道该走哪条路径。",
+            "code": "#include <iostream>\n#include <optional>\n#include <string>\nstd::optional<int> parse_int(const std::string& s) {\n    try { return std::stoi(s); }\n    catch (...) { return std::nullopt; }\n}\nint main() {\n    if (auto v = parse_int(\"42\")) std::cout << *v << '\\n';\n    else std::cout << \"bad\\n\";\n}",
+            "output": "42",
+            "tip": "`optional` 不携带错误原因；需要原因时用 `variant<T, Error>` 或项目自己的 `Result<T>`。C++23 的 `std::expected` 在 GCC 11 不可用，别在旧工具链上硬写。",
+            "lang": "cpp"
+          }
+        ]
       }
     ],
-    "sectionsCount": 6
+    "sectionsCount": 9
   },
   {
     "id": "cpp-ch15",
@@ -1505,9 +2079,50 @@ window.CPP_COURSE_CHAPTERS = [
             "lang": "bash"
           }
         ]
+      },
+      {
+        "id": "cpp-15-3",
+        "title": "15.3 编译期数据结构与优化边界",
+        "level": "advanced",
+        "minutes": 70,
+        "lead": "`constexpr` 不是“更快的 const”。它把计算搬到编译期，但也有编译时间、代码膨胀和可调试性代价。本课讲清什么时候值得。",
+        "source": "C++20 The Complete Guide 第 8–12 章；C++ PL 4E §10.4；Effective Modern C++ Item 42",
+        "points": [
+          "constexpr 数据结构",
+          "consteval/constinit",
+          "编译期字符串与查找",
+          "LTO/PGO 与优化边界",
+          "编译时间与代码膨胀"
+        ],
+        "sections": [
+          {
+            "h": "constexpr 数组与编译期查找",
+            "p": "C++20 起 `constexpr` 函数里可以写循环、局部变量、`std::array`；把静态表/哈希/查找放到编译期，运行期只剩一次索引。代价是编译时间增加、错误信息变长；表很大时用生成脚本产出 `.cpp`，不要把几千行塞进模板。",
+            "code": "#include <array>\n#include <iostream>\nconstexpr std::array<int, 5> squares() {\n    std::array<int, 5> a{};\n    for (int i = 0; i < 5; ++i) a[i] = i * i;\n    return a;\n}\nint main() {\n    constexpr auto table = squares();\n    static_assert(table[4] == 16);\n    std::cout << table[3] << '\\n';\n}",
+            "output": "9",
+            "tip": "`constexpr` 函数在运行期也能调用；`consteval` 强制只在编译期求值。`static_assert` 是编译期断言，失败会直接阻止构建。",
+            "lang": "cpp"
+          },
+          {
+            "h": "consteval、constinit 与初始化顺序",
+            "p": "`consteval` 立即函数只能产生编译期常量，适合做单位/协议校验；`constinit` 保证变量是静态初始化（不会动态初始化），解决跨翻译单元静态初始化顺序问题，但它不要求 const。三者解决的是不同问题，不要混用。",
+            "code": "#include <iostream>\nconsteval int twice(int x) { return x * 2; }\nconstinit int global_value = twice(21);\nint main() {\n    // int runtime = twice(3);  // 编译错误：consteval 只能编译期调用\n    std::cout << global_value << '\\n';\n}",
+            "output": "42",
+            "tip": "`constinit` 只检查初始化方式，变量之后仍可修改；要只读用 `const`/`constexpr`。`consteval` 函数不能读运行期输入，也不能有副作用。",
+            "lang": "cpp"
+          },
+          {
+            "h": "优化边界：先测量，再开开关",
+            "p": "`-O2/-O3`、LTO、PGO、`-march=native` 都能改变性能，但也可能暴露 UB、增加构建时间、降低可移植性。正确顺序是：基准测试 → profile → 找瓶颈 → 单变量优化 → 回归。不要用 `-O3` 掩盖算法复杂度问题。",
+            "code": "g++ -std=c++20 -O2 -g -fno-omit-frame-pointer bench.cpp -o bench\nperf stat ./bench\nperf record -g ./bench\nperf report",
+            "output": "输出性能计数器与热点函数",
+            "tip": "`-march=native` 产物不能分发到旧 CPU；PGO 需要真实负载样本。优化后必须重跑正确性测试和性能回归，避免“快了但算错”。",
+            "lang": "bash"
+          }
+        ]
       }
     ],
-    "sectionsCount": 6
+    "sectionsCount": 9
   },
   {
     "id": "cpp-ch16",
@@ -1604,9 +2219,50 @@ window.CPP_COURSE_CHAPTERS = [
             "lang": "cpp"
           }
         ]
+      },
+      {
+        "id": "cpp-16-3",
+        "title": "16.3 线程池、future 与并行任务",
+        "level": "advanced",
+        "minutes": 75,
+        "lead": "每来一个任务就 new 一个 thread，迟早会把系统拖垮。线程池把线程复用、任务排队、异常传播和关闭语义集中管理。",
+        "source": "C++ Concurrency in Action 2E 第 9 章；C++ PL 4E §46；A Tour of C++ 3E §18",
+        "points": [
+          "固定线程池与任务队列",
+          "packaged_task/future 传播结果",
+          "async 的陷阱",
+          "关闭与异常处理",
+          "并行算法的粒度"
+        ],
+        "sections": [
+          {
+            "h": "固定线程池：队列 + 条件变量",
+            "p": "线程池预创建 N 个 worker，共享一个任务队列；提交任务时加锁入队并 notify_one，worker 在条件变量上等待。关闭时置停止标志并 notify_all，worker 取完剩余任务后退出。任务用 `std::function<void()>` 做类型擦除，简单但有一次间接调用。",
+            "code": "#include <condition_variable>\n#include <functional>\n#include <iostream>\n#include <mutex>\n#include <queue>\n#include <thread>\n#include <vector>\nclass Pool {\n    std::vector<std::thread> workers_;\n    std::queue<std::function<void()>> tasks_;\n    std::mutex mu_;\n    std::condition_variable cv_;\n    bool stop_ = false;\npublic:\n    explicit Pool(int n) {\n        for (int i = 0; i < n; ++i) workers_.emplace_back([this] {\n            while (true) {\n                std::function<void()> task;\n                {\n                    std::unique_lock<std::mutex> lk(mu_);\n                    cv_.wait(lk, [this] { return stop_ || !tasks_.empty(); });\n                    if (stop_ && tasks_.empty()) return;\n                    task = std::move(tasks_.front());\n                    tasks_.pop();\n                }\n                task();\n            }\n        });\n    }\n    void submit(std::function<void()> f) {\n        { std::lock_guard<std::mutex> lk(mu_); tasks_.push(std::move(f)); }\n        cv_.notify_one();\n    }\n    ~Pool() {\n        { std::lock_guard<std::mutex> lk(mu_); stop_ = true; }\n        cv_.notify_all();\n        for (auto& t : workers_) t.join();\n    }\n};\nint main() {\n    Pool p(2);\n    p.submit([] { std::cout << \"task\\n\"; });\n}",
+            "output": "task",
+            "tip": "任务里抛异常会让 worker 线程 terminate；submit 要包 try/catch 或把异常存进 future。析构顺序：先置 stop、notify、join，最后才销毁队列/锁。",
+            "lang": "cpp"
+          },
+          {
+            "h": "packaged_task + future：把返回值带回来",
+            "p": "`std::packaged_task<R()>` 把可调用对象和 `future<R>` 绑定，任务执行后结果/异常通过 future 传给调用方。`future.get()` 会阻塞直到就绪，并在任务抛异常时重新抛出；适合线程池返回结果。",
+            "code": "#include <future>\n#include <iostream>\n#include <thread>\nint main() {\n    std::packaged_task<int()> task([] { return 21 * 2; });\n    std::future<int> f = task.get_future();\n    std::thread t(std::move(task));\n    std::cout << f.get() << '\\n';\n    t.join();\n}",
+            "output": "42",
+            "tip": "`packaged_task` 不可拷贝，只能 move 进线程；`future` 只能 get 一次，第二次调用行为未指定。不要在线程里持有 future 的引用跨线程销毁。",
+            "lang": "cpp"
+          },
+          {
+            "h": "async 的陷阱与并行粒度",
+            "p": "`std::async(std::launch::async, f)` 强制新线程；默认策略可能延迟执行，甚至返回的 future 析构时同步等待。不要对每个元素都 `async`，线程创建/调度开销会淹没计算。并行任务要有足够粒度（比如每块几千个元素），并处理异常与结果合并顺序。",
+            "code": "#include <future>\n#include <iostream>\n#include <vector>\nint main() {\n    auto f1 = std::async(std::launch::async, [] { return 1 + 2; });\n    auto f2 = std::async(std::launch::async, [] { return 3 + 4; });\n    std::cout << f1.get() + f2.get() << '\\n';\n}",
+            "output": "10",
+            "tip": "`std::async` 返回的 future 析构时若任务是 `std::launch::async` 会等待完成；如果是 deferred 策略，任务可能根本不执行。生产代码更推荐显式线程池，控制并发度和关闭顺序。",
+            "lang": "cpp"
+          }
+        ]
       }
     ],
-    "sectionsCount": 6
+    "sectionsCount": 9
   },
   {
     "id": "cpp-ch17",
@@ -1704,9 +2360,50 @@ window.CPP_COURSE_CHAPTERS = [
             "lang": "bash"
           }
         ]
+      },
+      {
+        "id": "cpp-17-3",
+        "title": "17.3 内存序实战与并发容器",
+        "level": "advanced",
+        "minutes": 80,
+        "lead": "`memory_order` 不是“越强越安全”，而是“用最弱的顺序换取正确性”。本课用发布-订阅、引用计数和无锁栈说明什么时候需要 acquire/release。",
+        "source": "C++ Concurrency in Action 2E 第 5–7 章；C++ PL 4E §46；cppreference memory_order",
+        "points": [
+          "release/acquire 发布对象",
+          "relaxed 计数与顺序",
+          "seq_cst 的默认代价",
+          "无锁栈的 ABA 风险",
+          "atomic wait/notify 与测试"
+        ],
+        "sections": [
+          {
+            "h": "release/acquire：安全发布指针",
+            "p": "生产者先构造对象，再用 `store(ptr, release)` 发布；消费者 `load(acquire)` 读到指针后，能看到构造期间的所有写入。`relaxed` 只保证原子性，不建立同步；`seq_cst` 最强但会在多核上插入更多屏障。",
+            "code": "#include <atomic>\n#include <iostream>\n#include <thread>\nstruct Data { int value = 42; };\nstd::atomic<Data*> slot{nullptr};\nData payload;\nint main() {\n    std::thread producer([] {\n        payload.value = 7;\n        slot.store(&payload, std::memory_order_release);\n    });\n    std::thread consumer([] {\n        Data* p = nullptr;\n        while (!(p = slot.load(std::memory_order_acquire))) {}\n        std::cout << p->value << '\\n';\n    });\n    producer.join();\n    consumer.join();\n}",
+            "output": "7",
+            "tip": "release store 与 acquire load 必须配对，且指向同一原子变量；单独一个 relaxed 无法建立 happens-before。发布后不要再改对象，否则数据竞争。",
+            "lang": "cpp"
+          },
+          {
+            "h": "relaxed 只适合计数，不适合同步",
+            "p": "引用计数只需要原子增减，不需要顺序保证，可以用 `fetch_add(relaxed)`；但“最后一个释放者”必须用 `acq_rel` 或 acquire fence，才能看到其他线程对对象的写入。`compare_exchange` 默认 seq_cst，可显式传成功/失败两种内存序。",
+            "code": "#include <atomic>\n#include <iostream>\nstruct Ref {\n    std::atomic<int> count{1};\n    int value = 5;\n    void add() { count.fetch_add(1, std::memory_order_relaxed); }\n    void release() {\n        if (count.fetch_sub(1, std::memory_order_acq_rel) == 1) delete this;\n    }\n};\nint main() {\n    Ref* p = new Ref();\n    p->add();\n    p->release();\n    p->release();\n    std::cout << \"done\\n\";\n}",
+            "output": "done",
+            "tip": "引用计数对象的析构必须等所有线程都退出；`acq_rel` 保证最后一个释放者看到之前的写入。手写引用计数很容易漏掉内存序，优先用 `shared_ptr`。",
+            "lang": "cpp"
+          },
+          {
+            "h": "无锁栈的 ABA 与 atomic wait",
+            "p": "无锁栈 push/pop 用 CAS 改 head，但“弹出 A、别人弹出 A 又压回 A”会让 CAS 误以为没变，这就是 ABA。解决办法是带版本号的指针、hazard pointer 或 RCU。C++20 的 `atomic::wait/notify_one` 可以做无锁阻塞，不忙等。",
+            "code": "#include <atomic>\n#include <iostream>\n#include <thread>\nstd::atomic<int> flag{0};\nint main() {\n    std::thread waiter([] {\n        while (flag.load(std::memory_order_acquire) == 0)\n            flag.wait(0, std::memory_order_acquire);\n        std::cout << \"woken\\n\";\n    });\n    std::thread setter([] {\n        flag.store(1, std::memory_order_release);\n        flag.notify_one();\n    });\n    waiter.join();\n    setter.join();\n}",
+            "output": "woken",
+            "tip": "`wait` 可能虚假唤醒，必须在循环里检查谓词；`notify_one` 前要先改值，否则等待线程可能错过通知。无锁容器先用 TSAN/压力测试验证，再谈性能。",
+            "lang": "cpp"
+          }
+        ]
       }
     ],
-    "sectionsCount": 6
+    "sectionsCount": 9
   },
   {
     "id": "cpp-ch18",
@@ -1804,8 +2501,49 @@ window.CPP_COURSE_CHAPTERS = [
             "lang": "cpp"
           }
         ]
+      },
+      {
+        "id": "cpp-18-3",
+        "title": "18.3 性能剖析、发布与持续维护",
+        "level": "advanced",
+        "minutes": 70,
+        "lead": "功能完成不等于项目完成。本课把 profile、Sanitizer、CI、版本与回滚串成发布前的最后一道闸。",
+        "source": "C++ PL 4E §12–13；C++ Core Guidelines P.1–P.12；Google Benchmark 文档",
+        "points": [
+          "先 profile 再优化",
+          "ASan/UBSan/TSan 分工",
+          "CI 与构建矩阵",
+          "版本、ABI 与发布清单",
+          "监控与回滚"
+        ],
+        "sections": [
+          {
+            "h": "profile 的三种视角",
+            "p": "`perf stat` 看指令/缓存/分支整体指标，`perf record -g` 看热点调用栈，微基准（Google Benchmark）看单函数随规模的变化。不要凭直觉猜瓶颈；先建立可重复的基线，再单变量改动。",
+            "code": "g++ -std=c++20 -O2 -g -fno-omit-frame-pointer app.cpp -o app\nperf stat -e cycles,instructions,cache-misses ./app\nperf record -g ./app\nperf report --stdio | head -40",
+            "output": "输出 cycles/instructions/cache-misses 与热点栈",
+            "tip": "`-O2` 下变量可能被优化掉，性能分析用 `-g` 保留符号；ASan/TSan 会改变性能，不能用来做基准。微基准要防止编译器把整个循环优化掉（用 `DoNotOptimize`）。",
+            "lang": "bash"
+          },
+          {
+            "h": "Sanitizer 各管一类 bug",
+            "p": "ASan 抓越界/use-after-free/泄漏，UBSan 抓有符号溢出/空指针/对齐等 UB，TSan 抓数据竞争。它们不能同时开；CI 里分构建矩阵跑。Sanitizer 报错要当真实 bug 修，不要用 suppressions 掩盖。",
+            "code": "g++ -std=c++20 -g -fsanitize=address,undefined app.cpp -o app_asan\n./app_asan\ng++ -std=c++20 -g -fsanitize=thread app.cpp -o app_tsan\n./app_tsan",
+            "output": "无输出即通过；有问题会打印栈和地址",
+            "tip": "ASan 与 TSan 不能同时链接；TSan 对未插桩的第三方库会误报/漏报。Release 构建也要保留符号服务器，线上崩溃才能定位。",
+            "lang": "bash"
+          },
+          {
+            "h": "发布清单、版本与回滚",
+            "p": "发布前：锁依赖版本、跑完整测试/基准、生成 changelog、打 tag、验证安装包/容器、准备回滚。ABI 变更要升 soname；配置文件/数据库迁移要可逆。上线后看错误率、延迟、CPU/内存，异常时先回滚再定位。",
+            "code": "cmake -S . -B build -DCMAKE_BUILD_TYPE=Release\ncmake --build build -j\nctest --test-dir build --output-on-failure\n./build/app --selftest\ngit tag -a v1.4.0 -m \"release 1.4.0\"",
+            "output": "所有测试通过，tag 创建成功",
+            "tip": "`-DCMAKE_BUILD_TYPE=Release` 不等于打开所有优化/断言；在 CMake 里显式设置 `-O2 -DNDEBUG` 和警告选项。发布包要记录编译器版本、提交哈希和构建时间。",
+            "lang": "bash"
+          }
+        ]
       }
     ],
-    "sectionsCount": 6
+    "sectionsCount": 9
   }
 ];

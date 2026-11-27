@@ -21662,7 +21662,7 @@ async function loadJbaseBody(course){
 }
 function openStudySubject(key){
   if(key==='jbase'){location.href='./subjects/java-course.html?v=20261125z70';return;}
-  if(key==='cpp'){location.href='./subjects/cpp-course.html?v=20261127z104';return;}
+  if(key==='cpp'){location.href='./subjects/cpp-course.html?v=20261127z105';return;}
   const d=studyData(key);
   if(!d){toast('该科目资料尚未装载','info');return;}
   STUDY_CUR={key:key,idx:0};

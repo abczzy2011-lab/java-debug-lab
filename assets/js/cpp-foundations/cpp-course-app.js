@@ -41,7 +41,7 @@
     apiHref: 'https://en.cppreference.com/w/',
     apiLabel: '查 cppreference',
     routeNote: '建议按篇推进：第 1–4 章打语言底座，第 5–8 章学对象与泛型，第 9–12 章进 STL 与现代 C++，第 13–15 章补 C++20 与性能，第 16–18 章完成并发与工程化。每课末尾的坑点优先于“多写代码”记忆。',
-    overviewDocTitle: 'C++ 现代编程与工程实战 · 五篇 18 章 36 课',
+    overviewDocTitle: 'C++ 现代编程与工程实战 · 五篇 18 章 54 课',
     lessonDocSuffix: 'C++ 现代编程',
     defaultSource: 'A Tour of C++ 3E；C++ Primer Plus 6E；Beginning C++17；C++ PL 4E；Effective Modern C++；C++20 - The Complete Guide；C++ Concurrency in Action 2E',
     sourceNote: '正文按主题合并自 8 本 C++ 教材；示例以 C++20 为目标，线上判题使用 GCC 14.1 并显式传入 -std=c++20。',
