@@ -281,7 +281,7 @@
       paragraphs(section.p);
     if (section.code) {
       out += '<div class="code-card">' +
-        '<div class="code-head"><span>' + escapeHTML(cfg.languageLabel || 'code') + '</span><button class="copy" type="button" data-copy="' + escapeHTML(encodeURIComponent(section.code)) + '" aria-label="复制这段代码">复制</button></div>' +
+        '<div class="code-head"><span>' + escapeHTML((section && section.lang) || cfg.languageLabel || 'code') + '</span><button class="copy" type="button" data-copy="' + escapeHTML(encodeURIComponent(section.code)) + '" aria-label="复制这段代码">复制</button></div>' +
         '<pre><code>' + escapeHTML(section.code) + '</code></pre>' +
       '</div>';
     }

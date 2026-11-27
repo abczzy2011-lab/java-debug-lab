@@ -13488,9 +13488,10 @@ function esc(s){
 function uiIcon(name,cls){
   var base='./assets/icons/';
   var key=String(name||'study').replace(/[^a-z0-9_-]/gi,'')||'study';
-  return '<img class="'+(cls||'ui-ico')+'" src="'+base+key+'.png" alt="" loading="lazy" decoding="async">';
+  var ext=key==='cpp'?'svg':'png';
+  return '<img class="'+(cls||'ui-ico')+'" src="'+base+key+'.'+ext+'" alt="" loading="lazy" decoding="async">';
 }
-var UI_SUBJECT_ICON={jbase:'java',java:'java',hw:'hardware',algo:'algo',ai:'ai',llm:'llm',api:'api'};
+var UI_SUBJECT_ICON={jbase:'java',java:'java',hw:'hardware',algo:'algo',ai:'ai',llm:'llm',api:'api',cpp:'cpp'};
 function subjectIconName(key){ return UI_SUBJECT_ICON[key]||key||'study'; }
 /* 题干 / 选项文本渲染：普通文字转义，反引号包裹的 Java 片段用高亮器上色（IDEA 配色）。
    含换行的片段渲染为块级代码块，行内片段渲染为内联 code。返回可直接进 innerHTML 的 HTML。 */
@@ -21527,6 +21528,7 @@ const STUDY_SUBJECTS=[
   {key:'hw',   icon:'hardware', name:'硬件知识 · 电路与数字系统', varName:'STUDY_HW',    startFn:'startHw'},
   {key:'algo', icon:'algo', name:'算法与代码逻辑',            varName:'STUDY_ALGO',  startFn:'startLogic'},
   {key:'jbase',icon:'java', name:'Java 基础',                  varName:'STUDY_JBASE', startFn:'startLogic'},
+  {key:'cpp',  icon:'cpp',  name:'C++ · 现代编程与工程',        varName:'',            startFn:'cppCourse'},
   {key:'ai',   icon:'ai', name:'AI · 人工智能',             varName:'STUDY_AI',    startFn:'startLogic'},
   {key:'llm',  icon:'llm', name:'大模型 · LLM 全景',          varName:'STUDY_LLM',   startFn:'startLogic'},
   {key:'api',  icon:'api', name:'Java API 完整文档',           varName:'STUDY_API',   startFn:'apiOpen'}
@@ -21632,13 +21634,14 @@ function openStudyHub(){
   let h='';
   STUDY_SUBJECTS.forEach(function(m){
     const d=studyData(m.key);
-    const n=d?d.courses.length:0;
-    const pts=d?d.courses.reduce(function(a,c){return a+(c.points?c.points.length:0);},0):0;
+    const isCpp=m.key==='cpp';
+    const n=isCpp?36:(d?d.courses.length:0);
+    const pts=isCpp?108:(d?d.courses.reduce(function(a,c){return a+(c.points?c.points.length:0);},0):0);
     h+='<div class="study-card" onclick="openStudySubject(\''+m.key+'\')">'
       +'<div class="sc-ico">'+uiIcon(subjectIconName(m.icon),'ui-ico ui-ico-sc')+'</div>'
       +'<div class="sc-name">'+esc(m.name)+'</div>'
-      +'<div class="sc-desc">'+esc(d?d.intro:'资料准备中')+'</div>'
-      +'<div class="sc-meta">'+n+' 课 · '+pts+' 个知识点'+(d?'':' · 暂无资料')+'</div></div>';
+      +'<div class="sc-desc">'+esc(isCpp?'8 本教材压成五篇 18 章 36 课：语言底座、对象与泛型、STL 与现代 C++、C++20 与性能、并发与工程。':(d?d.intro:'资料准备中'))+'</div>'
+      +'<div class="sc-meta">'+n+' 课 · '+pts+' 个知识点'+(isCpp?' · 课程已上线':(d?'':' · 暂无资料'))+'</div></div>';
   });
   grid.innerHTML=h;
   updateWbBadge();
@@ -21659,6 +21662,7 @@ async function loadJbaseBody(course){
 }
 function openStudySubject(key){
   if(key==='jbase'){location.href='./subjects/java-course.html?v=20261125z70';return;}
+  if(key==='cpp'){location.href='./subjects/cpp-course.html?v=20261127z104';return;}
   const d=studyData(key);
   if(!d){toast('该科目资料尚未装载','info');return;}
   STUDY_CUR={key:key,idx:0};

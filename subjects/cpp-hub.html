@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080A0E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>C++ 学科 · 学习资料 / 改错 / 输出实现场</title>
+<meta name="description" content="C++ 学科入口：五篇 18 章 36 课系统学习资料、24 题改错实验室、18 题输出实现场；课程取材于 8 本 C++ 教材，判题使用 GCC 14.1 与 C++20。">
+<link rel="icon" type="image/svg+xml" href="../assets/icons/cpp.svg">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --line:rgba(244,239,230,.13);--line-strong:rgba(244,239,230,.25);
+  --text:#F3EFE6;--muted:#A7B0B1;--dim:#6F797D;
+  --accent:#7EA6FF;--violet:#D6B27A;--yellow:#7EA6FF;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --mono:"SFMono-Regular","JetBrains Mono","Sarasa Gothic SC",Menlo,Consolas,"PingFang SC","Microsoft YaHei",monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+html,body{min-height:100%}
+body{color:var(--text);font-family:var(--font);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button,a{font:inherit;color:inherit}
+a{text-decoration:none}
+:focus-visible{outline:2px solid rgba(126,166,255,.85);outline-offset:3px}
+.subbar{
+  display:flex;align-items:center;gap:12px;min-height:58px;padding:calc(8px + env(safe-area-inset-top,0px)) 14px 8px;
+  border-bottom:1px solid var(--line);position:relative;z-index:3;
+  background:radial-gradient(70% 160% at 12% 0%,rgba(126,166,255,.10),transparent 64%),linear-gradient(180deg,rgba(16,20,25,.88),rgba(9,12,16,.94));
+  box-shadow:0 10px 28px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.055);
+  -webkit-backdrop-filter:blur(18px) saturate(150%);backdrop-filter:blur(18px) saturate(150%);
+}
+.home{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:0 14px;border-radius:13px;
+  border:1px solid rgba(126,166,255,.30);background:linear-gradient(115deg,rgba(126,166,255,.12),rgba(214,178,122,.08));
+  color:#F7F1E4;font-size:13px;font-weight:800;white-space:nowrap;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 4px 14px rgba(0,0,0,.22);
+}
+.home:hover{border-color:rgba(126,166,255,.58);background:linear-gradient(115deg,rgba(126,166,255,.20),rgba(214,178,122,.12))}
+.home span{font-size:19px;line-height:1;font-weight:700}
+.brand{display:flex;align-items:center;gap:8px;min-width:0;font-size:13px;font-weight:800}
+.brand img{width:26px;height:26px;object-fit:contain;filter:drop-shadow(0 0 8px rgba(126,166,255,.16))}
+.brand b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spacer{flex:1}
+.tip{font-size:11px;color:var(--dim);white-space:nowrap}
+.hub{max-width:1040px;margin:0 auto;padding:clamp(34px,7vh,72px) 20px 54px}
+.hero{text-align:center;display:flex;flex-direction:column;align-items:center}
+.hero-ico{
+  width:84px;height:84px;border-radius:22px;display:grid;place-items:center;margin-bottom:18px;
+  border:1px solid rgba(126,166,255,.30);
+  background:radial-gradient(circle at 28% 20%,rgba(126,166,255,.30),transparent 62%),linear-gradient(135deg,rgba(34,30,24,.88),rgba(7,16,29,.92));
+  box-shadow:0 20px 52px rgba(0,0,0,.34),0 0 42px rgba(126,166,255,.10),inset 0 1px 0 rgba(255,255,255,.16);
+}
+.hero-ico img{width:66px;height:66px;object-fit:contain;filter:drop-shadow(0 7px 16px rgba(0,0,0,.34))}
+.kicker{font-family:var(--mono);font-size:10.5px;font-weight:800;letter-spacing:.24em;color:var(--accent);text-transform:uppercase;margin-bottom:10px}
+h1{font-size:clamp(38px,6vw,64px);line-height:1.04;letter-spacing:-.045em;font-weight:850;text-align:center;background:linear-gradient(105deg,#FFFFFF 4%,#F3EFE6 42%,#A9C6FF 74%,#E6D6B8 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{max-width:650px;margin-top:16px;color:var(--muted);font-size:14px;line-height:1.9;text-align:center}
+.hero p strong{color:#F7F1E4;font-weight:750}
+.entry-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:42px}
+.entry{
+  position:relative;overflow:hidden;display:flex;flex-direction:column;min-height:260px;padding:24px 24px 20px;border-radius:20px;
+  border:1px solid var(--line);background:linear-gradient(180deg,rgba(24,24,23,.62),rgba(9,12,16,.80));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 18px 42px rgba(0,0,0,.18);
+  transition:transform .2s var(--ease),border-color .2s,box-shadow .2s,background .2s;
+}
+.entry:hover{transform:translateY(-4px);border-color:var(--entry-color);box-shadow:0 26px 56px rgba(0,0,0,.30),0 0 0 1px rgba(255,255,255,.03) inset}
+.entry:active{transform:translateY(-1px) scale(.995)}
+.entry::before{content:"";position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,transparent,var(--entry-color),transparent);opacity:.76}
+.entry::after{content:"";position:absolute;right:-58px;bottom:-76px;width:190px;height:190px;border-radius:50%;background:radial-gradient(circle,var(--entry-glow),transparent 68%);pointer-events:none}
+.entry.practice{--entry-color:#D6B27A;--entry-glow:rgba(214,178,122,.16)}
+.entry.study{--entry-color:#8FB8FF;--entry-glow:rgba(126,166,255,.16)}
+.entry.course{--entry-color:#9CC9B8;--entry-glow:rgba(94,234,212,.15)}
+.entry.api{--entry-color:#7EA6FF;--entry-glow:rgba(126,166,255,.15)}
+.entry-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
+.entry-ico{width:52px;height:52px;display:grid;place-items:center;border-radius:14px;border:1px solid color-mix(in srgb,var(--entry-color) 26%,transparent);background:color-mix(in srgb,var(--entry-color) 8%,transparent)}
+.entry-ico img{width:38px;height:38px;object-fit:contain}
+.badge{font-size:10px;font-weight:800;letter-spacing:.02em;padding:4px 8px;border-radius:999px;border:1px solid color-mix(in srgb,var(--entry-color) 34%,transparent);background:color-mix(in srgb,var(--entry-color) 8%,transparent);color:var(--entry-color);white-space:nowrap}
+.entry h2{font-size:24px;line-height:1.25;font-weight:800;letter-spacing:-.02em;margin-bottom:7px}
+.entry p{font-size:12.5px;line-height:1.75;color:var(--muted);min-height:54px}
+.entry-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:14px;border-top:1px solid var(--line);font-size:10.5px;color:var(--dim);font-weight:650;line-height:1.6}
+.entry-meta span{padding:2px 0}
+.entry-cta{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:13px;color:var(--entry-color);font-size:12px;font-weight:800}
+.entry-cta span:last-child{font-size:18px;transition:transform .16s}
+.entry:hover .entry-cta span:last-child{transform:translateX(3px)}
+.note{margin-top:28px;padding:12px 15px;border:1px solid var(--line);border-radius:13px;background:rgba(10,13,17,.46);font-size:11.5px;line-height:1.8;color:var(--dim);text-align:center}
+.note b{color:var(--muted);font-weight:700}
+.output-spotlight{
+  position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(220px,.75fr);gap:22px;align-items:center;
+  margin-top:36px;padding:24px 26px;border:1px solid rgba(200,169,118,.30);border-radius:22px;
+  background:
+    radial-gradient(48% 110% at 8% 0%,rgba(200,169,118,.17),transparent 67%),
+    radial-gradient(40% 90% at 96% 14%,rgba(126,166,255,.14),transparent 68%),
+    linear-gradient(145deg,rgba(27,28,30,.72),rgba(7,11,18,.88));
+  box-shadow:0 24px 58px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.09);
+  transition:transform .2s var(--ease),border-color .2s,box-shadow .2s;
+}
+.output-spotlight:hover{transform:translateY(-3px);border-color:rgba(200,169,118,.56);box-shadow:0 30px 68px rgba(0,0,0,.34),0 0 0 1px rgba(255,255,255,.03) inset}
+.output-spotlight:active{transform:translateY(-1px) scale(.997)}
+.output-spotlight::before{content:"";position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,transparent,rgba(200,169,118,.8),rgba(126,166,255,.7),transparent)}
+.spotlight-kicker{display:block;font-family:var(--mono);font-size:9px;font-weight:850;letter-spacing:.18em;color:#E9D6B3}
+.output-spotlight h2{margin-top:7px;font-size:clamp(28px,4vw,40px);line-height:1.12;letter-spacing:-.045em;font-weight:850;background:linear-gradient(100deg,#FFF9EE 4%,#F2DFBE 58%,#BFD5FF 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.output-spotlight p{max-width:590px;margin-top:9px;font-size:11.5px;line-height:1.8;color:var(--muted)}
+.output-spotlight p b{color:#F7F0E2;font-weight:750}
+.spotlight-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px}
+.spotlight-meta span{padding:3px 7px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.03);font-size:8.5px;font-weight:750;color:var(--dim)}
+.spotlight-cta{display:flex;align-items:center;gap:8px;margin-top:16px;font-size:11px;font-weight:850;color:#F2DFBE}
+.spotlight-cta span:last-child{font-size:18px;color:#A9C8FF;transition:transform .16s}
+.output-spotlight:hover .spotlight-cta span:last-child{transform:translateX(3px)}
+.spotlight-demo{padding:11px;border:1px solid rgba(126,166,255,.16);border-radius:13px;background:rgba(5,10,18,.58);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.demo-head,.demo-run{display:flex;align-items:center;justify-content:space-between;gap:7px;font-family:var(--mono);font-size:7.5px;font-weight:800;letter-spacing:.06em;color:#AFC8ED}
+.demo-head{padding-bottom:7px;border-bottom:1px solid var(--line);color:#E8D7B7}
+.spotlight-demo pre{margin:0;padding:11px 2px 13px;font-family:var(--mono);font-size:11.5px;line-height:1.6;color:#DCE9FA;white-space:pre}
+.demo-run{padding-top:8px;border-top:1px solid var(--line)}
+.demo-run b{font-size:14px;color:#A7F0E3}
+
+@media (min-width:761px) and (max-width:940px){
+  .entry{padding:22px 18px 18px}
+  .entry h2{font-size:22px}
+  .entry p{font-size:12px}
+}
+@media (max-width:760px){
+  .subbar{gap:9px;padding-left:10px;padding-right:10px}
+  .home{min-height:42px;padding:0 11px;font-size:12px}
+  .brand{font-size:12px;gap:6px}
+  .brand img{width:23px;height:23px}
+  .tip{display:none}
+  .hub{padding:30px 14px 34px}
+  .hero-ico{width:72px;height:72px;border-radius:19px;margin-bottom:14px}
+  .hero-ico img{width:56px;height:56px}
+  .hero p{font-size:13px;line-height:1.8}
+  .output-spotlight{grid-template-columns:1fr;gap:15px;margin-top:28px;padding:19px 17px;border-radius:17px}
+  .output-spotlight p{font-size:10.5px}
+  .spotlight-demo pre{font-size:10.5px}
+  .entry-grid{grid-template-columns:1fr;gap:12px;margin-top:30px}
+  .entry{min-height:0;padding:19px 18px 17px;border-radius:17px}
+  .entry h2{font-size:21px}
+  .entry p{min-height:0;font-size:12px}
+  .entry-meta{padding-top:11px}
+}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important;animation-duration:.01ms!important}}
+
+.entry.algo{--entry-color:#C4B5FD;--entry-glow:rgba(196,181,253,.15)}
+
+.book-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:16px}
+.book-pill{padding:11px 12px;border:1px solid rgba(244,239,230,.10);border-radius:11px;background:rgba(255,255,255,.025);font-size:9.5px;line-height:1.55;color:var(--dim)}
+.book-pill b{display:block;margin-bottom:3px;color:#D8C08B;font-size:10px;font-weight:800}
+@media (max-width:760px){.book-strip{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+<link rel="stylesheet" href="../assets/css/liquid-glass.css?v=20261127z104">
+<link rel="stylesheet" href="../assets/css/site-fx.css?v=20261127z102">
+</head>
+<body>
+<header class="subbar">
+  <a class="home" href="../java-debug-lab.html?v=20261127z104" aria-label="返回学科入口"><span aria-hidden="true">←</span>返回学科</a>
+  <div class="brand"><img src="../assets/icons/cpp.svg" alt="" width="26" height="26"><b>C++ 学科</b></div>
+  <div class="spacer"></div>
+  <div class="tip">3 类入口 · C++20</div>
+</header>
+<main class="hub">
+  <section class="hero">
+    <div class="hero-ico"><img src="../assets/icons/cpp.svg" alt="C++ 学科" width="66" height="66"></div>
+    <div class="kicker">SUBJECT · C++ · 3 CATEGORIES</div>
+    <h1>C++</h1>
+    <p>从 8 本教材压成一条可执行路线：<strong>学习资料</strong>是五篇 18 章 36 课，<strong>改错实验室</strong>在带 bug 的 main.cpp 里定位逻辑，<strong>输出实现场</strong>只给目标输出，从空白写出完整程序。两套实验室都用 GCC 14.1 按 C++20 真实编译。</p>
+  </section>
+
+  <a class="output-spotlight" href="./cpp-output.html?v=20261127z104" aria-label="进入 C++ 输出实现场">
+    <div class="spotlight-copy">
+      <span class="spotlight-kicker">OUTPUT → CODE · C++20 · GCC 14</span>
+      <h2>C++ 输出实现场</h2>
+      <p>没有待改的错误代码，也没有可抄答案。先给目标输出，你从 <b>main.cpp</b> 的空白程序开始写；提交后由 GCC 14.1 按 C++20 跑 3 组用例，按 stdout 匹配度评分，并把运行毫秒计入成绩。</p>
+      <div class="spotlight-meta"><span>18 题 · 54 组测试</span><span>输出 85 分 + 速度 15 分</span><span>Judge0 GCC 14.1</span></div>
+      <div class="spotlight-cta"><span>从零写一题</span><span aria-hidden="true">→</span></div>
+    </div>
+    <div class="spotlight-demo" aria-hidden="true">
+      <div class="demo-head"><span>目标输出 · SAMPLE</span><span>stdout</span></div>
+      <pre>1
+1 2
+1 2 3
+1 2 3 4</pre>
+      <div class="demo-run"><span>g++ -std=c++20</span><b>3 ms</b></div>
+    </div>
+  </a>
+
+  <section class="entry-grid">
+    <a class="entry course" href="./cpp-course.html?v=20261127z104">
+      <div class="entry-top">
+        <div class="entry-ico"><img src="../assets/icons/study.png" alt="" width="38" height="38"></div>
+        <span class="badge">五篇 18 章</span>
+      </div>
+      <h2>C++ 学习资料</h2>
+      <p>把 8 本教材按主题重写成 36 课、108 个小节：从编译链接、类型与值类别，到 RAII、移动语义、模板与 concepts、STL、ranges、C++20、并发与工程化。每课都有可运行代码、输出与坑点。</p>
+      <div class="entry-meta"><span>36 课 / 108 小节</span><span>A Tour of C++ · C++ Primer Plus · Effective Modern C++</span><span>同一套 reader 架构</span></div>
+      <div class="entry-cta"><span>进入完整课程</span><span aria-hidden="true">→</span></div>
+    </a>
+    <a class="entry practice" href="./cpp-debug-lab.html?v=20261127z104">
+      <div class="entry-top">
+        <div class="entry-ico"><img src="../assets/icons/algo.png" alt="" width="38" height="38"></div>
+        <span class="badge">3 档 24 题</span>
+      </div>
+      <h2>C++ 改错实验室</h2>
+      <p>给你一段带 bug 的 main.cpp，在编辑器里原地修；先跑公开样例，再提交隐藏用例。错误覆盖循环边界、整数溢出、getline、栈顶配对、排序键、最大堆、背包遍历方向等。</p>
+      <div class="entry-meta"><span>24 题 · 72 组用例</span><span>GCC 14.1 真实编译</span><span>逐用例 diff · 解析 · 参考修复</span></div>
+      <div class="entry-cta"><span>进入改错</span><span aria-hidden="true">→</span></div>
+    </a>
+  </section>
+
+  <div class="output-spotlight" style="grid-template-columns:1fr;cursor:default;margin-top:16px" aria-label="C++ 教材路线">
+    <div>
+      <span class="spotlight-kicker">8 BOOKS → 5 PARTS → 18 CHAPTERS</span>
+      <h2 style="font-size:26px">八本书各自负责一段路</h2>
+      <p style="max-width:100%">不把八本书平铺成书单，而是按“总纲 / 入门补漏 / 语言权威 / 现代规则 / C++20 专题 / 并发”分工，重叠主题合并成 36 课；完整映射见 <a href="../docs/cpp-book-map.md" style="color:#D8C08B;text-decoration:none;border-bottom:1px solid rgba(216,192,139,.35)">docs/cpp-book-map.md</a>。</p>
+      <div class="book-strip">
+        <div class="book-pill"><b>A Tour of C++ 2E</b>总纲 · 快速全景</div>
+        <div class="book-pill"><b>A Tour of C++ 3E</b>总纲 · 现代全景</div>
+        <div class="book-pill"><b>C++ Primer Plus 6E</b>入门 · 编译到 STL</div>
+        <div class="book-pill"><b>Beginning C++17</b>实操 · 类与容器</div>
+        <div class="book-pill"><b>The C++ Programming Language 4E</b>权威 · 类型与模板</div>
+        <div class="book-pill"><b>Effective Modern C++</b>规则 · 移动与智能指针</div>
+        <div class="book-pill"><b>C++20 - The Complete Guide</b>专题 · concepts / ranges</div>
+        <div class="book-pill"><b>C++ Concurrency in Action 2E</b>并发 · 线程与内存序</div>
+      </div>
+      <p style="margin:10px 2px 0;font-size:10px;color:var(--dim)">标准签名与边界另查 <a href="https://en.cppreference.com/w/cpp" target="_blank" rel="noopener" style="color:#D8C08B;text-decoration:none">cppreference ↗</a>；它不计入 8 本教材。</p>
+    </div>
+  </div>
+
+  <div class="note"><b>C++ 线只做三件事：系统学、改错、从输出写代码。</b> 课程正文与两套实验室共享同一套视觉与进度本地保存；判题由公共 Judge0 的 GCC 14.1 执行，编译选项固定为 <b>-std=c++20 -O2</b>。</div>
+</main>
+<script defer src="../assets/js/site-fx.js?v=20261127z102"></script>
+</body>
+</html>
