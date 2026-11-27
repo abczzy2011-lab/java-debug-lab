@@ -7,6 +7,8 @@
   const DATA = window.TERMINAL_DATA;
   if (!DATA || !DATA.platforms) return;
 
+  const DATA_VERSION = encodeURIComponent(DATA.version || '20261127z91n');
+  const DATA_URL = id => `../assets/data/terminal-${id}.json?v=${DATA_VERSION}`;
   const LS_KEY = 'jdl.terminal.mastered.v2';
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -24,12 +26,17 @@
   };
 
   const PAGE_SIZE = 120;
+  const flatCache = new Map();
+  const loads = new Map();
+  let fallbackLoad = null;
+  let searchTimer = 0;
   const state = {
     platform: 'macos',
     group: 'all',
     query: '',
     limit: PAGE_SIZE,
     mastered: loadMastered(),
+    loading: '',
   };
 
   const els = {
@@ -52,6 +59,10 @@
   };
 
   const platform = () => DATA.platforms[state.platform] || DATA.platforms.macos;
+  const isReady = (id) => {
+    const p = DATA.platforms[id];
+    return Boolean(p && p.commands && Object.keys(p.commands).length);
+  };
   const groups = () => DATA.groups.map(g => {
     const override = platform().groupOverrides && platform().groupOverrides[g.id];
     return override ? { ...g, ...override } : g;
@@ -67,10 +78,14 @@
     return i === -1 ? FIRST.length : i;
   };
   const allCommands = () => {
+    if (!isReady(state.platform)) return [];
+    if (flatCache.has(state.platform)) return flatCache.get(state.platform);
     const p = platform();
-    return groups().flatMap((g, gi) => (p.commands && p.commands[g.id]
+    const rows = groups().flatMap((g, gi) => (p.commands && p.commands[g.id]
       ? p.commands[g.id].map((c, ci) => ({ ...c, group: g, _gi: gi, _ci: ci }))
       : []));
+    flatCache.set(state.platform, rows);
+    return rows;
   };
 
   const keyOf = (cmd) => `${state.platform}:${cmd.group.id}:${cmd.id}`;
@@ -81,7 +96,85 @@
 
   const groupCount = (groupId) => {
     const p = platform();
+    if (p.groupCounts && typeof p.groupCounts[groupId] === 'number') return p.groupCounts[groupId];
     return p.commands && p.commands[groupId] ? p.commands[groupId].length : 0;
+  };
+
+  const loadFallback = () => {
+    if (fallbackLoad) return fallbackLoad;
+    fallbackLoad = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = `../assets/js/terminal-commands.js?v=${DATA_VERSION}`;
+      script.onload = () => {
+        const full = window.TERMINAL_DATA;
+        if (!full || !full.platforms) {
+          reject(new Error('fallback data missing'));
+          return;
+        }
+        DATA.platforms = full.platforms;
+        DATA.groups = full.groups || DATA.groups;
+        DATA.total = full.total || Object.values(full.platforms).reduce((sum, p) =>
+          sum + Object.values(p.commands || {}).reduce((n, rows) => n + rows.length, 0), 0);
+        flatCache.clear();
+        resolve();
+      };
+      script.onerror = () => reject(new Error('fallback load failed'));
+      document.head.appendChild(script);
+    });
+    return fallbackLoad;
+  };
+
+  const loadPlatform = (id) => {
+    if (isReady(id)) return Promise.resolve();
+    if (loads.has(id)) return loads.get(id);
+    const promise = fetch(DATA_URL(id), { credentials: 'same-origin' })
+      .then(response => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json();
+      })
+      .then(payload => {
+        if (!payload || !payload.commands) throw new Error('invalid platform data');
+        DATA.platforms[id] = { ...DATA.platforms[id], ...payload };
+        flatCache.delete(id);
+      })
+      .catch(error => {
+        console.warn(`终端数据 ${id} 加载失败，回退到全量脚本`, error);
+        return loadFallback().then(() => {
+          if (!isReady(id)) throw error;
+        });
+      })
+      .finally(() => loads.delete(id));
+    loads.set(id, promise);
+    return promise;
+  };
+
+  const renderLoading = (id) => {
+    if (!els.grid) return;
+    const p = DATA.platforms[id] || {};
+    els.grid.classList.remove('is-planned');
+    els.grid.innerHTML = `<div class="term-empty" style="grid-column:1/-1"><strong>正在载入 ${esc(p.label || id)} 指令…</strong><span>已先显示平台、分组和快捷键，命令正文按需加载。</span></div>`;
+    if (els.title) els.title.textContent = `${p.label || id} 指令全集`;
+    if (els.subtitle) els.subtitle.textContent = '正在按平台载入命令数据…';
+    if (els.count) els.count.textContent = `${p.label || id} · 载入中`;
+    if (els.more) els.more.hidden = true;
+    if (els.empty) els.empty.hidden = true;
+    if (els.search) {
+      els.search.disabled = true;
+      els.search.placeholder = `${p.label || id} 数据载入中…`;
+    }
+    renderProgress();
+  };
+
+  const renderError = (id) => {
+    if (!els.grid) return;
+    const p = DATA.platforms[id] || {};
+    els.grid.innerHTML = `<div class="term-empty" style="grid-column:1/-1"><strong>${esc(p.label || id)} 数据加载失败</strong><span>请检查网络后刷新页面，其他平台仍可切换。</span></div>`;
+    if (els.title) els.title.textContent = `${p.label || id} 指令全集`;
+    if (els.subtitle) els.subtitle.textContent = '命令数据加载失败，请检查网络后刷新';
+    if (els.count) els.count.textContent = `${p.label || id} · 加载失败`;
+    if (els.more) els.more.hidden = true;
+    if (els.empty) els.empty.hidden = true;
+    if (els.search) els.search.disabled = true;
   };
 
   const matches = (cmd) => {
@@ -127,7 +220,7 @@
   const renderFilters = () => {
     if (!els.filters) return;
     const p = platform();
-    const total = allCommands().length;
+    const total = typeof p.count === 'number' ? p.count : allCommands().length;
     els.filters.innerHTML = [
       `<button class="term-filter ${state.group === 'all' ? 'is-active' : ''}" type="button"
         data-group="all" aria-pressed="${state.group === 'all'}" ${p.status === 'planned' ? 'disabled' : ''}>
@@ -197,6 +290,10 @@
   const renderProgress = () => {
     if (!els.progress) return;
     const p = platform();
+    if (!isReady(state.platform)) {
+      els.progress.innerHTML = '<span class="term-progress-plan">载入中…</span>';
+      return;
+    }
     if (p.status !== 'ready') {
       els.progress.innerHTML = `<span class="term-progress-plan">${DATA.groups.length} 个分组已预留</span>`;
       return;
@@ -206,6 +303,10 @@
 
   const renderGrid = () => {
     if (!els.grid) return;
+    if (!isReady(state.platform)) {
+      renderLoading(state.platform);
+      return;
+    }
     const p = platform();
     els.grid.classList.remove('is-planned');
     if (p.status !== 'ready') {
@@ -246,8 +347,10 @@
   };
 
   const renderHero = () => {
-    const total = Object.values(DATA.platforms).reduce((sum, p) =>
-      sum + Object.values(p.commands || {}).reduce((n, rows) => n + (Array.isArray(rows) ? rows.length : 0), 0), 0);
+    const total = typeof DATA.total === 'number'
+      ? DATA.total
+      : Object.values(DATA.platforms).reduce((sum, p) =>
+        sum + Object.values(p.commands || {}).reduce((n, rows) => n + (Array.isArray(rows) ? rows.length : 0), 0), 0);
     if (els.heroCount) els.heroCount.textContent = total.toLocaleString('en-US');
     if (els.heroGroups) els.heroGroups.textContent = String(DATA.groups.length);
   };
@@ -312,16 +415,54 @@
     renderProgress();
   };
 
-  els.tabs?.addEventListener('click', e => {
-    const tab = e.target.closest('[data-os]');
-    if (!tab) return;
-    const next = tab.dataset.os;
-    if (!DATA.platforms[next] || next === state.platform) return;
-    state.platform = next;
+  const switchTo = async (id) => {
+    if (!DATA.platforms[id]) return;
+    if (id === state.platform && isReady(id)) return;
+    state.platform = id;
     state.group = 'all';
     state.query = '';
     state.limit = PAGE_SIZE;
+    if (els.search) els.search.value = '';
+    if (isReady(id)) {
+      state.loading = '';
+      renderAll();
+      return;
+    }
+    state.loading = id;
+    renderTabs();
+    renderFilters();
+    renderLoading(id);
+    try {
+      await loadPlatform(id);
+    } catch {
+      if (state.platform === id) {
+        state.loading = '';
+        renderError(id);
+      }
+      return;
+    }
+    if (state.platform !== id) return;
+    state.loading = '';
     renderAll();
+  };
+
+  const prefetch = (id) => {
+    if (!DATA.platforms[id] || id === state.platform || isReady(id)) return;
+    loadPlatform(id).catch(() => {});
+  };
+
+  els.tabs?.addEventListener('click', e => {
+    const tab = e.target.closest('[data-os]');
+    if (!tab) return;
+    switchTo(tab.dataset.os);
+  });
+  els.tabs?.addEventListener('pointerover', e => {
+    const tab = e.target.closest('[data-os]');
+    if (tab) prefetch(tab.dataset.os);
+  });
+  els.tabs?.addEventListener('focusin', e => {
+    const tab = e.target.closest('[data-os]');
+    if (tab) prefetch(tab.dataset.os);
   });
 
   els.filters?.addEventListener('click', e => {
@@ -336,7 +477,10 @@
   els.search?.addEventListener('input', () => {
     state.query = els.search.value;
     state.limit = PAGE_SIZE;
-    renderGrid();
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      if (isReady(state.platform)) renderGrid();
+    }, 90);
   });
 
   els.reset?.addEventListener('click', () => {
@@ -344,6 +488,7 @@
     state.query = '';
     state.limit = PAGE_SIZE;
     if (els.search) els.search.value = '';
+    clearTimeout(searchTimer);
     renderFilters();
     renderGrid();
     els.search?.focus();
@@ -369,5 +514,28 @@
     if (masterBtn) toggleMastered(masterBtn, masterBtn.dataset.master);
   });
 
-  renderAll();
+  const boot = async () => {
+    renderHero();
+    renderTabs();
+    if (isReady('macos')) {
+      renderAll();
+      return;
+    }
+    state.loading = 'macos';
+    renderTabs();
+    renderFilters();
+    renderLoading('macos');
+    try {
+      await loadPlatform('macos');
+    } catch {
+      state.loading = '';
+      renderError('macos');
+      return;
+    }
+    if (state.platform !== 'macos') return;
+    state.loading = '';
+    renderAll();
+  };
+
+  boot();
 })();

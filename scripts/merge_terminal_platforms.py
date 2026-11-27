@@ -101,6 +101,12 @@ def main() -> int:
     with open(target, "w", encoding="utf-8") as fh:
         fh.write(header + "window.TERMINAL_DATA = " + body + ";\n")
 
+    if target == TARGET:
+        subprocess.run(
+            [sys.executable, os.path.join(ROOT, "scripts", "build_terminal_perf.py")],
+            check=True,
+        )
+
     print("\n合并完成 ->", target)
     for p in PLATFORMS:
         print(f"  {p}: {totals[p]} 条")

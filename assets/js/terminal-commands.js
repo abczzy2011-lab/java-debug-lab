@@ -4,7 +4,7 @@
  * 由 scripts/merge_terminal_platforms.py 从 agent-output/{macos,linux,windows}.json 合并生成，勿手改。
  */
 window.TERMINAL_DATA = {
- "version": "20261127z90n",
+ "version": "20261127z91n",
  "title": "终端指令全集",
  "license": "Command descriptions/examples adapted from tldr-pages zh (CC BY 4.0).",
  "groups": [
