@@ -20,7 +20,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 HTML_FILES = [ROOT / "index.html", ROOT / "java-debug-lab.html"]
 BUNDLE = ROOT / "assets" / "js" / "home-bundle.js"
-VERSION = "20261127z91n"
+VERSION = "20261127z92n"
 
 # 常用类兜底，保证 API 面板刚打开、全量索引还没下完时也能按类名搜索。
 FALLBACK = [

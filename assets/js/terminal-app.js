@@ -7,7 +7,7 @@
   const DATA = window.TERMINAL_DATA;
   if (!DATA || !DATA.platforms) return;
 
-  const DATA_VERSION = encodeURIComponent(DATA.version || '20261127z91n');
+  const DATA_VERSION = encodeURIComponent(DATA.version || '20261127z92n');
   const DATA_URL = id => `../assets/data/terminal-${id}.json?v=${DATA_VERSION}`;
   const LS_KEY = 'jdl.terminal.mastered.v2';
   const $ = (sel, root = document) => root.querySelector(sel);

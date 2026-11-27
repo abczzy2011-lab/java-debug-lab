@@ -83,7 +83,7 @@ def build() -> int:
         }
 
     meta = {
-        "version": data.get("version") or "20261127z91n",
+        "version": data.get("version") or "20261127z92n",
         "title": data.get("title") or "终端指令全集",
         "license": data.get("license", ""),
         "groups": groups,

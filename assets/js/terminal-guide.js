@@ -2,7 +2,7 @@
  * 教程只讲“先做什么、看到什么、怎么验收”，命令细节回到 terminal.html 命令库。
  */
 window.TERMINAL_GUIDE = {
-  version: "20261127z91n",
+  version: "20261127z92n",
   libraryCount: 3095,
   tracks: [
     {

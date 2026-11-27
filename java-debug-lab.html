@@ -830,7 +830,7 @@ span.apiref:hover{color:var(--accent);border-bottom-color:var(--accent)}
     </div>
   </div>
   <div class="utility-cards" aria-label="终端与全栈考试入口">
-    <a class="subject-card utility-card" style="--card-accent:#5EEAD4" href="subjects/terminal.html?v=20261127z91n">
+    <a class="subject-card utility-card" style="--card-accent:#5EEAD4" href="subjects/terminal.html?v=20261127z92n">
       <span class="utility-flag">3,095 条全量 · 45 道题</span>
       <div class="subject-icon"><img class="ui-ico ui-ico-subject" src="./assets/icons/terminal.png" alt="" decoding="async"></div>
       <div class="subject-name">终端指令全集</div>
@@ -1359,7 +1359,77 @@ span.apiref:hover{color:var(--accent);border-bottom-color:var(--accent)}
   </div>
 </div>
 
-<script defer src="./assets/js/home-bundle.js?v=20261127z91n"></script>
+<script>
+/* 首页应用按需加载：学科卡是静态 HTML，不依赖 5.3 MB 应用包。
+   学习中心、错题本、API 模式或键盘/指针预热时，才按顺序加载应用包与扩容数据。 */
+(function(){
+  var VERSION="20261127z92n";
+  var CHAIN=[
+    "./assets/js/home-bundle.js?v="+VERSION,
+    "./assets/js/java-debug-expansion-z87.js?v=20261126z87f",
+    "./assets/js/logic-expansion-z87.js?v=20261126z87g"
+  ];
+  var state=0, queue=[], tipTimer=0, tipEl=null;
+  function showTip(){
+    clearTimeout(tipTimer);
+    tipTimer=setTimeout(function(){
+      if(!tipEl){
+        tipEl=document.createElement("div");
+        tipEl.id="home-bundle-loading";
+        tipEl.style.cssText="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:300;padding:10px 16px;border-radius:10px;background:rgba(15,18,22,.94);color:#E8E3D9;font-size:13px;border:1px solid rgba(255,255,255,.10);box-shadow:0 12px 30px rgba(0,0,0,.35)";
+        document.body.appendChild(tipEl);
+      }
+      tipEl.textContent="正在加载页面功能…";
+    },250);
+  }
+  function hideTip(){
+    clearTimeout(tipTimer);
+    if(tipEl&&tipEl.parentNode)tipEl.parentNode.removeChild(tipEl);
+    tipEl=null;
+  }
+  function flush(){
+    hideTip();
+    var q=queue; queue=[];
+    q.forEach(function(fn){ try{ fn(); }catch(e){ console.error(e); } });
+  }
+  function fail(){
+    state=0; queue=[]; hideTip();
+    var el=document.getElementById("home-bundle-error");
+    if(!el){
+      el=document.createElement("div");
+      el.id="home-bundle-error";
+      el.style.cssText="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:300;padding:10px 16px;border-radius:10px;background:#2A1518;color:#E7BDB8;font-size:13px;border:1px solid rgba(255,120,120,.3);box-shadow:0 12px 30px rgba(0,0,0,.35)";
+      document.body.appendChild(el);
+    }
+    el.textContent="页面功能加载失败，请刷新后重试";
+    setTimeout(function(){ if(el&&el.parentNode) el.parentNode.removeChild(el); },4000);
+  }
+  function load(i){
+    if(i>=CHAIN.length){ state=2; flush(); return; }
+    var s=document.createElement("script");
+    s.src=CHAIN[i];
+    s.async=false;
+    s.onload=function(){ load(i+1); };
+    s.onerror=fail;
+    document.head.appendChild(s);
+  }
+  function withBundle(fn, silent){
+    if(state===2){ fn(); return; }
+    queue.push(fn);
+    if(state===0){ state=1; if(!silent)showTip(); load(0); }
+  }
+  window.__withHomeBundle=withBundle;
+  window.__prefetchHomeBundle=function(){ withBundle(function(){}, true); };
+  window.openStudyHub=function(){ withBundle(function(){ window.openStudyHub(); }); };
+  window.openWrongbook=function(){ withBundle(function(){ window.openWrongbook(); }); };
+  [".study-cta",".wrongbook-cta"].forEach(function(sel){
+    document.querySelectorAll(sel).forEach(function(el){
+      el.addEventListener("pointerenter", window.__prefetchHomeBundle, {once:true});
+      el.addEventListener("focus", window.__prefetchHomeBundle, {once:true});
+    });
+  });
+})();
+</script>
 <script>
 window.__JAVA_DOC_LINKS__=function(){
   var p=(typeof S!=='undefined'&&S.problem)?S.problem:null;
@@ -1394,7 +1464,7 @@ window.__JAVA_DOC_LINKS__=function(){
   return picks.slice(0,6);
 };
 </script>
-<script src="./assets/js/java-doc.js?v=20261125z57"></script>
+<script defer src="./assets/js/java-doc.js?v=20261125z57"></script>
 <script>window.__JAVIS_CLOUD_BASE__ = window.__JAVIS_CLOUD_BASE__ || "https://javis-hybrid-router.abczzy2011.workers.dev";</script>
 <!-- Liquid-glass refraction: hyalite v0.5.0, MIT, github.com/VII-Cae/hyalite--liquid-glass -->
 <script src="./assets/vendor/hyalite/hyalite.js"></script>
@@ -1411,8 +1481,10 @@ window.__JAVA_DOC_LINKS__=function(){
   }
   if(!mode) return;
   function enter(){
-    if(mode==='api'){ apiOpen(); return; }
-    if(['java','hw','algo','jbase','ai','llm'].indexOf(mode)>=0) selectSubject(mode);
+    window.__withHomeBundle(function(){
+      if(mode==='api'){ apiOpen(); return; }
+      if(['java','hw','algo','jbase','ai','llm'].indexOf(mode)>=0) selectSubject(mode);
+    });
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',enter,{once:true});
   else enter();
@@ -1479,9 +1551,7 @@ window.__JAVA_DOC_LINKS__=function(){
   },{passive:true});
 })();
 </script>
-<script defer src="./assets/js/java-debug-expansion-z87.js?v=20261126z87f"></script>
-<script defer src="./assets/js/logic-expansion-z87.js?v=20261126z87g"></script>
-<script src="./assets/js/fullstack/fullstack-data.js?v=20261126z85"></script>
-<script src="./assets/js/fullstack/fullstack-entry.js?v=20261126z85"></script>
+<script defer src="./assets/js/fullstack/fullstack-data.js?v=20261126z85"></script>
+<script defer src="./assets/js/fullstack/fullstack-entry.js?v=20261126z85"></script>
 </body>
 </html>
