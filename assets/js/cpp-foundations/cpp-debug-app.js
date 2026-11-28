@@ -171,7 +171,7 @@
             '<span class="stat"><b>85 + 15</b> 评分</span>' +
             '<span class="stat"><b>' + solvedCount() + '</b> 已通过</span>' +
           '</div>' +
-          '<div class="hero-actions"><a class="hero-btn primary" href="#task/' + escapeHTML(firstUndone.id) + '">' + (done < tasks.length ? '继续未完成' : '从第一题开始') + ' <span aria-hidden="true">→</span></a><button class="hero-btn" type="button" data-scroll-rules>评分规则</button><a class="hero-btn" href="./cpp-api.html?v=20261128z117">API 速查 <span aria-hidden="true">→</span></a></div>' +
+          '<div class="hero-actions"><a class="hero-btn primary" href="#task/' + escapeHTML(firstUndone.id) + '">' + (done < tasks.length ? '继续未完成' : '从第一题开始') + ' <span aria-hidden="true">→</span></a><button class="hero-btn" type="button" data-scroll-rules>评分规则</button><a class="hero-btn" href="./cpp-api.html?v=20261128z118">API 速查 <span aria-hidden="true">→</span></a></div>' +
           '<div class="hero-note"><span>真实 Judge0 执行</span><span>逐用例比对</span><span>本地保存进度</span><span>可看解析复盘</span></div>' +
         '</div>' +
       '</section>' +
@@ -230,7 +230,7 @@
 
     $('#content').innerHTML = '<div class="task-topnav"><a class="back" href="#bank"><span aria-hidden="true">←</span> 返回题库</a>' +
       '<span class="task-topnav-mid">' + level.short + String(task.order).padStart(2, '0') + ' / ' + tasks.length + ' · ' + level.label + '</span>' +
-      '<div class="task-topnav-links"><a class="api-quick" href="./cpp-api.html?v=20261128z117" aria-label="打开站内 C++ API 速查">API 速查</a><a href="#task/' + escapeHTML(prev.id) + '" aria-label="上一题 ' + escapeHTML(prev.title) + '">← 上一题</a><a href="#task/' + escapeHTML(next.id) + '" aria-label="下一题 ' + escapeHTML(next.title) + '">下一题 →</a></div></div>' +
+      '<div class="task-topnav-links"><a class="api-quick" href="./cpp-api.html?v=20261128z118" aria-label="打开站内 C++ API 速查">API 速查</a><a href="#task/' + escapeHTML(prev.id) + '" aria-label="上一题 ' + escapeHTML(prev.title) + '">← 上一题</a><a href="#task/' + escapeHTML(next.id) + '" aria-label="下一题 ' + escapeHTML(next.title) + '">下一题 →</a></div></div>' +
       '<div class="task-shell">' +
       '<aside class="brief">' +
         '<div class="task-eyebrow"><span class="level level-' + escapeHTML(task.level) + '">' + level.label + '</span><span>' + level.short + String(task.order).padStart(2, '0') + '</span><span>' + escapeHTML(task.minutes) + ' 分钟</span></div>' +

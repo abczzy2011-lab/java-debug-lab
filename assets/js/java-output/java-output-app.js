@@ -293,6 +293,13 @@
       .finally(() => clearTimeout(timer));
   }
 
+  function isLocalJudgeHost() {
+    const host = String(window.location.hostname || '').toLowerCase();
+    return window.location.protocol === 'file:' ||
+      host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0' ||
+      host === '[::1]' || host === '::1' || /\.local$/.test(host);
+  }
+
   function setEngineBadge(status, text, detail) {
     state.judge.status = status;
     state.judge.detail = detail || state.judge.detail || '';
@@ -333,6 +340,19 @@
         state.judge = { endpoint: base, label: '指定后端 · 未响应', detail: base, status: 'bad' };
         setEngineBadge('bad', '指定后端未响应', base);
       }
+      return;
+    }
+
+    // 公开 HTTPS 站点访问 127.0.0.1 会被 CORS / mixed-content 拦截；
+    // 只在本地开发或 file:// 预览时探测候选端口，线上直接走公共节点。
+    if (!isLocalJudgeHost()) {
+      state.judge = {
+        endpoint: 'https://ce.judge0.com',
+        label: '公共 Judge0 · 备用',
+        detail: '公开站点不探测本机后端，已直接使用公共编译节点',
+        status: 'warn'
+      };
+      setEngineBadge('warn', '公共 Judge0 · 备用', state.judge.detail);
       return;
     }
 
