@@ -42,6 +42,7 @@
 .ref-group-head p{margin-top:4px;font-size:10.5px;line-height:1.7;color:var(--dim)}
 .ref-group-count{flex:none;padding:3px 8px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.03);font-family:var(--mono);font-size:8.5px;font-weight:800;color:var(--dim)}
 .api-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.api-card{min-width:0}
 .api-card{
   display:flex;flex-direction:column;min-height:165px;padding:14px 15px 12px;text-align:left;border-radius:12px;
   border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.032),rgba(255,255,255,.012));
@@ -104,7 +105,7 @@
 .foot-btn[aria-disabled="true"]{opacity:.35;pointer-events:none}
 @media (max-width:1040px){
   .reference-shell{padding:16px 14px 52px}
-  .api-grid{grid-template-columns:1fr}
+  .api-grid{grid-template-columns:minmax(0,1fr)}
   .related-grid{grid-template-columns:1fr}
 }
 @media (max-width:760px){
