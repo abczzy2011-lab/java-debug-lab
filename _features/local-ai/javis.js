@@ -383,7 +383,7 @@ function bindUi() {
     if (action) { handleAction(action.dataset.jvAction, action); }
   });
   document.addEventListener('keydown', e => {
-    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); state.panelOpen ? closePanel() : openPanel(); }
+    if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key.toLowerCase() === 'k') { e.preventDefault(); state.panelOpen ? closePanel() : openPanel(); }
     if (e.key === 'Tab' && state.kitOpen) { trapKitFocus(e); return; }
     if (e.key === 'Escape' && state.kitOpen) { closeKit(); return; }
     if (e.key === 'Escape' && state.searchOpen) { closeSearch(); return; }

@@ -550,17 +550,25 @@
     }catch(err){}
   }
 
+  function quickHasJavis(){
+    // Javis 在首页与 java-debug-lab.html 用 ⌘K 打开助教；快速跳转在这些页面
+    // 改用 ⌘⇧K，避免同一次按键同时打开两个面板。
+    return !!document.querySelector('script[src*="javis.js"]');
+  }
+
   function buildQuickNav(){
     if(quickBuilt || !document.body) return;
     quickBuilt = true;
     var isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform || '');
-    var keyLabel = isMac ? '⌘K' : 'Ctrl K';
+    var javisPage = quickHasJavis();
+    var keyLabel = javisPage ? (isMac ? '⌘⇧K' : 'Ctrl Shift K') : (isMac ? '⌘K' : 'Ctrl K');
     var searchIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.2 4.2"></path></svg>';
 
     quickTrigger = document.createElement('button');
     quickTrigger.type = 'button';
     quickTrigger.className = 'fx-quick-trigger';
-    quickTrigger.setAttribute('aria-label', '打开全站快速跳转');
+    quickTrigger.setAttribute('aria-label', '打开全站快速跳转（' + keyLabel + '）');
+    quickTrigger.title = '打开全站快速跳转（' + keyLabel + '）';
     quickTrigger.setAttribute('aria-haspopup', 'dialog');
     quickTrigger.setAttribute('aria-controls', 'fxPalette');
     quickTrigger.setAttribute('aria-expanded', 'false');
@@ -823,6 +831,8 @@
     if(event.isComposing) return;
     var key = event.key;
     if((event.metaKey || event.ctrlKey) && (key === 'k' || key === 'K')){
+      // 有 Javis 的页面保留它的 ⌘K，快速跳转走 ⌘⇧K。
+      if(quickHasJavis() && !event.shiftKey) return;
       event.preventDefault();
       if(quickOpen) closeQuickNav();
       else openQuickNav();
