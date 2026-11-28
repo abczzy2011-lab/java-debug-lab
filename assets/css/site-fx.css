@@ -301,6 +301,10 @@ html.fx-palette-open .fx-quick-trigger{opacity:0;pointer-events:none;transform:t
   color:#958C7D;font:500 10.5px/1.35 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
+.fx-palette-copy mark{
+  color:#FFF3DE;background:rgba(200,169,118,.22);
+  border-radius:3px;padding:0 .08em;box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
 .fx-palette-meta{display:flex;align-items:center;gap:7px;flex:none}
 .fx-palette-meta em{
   color:#887E6F;font:600 9px/1 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;

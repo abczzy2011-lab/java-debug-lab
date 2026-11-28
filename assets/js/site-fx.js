@@ -464,14 +464,42 @@
     var score = 0;
     query.split(' ').forEach(function(term){
       if(!term) return;
-      if(name === term) score += 120;
-      else if(name.indexOf(term) === 0) score += 80;
-      else if(name.indexOf(term) >= 0) score += 55;
-      if(desc.indexOf(term) >= 0) score += 18;
-      if(tags.indexOf(term) >= 0) score += 9;
-      if(cat.indexOf(term) >= 0) score += 5;
+      var prefix = false;
+      if(name === term) score += 160;
+      else if(name.indexOf(term) === 0){ score += 110; prefix = true; }
+      else if(name.indexOf(term) >= 0) score += 70;
+      // 搜“java / python”时，学科入口应排在题库与应用之前。
+      if(prefix && page.c === '学科') score += 35;
+      if(desc.indexOf(term) >= 0) score += 16;
+      if(tags.indexOf(term) >= 0) score += 8;
+      if(cat.indexOf(term) >= 0) score += 4;
     });
     return score;
+  }
+
+  function quickHighlight(text, query){
+    var raw = String(text == null ? '' : text);
+    var terms = (query || '').split(' ').filter(Boolean).map(function(term){ return quickNorm(term); });
+    if(!terms.length) return quickEsc(raw);
+    var lower = raw.toLowerCase();
+    var out = '';
+    var pos = 0;
+    while(pos < raw.length){
+      var best = -1;
+      var bestLen = 0;
+      terms.forEach(function(term){
+        var at = lower.indexOf(term, pos);
+        if(at < 0) return;
+        if(best < 0 || at < best || (at === best && term.length > bestLen)){
+          best = at;
+          bestLen = term.length;
+        }
+      });
+      if(best < 0){ out += quickEsc(raw.slice(pos)); break; }
+      out += quickEsc(raw.slice(pos, best)) + '<mark>' + quickEsc(raw.substr(best, bestLen)) + '</mark>';
+      pos = best + bestLen;
+    }
+    return out;
   }
 
   function quickRoot(){
@@ -643,7 +671,7 @@
     });
   }
 
-  function quickRowHTML(page, index, current){
+  function quickRowHTML(page, index, current, query){
     var now = current ? '<span class="fx-palette-now">当前</span>' : '';
     return '<a class="fx-palette-row' + (current ? ' is-current' : '') + '"' +
       ' href="' + quickEsc(quickHref(page)) + '"' +
@@ -653,7 +681,7 @@
       ' role="option" aria-selected="false"' +
       (current ? ' data-current="1" aria-current="page"' : '') + '>' +
       '<span class="fx-palette-badge fx-tone-' + quickEsc(page.h) + '" aria-hidden="true">' + quickEsc(page.b) + '</span>' +
-      '<span class="fx-palette-copy"><b>' + quickEsc(page.n) + '</b><small>' + quickEsc(page.d) + '</small></span>' +
+      '<span class="fx-palette-copy"><b>' + quickHighlight(page.n, query) + '</b><small>' + quickHighlight(page.d, query) + '</small></span>' +
       '<span class="fx-palette-meta"><em>' + quickEsc(page.c) + '</em>' + now + '<i aria-hidden="true">↵</i></span>' +
       '</a>';
   }
@@ -679,7 +707,7 @@
       if(!pages.length) return;
       html += '<div class="fx-palette-label">' + quickEsc(label) + '</div>';
       pages.forEach(function(page){
-        html += quickRowHTML(page, index, current && page.r === current.r);
+        html += quickRowHTML(page, index, current && page.r === current.r, query);
         index += 1;
       });
     }
