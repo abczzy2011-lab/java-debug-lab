@@ -248,6 +248,8 @@ button{background:none;border:0;cursor:pointer}
 .task-topnav-links{display:flex;gap:5px}
 .task-topnav-links a{display:inline-flex;align-items:center;min-height:34px;padding:0 9px;border:1px solid var(--line);border-radius:8px;color:var(--muted);font-size:9.5px;font-weight:750;background:rgba(255,255,255,.025);white-space:nowrap}
 .task-topnav-links a:hover{border-color:var(--line-strong);color:var(--text);background:rgba(255,255,255,.06)}
+.task-topnav-links a.api-quick{color:#C9D9FF;border-color:rgba(143,184,255,.28);background:rgba(143,184,255,.07)}
+.task-topnav-links a.api-quick:hover{border-color:rgba(143,184,255,.55);background:rgba(143,184,255,.12)}
 .task-foot-links{display:flex;gap:12px;min-width:0}
 .task-foot-links a{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
 @media (max-width:1040px){

@@ -56,14 +56,23 @@
     return apis.filter(function (api) { return api.example; }).length;
   }
 
+  function revealActiveChip() {
+    var rail = $('.ref-chips');
+    var active = $('.ref-chips .active');
+    if (!rail || !active || rail.scrollWidth <= rail.clientWidth + 2) return;
+    var target = active.getBoundingClientRect().left - rail.getBoundingClientRect().left + rail.scrollLeft - Math.max(0, (rail.clientWidth - active.offsetWidth) / 2);
+    if (rail.scrollTo) rail.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
+    else rail.scrollLeft = Math.max(0, target);
+  }
+
   function renderHome() {
     $('#app').innerHTML = '<div class="panel">' +
       '<section class="ref-hero">' +
         '<div class="kicker">CPP · STANDARD LIBRARY · ' + apis.length + ' ENTRIES</div>' +
         '<h1>C++ API 速查</h1>' +
-        '<p class="sub">12 组 ' + apis.length + ' 条 C++20 高频 API：头文件、签名、说明、返回值、是否修改对象、可复制示例、运行结果和坑点。全部离线，搜索与详情都在站内完成。</p>' +
+        '<p class="sub">12 组 ' + apis.length + ' 条 C++20 高频 API：头文件、签名、说明、返回值、是否修改对象、可复制示例、运行结果和坑点。全部在站内，搜索与详情都不请求外部文档。</p>' +
         '<div class="hero-stats">' +
-          '<span class="stat"><b>' + apis.length + '</b> 个条目</span>' +
+          '<span class="stat"><b>' + apis.length + '</b> 条</span>' +
           '<span class="stat"><b>' + groups.length + '</b> 组</span>' +
           '<span class="stat"><b>' + countExamples() + '</b> 段示例</span>' +
           '<span class="stat"><b>C++20</b> 标准</span>' +
@@ -82,7 +91,7 @@
             return '<button type="button" data-group="' + esc(group.id) + '" class="' + (filter === group.id ? 'active' : '') + '">' + esc(group.label) + ' <b>' + apis.filter(function (api) { return api.group === group.id; }).length + '</b></button>';
           }).join('') +
         '</div>' +
-        '<div class="ref-meta"><span id="refCount">' + apis.length + ' / ' + apis.length + ' 条</span><span>或按 <kbd>Ctrl</kbd> + <kbd>K</kbd> 搜索</span></div>' +
+        '<div class="ref-meta"><span id="refCount" role="status" aria-live="polite">' + apis.length + ' / ' + apis.length + ' 条</span><span>或按 <kbd>Ctrl</kbd> + <kbd>K</kbd> 搜索</span></div>' +
       '</div>' +
       '<div class="ref-results" id="refResults"></div>' +
       '<div class="tool-foot">条目覆盖 C++20 标准库高频工具：容器、算法、字符串、流、文件系统、并发、内存、时间、类型工具、数值、正则与错误处理。示例是可直接改造的最小片段，签名以 C++20 为目标。</div>' +
@@ -99,6 +108,7 @@
     if (clear) clear.addEventListener('click', clearSearch);
     renderResults();
     bindChips();
+    revealActiveChip();
     updateHeader();
     window.scrollTo(0, 0);
     document.title = 'C++ API 速查 · ' + groups.length + ' 组 ' + apis.length + ' 条';
@@ -112,6 +122,7 @@
           chip.classList.toggle('active', chip.getAttribute('data-group') === filter);
         });
         renderResults();
+        revealActiveChip();
       });
     });
   }
@@ -124,7 +135,7 @@
     var count = $('#refCount');
     if (count) count.textContent = visible.length + ' / ' + apis.length + ' 条';
     if (!visible.length) {
-      result.innerHTML = '<div class="ref-empty"><b>没有匹配的条目</b><p>试试更短的关键词：<code>map</code>、<code>Promise</code>、<code>事件</code> 或 <code>深拷贝</code>。</p><button type="button" class="btn ghost" data-clear-empty>清空搜索</button></div>';
+      result.innerHTML = '<div class="ref-empty"><b>没有匹配的条目</b><p>试试更短的关键词：<code>vector</code>、<code>map</code>、<code>filesystem</code> 或 <code>mutex</code>。</p><button type="button" class="btn ghost" data-clear-empty>清空搜索</button></div>';
       var emptyBtn = $('[data-clear-empty]', result);
       if (emptyBtn) emptyBtn.addEventListener('click', clearSearch);
       return;
@@ -159,7 +170,7 @@
       '<div class="api-top"><span class="api-name">' + esc(api.name) + '</span><span class="api-short">' + esc(api.short) + '</span></div>' +
       '<p class="api-sum">' + esc(api.summary) + '</p>' +
       '<code class="api-syntax">' + esc(api.syntax) + '</code>' +
-      '<div class="api-foot"><span class="api-group">' + esc(groupLabel(api.group)) + '</span><span class="api-badge ' + (api.mutates ? 'mutates' : '') + '">' + (api.mutates ? '会修改原值' : '返回新值 / 只读') + '</span></div>' +
+      '<div class="api-foot"><span class="api-group">' + esc(groupLabel(api.group)) + '</span><span class="api-badge ' + (api.mutates ? 'mutates' : '') + '">' + (api.mutates ? '会修改对象' : '不修改对象') + '</span></div>' +
     '</button>';
   }
 
@@ -222,6 +233,7 @@
     var groupBtn = $('[data-related-group]', $('#app'));
     if (groupBtn) groupBtn.addEventListener('click', function () {
       filter = api.group;
+      query = '';
       location.hash = 'reference';
     });
     updateHeader();

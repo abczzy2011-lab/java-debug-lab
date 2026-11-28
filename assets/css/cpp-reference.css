@@ -134,7 +134,11 @@ body{
   .ref-hero .sub{font-size:12px;line-height:1.85}
   .search-wrap{min-height:50px;padding:0 11px;margin-top:18px}
   .ref-search{font-size:12px}
-  .ref-toolbar{padding:11px 13px}
+  .ref-toolbar{padding:10px 12px 9px;gap:6px}
+  .ref-chips{width:100%;flex-wrap:nowrap;overflow-x:auto;padding:0 1px 3px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .ref-chips::-webkit-scrollbar{display:none}
+  .ref-chips button{flex:0 0 auto;min-height:34px;padding:0 10px}
+  .ref-meta{width:100%;gap:6px}
   .ref-meta span:last-child{display:none}
   .ref-results{padding:2px 13px 18px}
   .api-card{min-height:0;padding:13px}
