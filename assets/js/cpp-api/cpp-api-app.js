@@ -135,9 +135,16 @@
     var count = $('#refCount');
     if (count) count.textContent = visible.length + ' / ' + apis.length + ' 条';
     if (!visible.length) {
-      result.innerHTML = '<div class="ref-empty"><b>没有匹配的条目</b><p>试试更短的关键词：<code>vector</code>、<code>map</code>、<code>filesystem</code> 或 <code>mutex</code>。</p><button type="button" class="btn ghost" data-clear-empty>清空搜索</button></div>';
+      var scopeHint = filter !== 'all' ? '<p class="empty-scope">当前筛选：' + esc(groupLabel(filter)) + '。这个分组内没有匹配项。</p>' : '';
+      var allAction = filter !== 'all' ? '<button type="button" class="btn ghost" data-search-all>在全部 ' + groups.length + ' 组中搜索</button>' : '';
+      result.innerHTML = '<div class="ref-empty"><b>没有匹配的条目</b><p>试试更短的关键词：<code>vector</code>、<code>map</code>、<code>filesystem</code> 或 <code>mutex</code>。</p>' + scopeHint + '<div class="empty-actions"><button type="button" class="btn ghost" data-clear-empty>清空搜索</button>' + allAction + '</div></div>';
       var emptyBtn = $('[data-clear-empty]', result);
       if (emptyBtn) emptyBtn.addEventListener('click', clearSearch);
+      var searchAllBtn = $('[data-search-all]', result);
+      if (searchAllBtn) searchAllBtn.addEventListener('click', function () {
+        var allChip = $('[data-group="all"]', $('#app'));
+        if (allChip) allChip.click();
+      });
       return;
     }
     if (query) {
