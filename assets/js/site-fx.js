@@ -456,6 +456,24 @@
     return String(value == null ? '' : value).toLowerCase().replace(/\s+/g, ' ').trim();
   }
 
+  function quickScore(page, query){
+    var name = quickNorm(page.n);
+    var desc = quickNorm(page.d);
+    var tags = quickNorm(page.t);
+    var cat = quickNorm(page.c);
+    var score = 0;
+    query.split(' ').forEach(function(term){
+      if(!term) return;
+      if(name === term) score += 120;
+      else if(name.indexOf(term) === 0) score += 80;
+      else if(name.indexOf(term) >= 0) score += 55;
+      if(desc.indexOf(term) >= 0) score += 18;
+      if(tags.indexOf(term) >= 0) score += 9;
+      if(cat.indexOf(term) >= 0) score += 5;
+    });
+    return score;
+  }
+
   function quickRoot(){
     var path = location.pathname || '/';
     if(/\/$/.test(path)){
@@ -650,6 +668,11 @@
       var haystack = quickNorm(page.n + ' ' + page.d + ' ' + page.c + ' ' + page.b + ' ' + page.t + ' ' + page.r);
       return query.split(' ').every(function(part){ return haystack.indexOf(part) >= 0; });
     });
+    if(query){
+      items.sort(function(a, b){
+        return (quickScore(b, query) - quickScore(a, query)) || (NAV_PAGES.indexOf(a) - NAV_PAGES.indexOf(b));
+      });
+    }
     var html = '';
     var index = 0;
     function addGroup(label, pages){

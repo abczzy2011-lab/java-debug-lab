@@ -170,6 +170,7 @@ html.fx-palette-open .fx-quick-trigger{opacity:0;pointer-events:none;transform:t
 }
 .fx-palette.is-open .fx-palette-scrim{opacity:1}
 .fx-palette.is-open .fx-palette-panel{opacity:1;transform:none}
+.fx-palette-head,.fx-palette-search,.fx-palette-chips,.fx-palette-foot{flex:none}
 
 .fx-palette-head{
   display:flex;align-items:flex-start;justify-content:space-between;gap:14px;

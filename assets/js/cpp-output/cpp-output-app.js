@@ -714,7 +714,7 @@
               <span class="doc-callout-kicker">C++ API · 站内速查</span>
               <p>做题时边写边查：容器、算法、字符串、并发与文件系统条目，全部在站内完成。</p>
             </div>
-            <a class="lab-btn" href="./cpp-api.html?v=20261128z118">打开 C++ API 速查 →</a>
+            <a class="lab-btn" href="./cpp-api.html?v=20261128z119">打开 C++ API 速查 →</a>
           </div>
         </aside>
         <section class="workspace-main">
@@ -722,7 +722,7 @@
             <div class="editor-head">
               <div class="editor-file">main.cpp <span>C++20 · GCC 14.1</span></div>
               <div class="editor-actions">
-                <a class="lab-btn small" href="./cpp-api.html?v=20261128z118">API 速查</a>
+                <a class="lab-btn small" href="./cpp-api.html?v=20261128z119">API 速查</a>
                 <button class="lab-btn small" type="button" data-action="reset">重置模板</button>
               </div>
             </div>
